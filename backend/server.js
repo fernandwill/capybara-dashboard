@@ -23,6 +23,78 @@ async function testConnection() {
     }
 }
 
+const Match = sequelize.define('Match', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    title: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    courtNumber: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+    },
+    startTime: {
+        type: DataTypes.Time,
+        allowNull: false
+    },
+    endTime: {
+        type: DataTypes.Time,
+        allowNull: false
+    },
+    price: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    status: {
+        type: DataTypes.ENUM('upcoming', 'completed'),
+        defaultValue: 'upcoming'
+    }
+});
+
+const Player = sequelize.define('Player', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    paymentStatus: {
+        type: DataTypes.ENUM('belum_setor', 'sudah_setor'),
+        defaultValue: 'belum_setor'
+    },
+    playerStatus: {
+        type: DataTypes.ENUM('active', 'tentative'),
+        defaultValue: 'active'
+    },
+    matchId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Match,
+            key: 'id'
+        }
+    }
+});
+
+Match.hasMany(Player, {foreignKey: 'matchId'});
+Player.belongsTo(Match, {foreignKet: 'matchId'});
+
+sequelize.sync({force: false});
+
 app.get('/', (req, res) => {
     res.json({message: 'Capybara Dashboard API activated!'});
 });
