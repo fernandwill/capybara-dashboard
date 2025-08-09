@@ -19,12 +19,34 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const handleNewMatch = () => {
+    // TODO: Open new match modal
+    alert('New Match modal will be implemented here!');
+  };
+
   useEffect(() => {
-    // Fetch stats from API
-    fetch('http://localhost:8000/api/stats')
-      .then(res => res.json())
-      .then(data => setStats(data))
-      .catch(err => console.error('Error fetching stats:', err));
+    // Fetch stats from API with better error handling
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/stats');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        // Keep default values if API fails
+        setStats({
+          totalMatches: 0,
+          upcomingMatches: 0,
+          completedMatches: 0,
+          hoursPlayed: '0.0'
+        });
+      }
+    };
+
+    fetchStats();
   }, []);
 
   return (
@@ -106,7 +128,7 @@ export default function Dashboard() {
             Past Matches
           </div>
         </div>
-        <button className="new-match-btn">
+        <button className="new-match-btn" onClick={handleNewMatch}>
           <span>+</span>
           New Match
         </button>
