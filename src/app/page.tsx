@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
+import MatchDetailsModal from "../components/MatchDetailsModal";
 
 interface Stats {
   totalMatches: number;
@@ -41,6 +42,8 @@ export default function Dashboard() {
     title: "",
     message: "",
   });
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const handleNewMatch = () => {
     setIsModalOpen(true);
@@ -62,6 +65,16 @@ export default function Dashboard() {
       title: "",
       message: "",
     });
+  };
+
+  const handleMatchClick = (match: Match) => {
+    setSelectedMatch(match);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedMatch(null);
   };
 
   const handleSubmitMatch = async (matchData: unknown) => {
@@ -326,7 +339,11 @@ export default function Dashboard() {
         ) : (
           <div className="matches-list">
             {filteredMatches.map((match) => (
-              <div key={match.id} className="match-card">
+              <div
+                key={match.id}
+                className="match-card clickable-card"
+                onClick={() => handleMatchClick(match)}
+              >
                 <div className="match-header">
                   <h3 className="match-title">{match.title}</h3>
                   <div className="match-header-right">
@@ -335,7 +352,10 @@ export default function Dashboard() {
                     </span>
                     <button
                       className="edit-btn"
-                      onClick={() => handleEditMatch(match)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditMatch(match);
+                      }}
                       title="Edit match"
                     >
                       ✏️
@@ -382,6 +402,12 @@ export default function Dashboard() {
         onClose={handleCloseSuccessModal}
         title={successModal.title}
         message={successModal.message}
+      />
+
+      <MatchDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        match={selectedMatch}
       />
     </div>
   );
