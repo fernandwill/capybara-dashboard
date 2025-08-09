@@ -10,6 +10,19 @@ interface Stats {
   hoursPlayed: string;
 }
 
+interface Match {
+  id: string;
+  title: string;
+  location: string;
+  courtNumber: string;
+  date: string;
+  time: string;
+  fee: number;
+  status: string;
+  description?: string;
+  createdAt: string;
+}
+
 export default function Dashboard() {
   const [stats, setStats] = useState<Stats>({
     totalMatches: 0,
@@ -20,6 +33,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [matches, setMatches] = useState<Match[]>([]);
 
   const handleNewMatch = () => {
     setIsModalOpen(true);
@@ -49,8 +63,9 @@ export default function Dashboard() {
       // Close modal
       setIsModalOpen(false);
       
-      // Refresh stats
+      // Refresh stats and matches
       fetchStats();
+      fetchMatches();
       
       // Show success message
       alert('Match created successfully!');
@@ -80,9 +95,59 @@ export default function Dashboard() {
     }
   };
 
+  const fetchMatches = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/matches');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setMatches(data);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      setMatches([]);
+    }
+  };
+
   useEffect(() => {
     fetchStats();
+    fetchMatches();
   }, []);
+
+  // Filter matches based on active tab and search query
+  const filteredMatches = matches.filter(match => {
+    // Filter by status (upcoming vs completed)
+    const statusMatch = activeTab === 'upcoming' 
+      ? match.status === 'UPCOMING' 
+      : match.status === 'COMPLETED';
+    
+    // Filter by search query (title or location)
+    const searchMatch = searchQuery === '' || 
+      match.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      match.location.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return statusMatch && searchMatch;
+  });
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
 
   return (
     <div className="dashboard-container">
@@ -170,7 +235,42 @@ export default function Dashboard() {
       </div>
 
       <div className="matches-container">
-        No upcoming matches found
+        {filteredMatches.length === 0 ? (
+          <div className="no-matches">
+            {activeTab === 'upcoming' ? 'No upcoming matches found' : 'No past matches found'}
+          </div>
+        ) : (
+          <div className="matches-list">
+            {filteredMatches.map((match) => (
+              <div key={match.id} className="match-card">
+                <div className="match-header">
+                  <h3 className="match-title">{match.title}</h3>
+                  <span className="match-fee">{formatCurrency(match.fee)}</span>
+                </div>
+                <div className="match-details">
+                  <div className="match-info">
+                    <span className="match-location">📍 {match.location}</span>
+                    <span className="match-court">Court #{match.courtNumber}</span>
+                  </div>
+                  <div className="match-datetime">
+                    <span className="match-date">{formatDate(match.date)}</span>
+                    <span className="match-time">{match.time}</span>
+                  </div>
+                </div>
+                {match.description && (
+                  <div className="match-description">
+                    {match.description}
+                  </div>
+                )}
+                <div className="match-status">
+                  <span className={`status-badge ${match.status.toLowerCase()}`}>
+                    {match.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <NewMatchModal

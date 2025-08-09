@@ -1,28 +1,32 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface NewMatchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (matchData: any) => void;
+  onSubmit: (matchData: unknown) => void;
 }
 
-export default function NewMatchModal({ isOpen, onClose, onSubmit }: NewMatchModalProps) {
+export default function NewMatchModal({
+  isOpen,
+  onClose,
+  onSubmit,
+}: NewMatchModalProps) {
   const [formData, setFormData] = useState({
-    title: '',
-    location: '',
-    courtNumber: '',
-    date: '',
-    startTime: '16:00',
-    endTime: '20:00',
+    title: "",
+    location: "",
+    courtNumber: "",
+    date: "",
+    startTime: "16:00",
+    endTime: "20:00",
     fee: 300000,
-    description: ''
+    description: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Combine date and time for the API
     const matchData = {
       title: formData.title,
@@ -31,30 +35,34 @@ export default function NewMatchModal({ isOpen, onClose, onSubmit }: NewMatchMod
       date: formData.date,
       time: `${formData.startTime}-${formData.endTime}`,
       fee: formData.fee,
-      status: 'UPCOMING',
-      description: formData.description
+      status: "UPCOMING",
+      description: formData.description,
     };
 
     onSubmit(matchData);
-    
+
     // Reset form
     setFormData({
-      title: '',
-      location: '',
-      courtNumber: '',
-      date: '',
-      startTime: '16:00',
-      endTime: '20:00',
+      title: "",
+      location: "",
+      courtNumber: "",
+      date: "",
+      startTime: "16:00",
+      endTime: "20:00",
       fee: 300000,
-      description: ''
+      description: "",
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'fee' ? Number(value) : value
+      [name]: name === "fee" ? Number(value) : value,
     }));
   };
 
@@ -65,7 +73,9 @@ export default function NewMatchModal({ isOpen, onClose, onSubmit }: NewMatchMod
       <div className="modal-container">
         <div className="modal-header">
           <h2>Create New Match</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -84,7 +94,7 @@ export default function NewMatchModal({ isOpen, onClose, onSubmit }: NewMatchMod
               />
             </div>
             <div className="form-group">
-              <label htmlFor="location">Tandem</label>
+              <label htmlFor="location">Location</label>
               <input
                 type="text"
                 id="location"
@@ -156,19 +166,18 @@ export default function NewMatchModal({ isOpen, onClose, onSubmit }: NewMatchMod
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="fee">Price</label>
-              <select
+              <input
+                type="number"
                 id="fee"
                 name="fee"
                 value={formData.fee}
                 onChange={handleChange}
-                className="form-select"
-              >
-                <option value={200000}>200000</option>
-                <option value={250000}>250000</option>
-                <option value={300000}>300000</option>
-                <option value={350000}>350000</option>
-                <option value={400000}>400000</option>
-              </select>
+                required
+                className="form-input"
+                placeholder="300000"
+                min="0"
+                step="1000"
+              />
             </div>
           </div>
 
