@@ -1,6 +1,7 @@
 import prisma from '../utils/database'
+import { Request, Response } from 'express'
 
-export const getPayment = async (req, res) => {
+export const getPayment = async (req: Request, res: Response) => {
     try {
         const payments = await prisma.payment.findMany({
             include: {
@@ -17,7 +18,7 @@ export const getPayment = async (req, res) => {
     }
 }
 
-export const getPaymentById = async (req, res) => {
+export const getPaymentById = async (req: Request, res: Response) => {
     try {
         const {id} = req.params
         const payment = await prisma.payment.findUnique({
@@ -38,7 +39,7 @@ export const getPaymentById = async (req, res) => {
     }
 }
 
-export const createPayment = async (req, res) => {
+export const createPayment = async (req: Request, res: Response) => {
     try {
         const {playerId, matchId, amount, status = 'PENDING', method, notes} = req.body
 
@@ -64,7 +65,7 @@ export const createPayment = async (req, res) => {
     }
 }
 
-export const updatePayment = async (req, res) => {
+export const updatePayment = async (req: Request, res: Response) => {
     try {
         const {id} = req.params
         const {playerId, matchId, amount, status, method, notes} = req.body
@@ -92,7 +93,7 @@ export const updatePayment = async (req, res) => {
     }
 }
 
-export const deletePayment = async (req, res) => {
+export const deletePayment = async (req: Request, res: Response) => {
     try {
         const {id} = req.params
         await prisma.payment.delete({

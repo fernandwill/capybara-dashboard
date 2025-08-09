@@ -1,10 +1,15 @@
 import prisma from '../utils/database'
+import { Request, Response } from 'express'
 
-export const getAllPlayer = async (req, res) => {
+export const getAllPlayer = async (req: Request, res: Response) => {
     try {
         const players = await prisma.player.findMany({
             include: {
-                currentMatch: true,
+                matchPlayers: {
+                    include: {
+                        match: true
+                    }
+                },
                 payments: true
             },
             orderBy: {
@@ -17,13 +22,17 @@ export const getAllPlayer = async (req, res) => {
     }
 }
 
-export const getPlayerById = async (req, res) => {
+export const getPlayerById = async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
         const player = await prisma.player.findUnique({
             where: {id},
             include: {
-                currentMatch: true,
+                matchPlayers: {
+                    include: {
+                        match: true
+                    }
+                },
                 payments: {
                     include: {
                         match: true
@@ -42,7 +51,7 @@ export const getPlayerById = async (req, res) => {
     }
 }
 
-export const createPlayer = async (req, res) => {
+export const createPlayer = async (req: Request, res: Response) => {
     try {
         const {name, email, phone, status = 'ACTIVE', paymentStatus = 'BELUM_SETOR'} = req.body
 
@@ -55,7 +64,11 @@ export const createPlayer = async (req, res) => {
                 paymentStatus,
             },
             include: {
-                currentMatch: true,
+                matchPlayers: {
+                    include: {
+                        match: true
+                    }
+                },
                 payments: true
             }
         })
@@ -66,10 +79,10 @@ export const createPlayer = async (req, res) => {
     }
 }
 
-export const updatePlayer = async (req, res) => {
+export const updatePlayer = async (req: Request, res: Response) => {
     try {
         const {id} = req.params
-        const {name, email, phone, status, paymentStatus, currentMatchId} = req.body
+        const {name, email, phone, status, paymentStatus} = req.body
 
         const player = await prisma.player.update({
             where: {id},
@@ -78,11 +91,14 @@ export const updatePlayer = async (req, res) => {
                 email, 
                 phone,
                 status,
-                paymentStatus,
-                currentMatchId
+                paymentStatus
             },
             include: {
-                currentMatch: true,
+                matchPlayers: {
+                    include: {
+                        match: true
+                    }
+                },
                 payments: true
             }
         })
@@ -93,7 +109,7 @@ export const updatePlayer = async (req, res) => {
     }
 }
 
-export const deletePlayer = async (req, res) => {
+export const deletePlayer = async (req: Request, res: Response) => {
     try {
         const {id} = req.params
         await prisma.player.delete({
