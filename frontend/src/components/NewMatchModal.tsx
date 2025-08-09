@@ -193,6 +193,8 @@ export default function NewMatchModal({
                 onChange={handleChange}
                 required
                 className="form-input"
+                step="300"
+                placeholder="16:00"
               />
             </div>
             <div className="form-group">
@@ -205,6 +207,8 @@ export default function NewMatchModal({
                 onChange={handleChange}
                 required
                 className="form-input"
+                step="300"
+                placeholder="20:00"
               />
             </div>
           </div>
