@@ -41,6 +41,10 @@ app.get('/api/health', (req, res) => {
     res.json({status: 'OK', message: 'API is running.'})
 })
 
+// Import the stats function directly for the /api/stats route
+import { getStats } from './controllers/MatchController'
+app.get('/api/stats', getStats)
+
 io.on('connection', (socket) => {
     console.log('Client connected: ', socket.id)
 

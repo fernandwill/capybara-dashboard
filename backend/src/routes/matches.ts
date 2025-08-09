@@ -6,11 +6,13 @@ import {
   updateMatch,
   deleteMatch,
   addPlayerToMatch,
-  removePlayerFromMatch
+  removePlayerFromMatch,
+  getStats
 } from '../controllers/MatchController'
 
 const router = Router()
 
+router.get('/stats', getStats)
 router.get('/', getAllMatches)
 router.get('/:id', getMatchById)
 router.post('/', createMatch)

@@ -23,7 +23,7 @@ export const getAllMatches = async (req, res) => {
 
 export const getMatchById = async (req, res) => {
     try {
-        const {id} = req.paramsc
+        const {id} = req.params
         const match = await prisma.match.findUnique({
             where: {id},
             include: {
@@ -168,5 +168,57 @@ export const removePlayerFromMatch = async (req, res) => {
         res.status(204).send()
     } catch (error) {
         res.status(500).json({error: 'Failed to remove player from match.'})
+    }
+}
+export const getStats = async (req, res) => {
+    try {
+        const totalMatches = await prisma.match.count()
+        
+        const upcomingMatches = await prisma.match.count({
+            where: {
+                status: 'UPCOMING'
+            }
+        })
+        
+        const completedMatches = await prisma.match.count({
+            where: {
+                status: 'COMPLETED'
+            }
+        })
+        
+        // Calculate total hours played for completed matches
+        const completedMatchesWithTime = await prisma.match.findMany({
+            where: {
+                status: 'COMPLETED'
+            },
+            select: {
+                time: true
+            }
+        })
+        
+        let totalHours = 0
+        completedMatchesWithTime.forEach(match => {
+            // Assuming time format is "HH:MM-HH:MM" like "16:00-20:00"
+            if (match.time && match.time.includes('-')) {
+                const [startTime, endTime] = match.time.split('-')
+                const [startHour, startMin] = startTime.split(':').map(Number)
+                const [endHour, endMin] = endTime.split(':').map(Number)
+                
+                const startMinutes = startHour * 60 + startMin
+                const endMinutes = endHour * 60 + endMin
+                const durationMinutes = endMinutes - startMinutes
+                
+                totalHours += durationMinutes / 60
+            }
+        })
+        
+        res.json({
+            totalMatches,
+            upcomingMatches,
+            completedMatches,
+            hoursPlayed: totalHours.toFixed(1)
+        })
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch stats' })
     }
 }
