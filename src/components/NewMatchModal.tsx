@@ -186,29 +186,31 @@ export default function NewMatchModal({
             <div className="form-group">
               <label htmlFor="startTime">Start Time</label>
               <input
-                type="time"
+                type="text"
                 id="startTime"
                 name="startTime"
                 value={formData.startTime}
                 onChange={handleChange}
                 required
                 className="form-input"
-                step="300"
+                pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
                 placeholder="16:00"
+                title="Enter time in 24-hour format (HH:MM)"
               />
             </div>
             <div className="form-group">
               <label htmlFor="endTime">End Time</label>
               <input
-                type="time"
+                type="text"
                 id="endTime"
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
                 required
                 className="form-input"
-                step="300"
+                pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
                 placeholder="20:00"
+                title="Enter time in 24-hour format (HH:MM)"
               />
             </div>
           </div>
@@ -217,7 +219,7 @@ export default function NewMatchModal({
             <div className="form-group">
               <label htmlFor="fee">Price</label>
               <input
-                type="number"
+                type="text"
                 id="fee"
                 name="fee"
                 value={formData.fee}
@@ -225,8 +227,8 @@ export default function NewMatchModal({
                 required
                 className="form-input"
                 placeholder="300000"
-                min="0"
-                step="1000"
+                pattern="[0-9]+"
+                title="Enter price amount (numbers only)"
               />
             </div>
           </div>
