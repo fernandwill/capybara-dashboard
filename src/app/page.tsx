@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import NewMatchModal from '../components/NewMatchModal';
 
 interface Stats {
   totalMatches: number;
@@ -18,34 +19,68 @@ export default function Dashboard() {
   });
   const [activeTab, setActiveTab] = useState('upcoming');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleNewMatch = () => {
-    // TODO: Open new match modal
-    alert('New Match modal will be implemented here!');
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSubmitMatch = async (matchData: any) => {
+    try {
+      const response = await fetch('http://localhost:8000/api/matches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(matchData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const newMatch = await response.json();
+      console.log('Match created successfully:', newMatch);
+      
+      // Close modal
+      setIsModalOpen(false);
+      
+      // Refresh stats
+      fetchStats();
+      
+      // Show success message
+      alert('Match created successfully!');
+    } catch (error) {
+      console.error('Error creating match:', error);
+      alert('Failed to create match. Please try again.');
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/stats');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      // Keep default values if API fails
+      setStats({
+        totalMatches: 0,
+        upcomingMatches: 0,
+        completedMatches: 0,
+        hoursPlayed: '0.0'
+      });
+    }
   };
 
   useEffect(() => {
-    // Fetch stats from API with better error handling
-    const fetchStats = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/stats');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setStats(data);
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-        // Keep default values if API fails
-        setStats({
-          totalMatches: 0,
-          upcomingMatches: 0,
-          completedMatches: 0,
-          hoursPlayed: '0.0'
-        });
-      }
-    };
-
     fetchStats();
   }, []);
 
@@ -137,6 +172,12 @@ export default function Dashboard() {
       <div className="matches-container">
         No upcoming matches found
       </div>
+
+      <NewMatchModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitMatch}
+      />
     </div>
   );
 }
