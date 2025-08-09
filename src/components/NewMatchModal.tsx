@@ -1,17 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface Match {
+  id: string;
+  title: string;
+  location: string;
+  courtNumber: string;
+  date: string;
+  time: string;
+  fee: number;
+  status: string;
+  description?: string;
+  createdAt: string;
+}
 
 interface NewMatchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (matchData: unknown) => void;
+  editingMatch?: Match | null;
 }
 
 export default function NewMatchModal({
   isOpen,
   onClose,
   onSubmit,
+  editingMatch,
 }: NewMatchModalProps) {
   const [formData, setFormData] = useState({
     title: "",
@@ -23,6 +38,37 @@ export default function NewMatchModal({
     fee: 300000,
     description: "",
   });
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingMatch) {
+      const [startTime, endTime] = editingMatch.time.split('-');
+      const formattedDate = new Date(editingMatch.date).toISOString().split('T')[0];
+      
+      setFormData({
+        title: editingMatch.title,
+        location: editingMatch.location,
+        courtNumber: editingMatch.courtNumber,
+        date: formattedDate,
+        startTime: startTime || "16:00",
+        endTime: endTime || "20:00",
+        fee: editingMatch.fee,
+        description: editingMatch.description || "",
+      });
+    } else {
+      // Reset form for new match
+      setFormData({
+        title: "",
+        location: "",
+        courtNumber: "",
+        date: "",
+        startTime: "16:00",
+        endTime: "20:00",
+        fee: 300000,
+        description: "",
+      });
+    }
+  }, [editingMatch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +118,7 @@ export default function NewMatchModal({
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2>Create New Match</h2>
+          <h2>{editingMatch ? 'Edit Match' : 'Create New Match'}</h2>
           <button className="modal-close" onClick={onClose}>
             ×
           </button>
@@ -199,7 +245,7 @@ export default function NewMatchModal({
               Cancel
             </button>
             <button type="submit" className="btn-create">
-              Create
+              {editingMatch ? 'Update' : 'Create'}
             </button>
           </div>
         </form>
