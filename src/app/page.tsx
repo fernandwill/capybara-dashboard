@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import NewMatchModal from "../components/NewMatchModal";
+import SuccessModal from "../components/SuccessModal";
 
 interface Stats {
   totalMatches: number;
@@ -35,6 +36,11 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [matches, setMatches] = useState<Match[]>([]);
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
+  const [successModal, setSuccessModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
 
   const handleNewMatch = () => {
     setIsModalOpen(true);
@@ -48,6 +54,14 @@ export default function Dashboard() {
   const handleEditMatch = (match: Match) => {
     setEditingMatch(match);
     setIsModalOpen(true);
+  };
+
+  const handleCloseSuccessModal = () => {
+    setSuccessModal({
+      isOpen: false,
+      title: "",
+      message: "",
+    });
   };
 
   const handleSubmitMatch = async (matchData: unknown) => {
@@ -84,8 +98,12 @@ export default function Dashboard() {
       fetchStats();
       fetchMatches();
 
-      // Show success message
-      alert(`Match ${isEditing ? "updated" : "created"} successfully!`);
+      // Show success modal
+      setSuccessModal({
+        isOpen: true,
+        title: "Success!",
+        message: `Match ${isEditing ? "updated" : "created"} successfully!`,
+      });
     } catch (error) {
       console.error(
         `Error ${editingMatch ? "updating" : "creating"} match:`,
@@ -357,6 +375,13 @@ export default function Dashboard() {
         onClose={handleCloseModal}
         onSubmit={handleSubmitMatch}
         editingMatch={editingMatch}
+      />
+
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={handleCloseSuccessModal}
+        title={successModal.title}
+        message={successModal.message}
       />
     </div>
   );
