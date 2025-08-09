@@ -180,14 +180,15 @@ body {
 .matches-container {
   background-color: #1a1a1a;
   border-radius: 12px;
-  padding: 48px 24px;
+  padding: 24px;
   border: 1px solid #333;
   min-height: 300px;
+}
+
+.matches-container:has(.no-matches) {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
-  font-size: 16px;
 }
 /* Modal Styles */
 .modal-overlay {
@@ -371,10 +372,22 @@ body {
 }
 
 .matches-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
   padding: 0;
+}
+
+@media (min-width: 768px) {
+  .matches-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .matches-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .match-card {
@@ -514,5 +527,44 @@ body {
   
   .match-fee {
     align-self: flex-start;
+  }
+}/*
+ Edit Button and Match Header Styles */
+.match-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.edit-btn:hover {
+  background-color: #333;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.edit-btn:active {
+  transform: scale(0.95);
+}
+
+/* Responsive adjustments for edit button */
+@media (max-width: 640px) {
+  .match-header-right {
+    gap: 8px;
+  }
+  
+  .edit-btn {
+    font-size: 14px;
+    padding: 4px;
   }
 }
