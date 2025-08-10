@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Player {
   id: string;
@@ -57,20 +57,20 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
   };
 
   // Fetch match players
-  const fetchMatchPlayers = async () => {
+  const fetchMatchPlayers = useCallback(async () => {
     if (!match) return;
     try {
       const response = await fetch(`http://localhost:8000/api/matches/${match.id}`);
       if (response.ok) {
         const matchData = await response.json();
         // Extract players from match data (assuming players are in matchPlayers relation)
-        const matchPlayers = matchData.players?.map((mp: any) => mp.player) || [];
+        const matchPlayers = matchData.players?.map((mp: { player: Player }) => mp.player) || [];
         setPlayers(matchPlayers);
       }
     } catch (error) {
       console.error('Error fetching match players:', error);
     }
-  };
+  }, [match]);
 
   // Fetch all players for adding
   const fetchAllPlayers = async () => {
@@ -199,7 +199,7 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
       fetchMatchPlayers();
       fetchAllPlayers();
     }
-  }, [isOpen, match]);
+  }, [isOpen, match, fetchMatchPlayers]);
 
   if (!isOpen || !match) return null;
 
@@ -359,7 +359,7 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
               ) : (
                 <div className="no-players-message">
                   <p>No players added to this match yet.</p>
-                  <p>Click "Add Player" to get started!</p>
+                  <p>Click &quot;Add Player&quot; to get started!</p>
                 </div>
               )}
             </div>
