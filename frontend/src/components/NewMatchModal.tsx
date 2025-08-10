@@ -15,10 +15,21 @@ interface Match {
   createdAt: string;
 }
 
+interface MatchData {
+  title: string;
+  location: string;
+  courtNumber: string;
+  date: string;
+  time: string;
+  fee: number;
+  status: string;
+  description?: string;
+}
+
 interface NewMatchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (matchData: unknown) => void;
+  onSubmit: (matchData: MatchData) => void;
   editingMatch?: Match | null;
 }
 
