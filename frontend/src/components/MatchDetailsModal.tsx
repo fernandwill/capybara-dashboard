@@ -1,7 +1,6 @@
-'use client';
+"use client";
 
-import { create } from 'domain';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 interface Player {
   id: string;
@@ -31,195 +30,220 @@ interface MatchDetailsModalProps {
   match: Match | null;
 }
 
-export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetailsModalProps) {
+export default function MatchDetailsModal({
+  isOpen,
+  onClose,
+  match,
+}: MatchDetailsModalProps) {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
+
   const [showAddPlayer, setShowAddPlayer] = useState(false);
-  const [newPlayerName, setNewPlayerName] = useState('');
+  const [newPlayerName, setNewPlayerName] = useState("");
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+    const day = date.getDate();
+    const month = date.toLocaleDateString("en-US", { month: "long" });
+    const year = date.getFullYear();
+    return `${weekday}, ${day} ${month} ${year}`;
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
   const fetchMatchPlayers = useCallback(async () => {
     if (!match) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/matches/${match.id}`);
+      const response = await fetch(
+        `http://localhost:8000/api/matches/${match.id}`
+      );
       if (response.ok) {
         const matchData = await response.json();
-        const matchPlayers = matchData.players?.map((mp: { player: Player }) => mp.player) || [];
+        const matchPlayers =
+          matchData.players?.map((mp: { player: Player }) => mp.player) || [];
         setPlayers(matchPlayers);
       }
     } catch (error) {
-      console.error('Error fetching match players:', error);
+      console.error("Error fetching match players:", error);
     }
   }, [match]);
-
-  const fetchAllPlayers = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/api/players');
-      if (response.ok) {
-        const data = await response.json();
-        setAllPlayers(data);
-        console.log('Available players: ', data);
-      }
-    } catch (error) {
-      console.error('Error fetching players:', error);
-    }
-  };
-
-  const handleAddPlayer = async (playerId: string) => {
-    if (!match) return;
-    try {
-      const response = await fetch(`http://localhost:8000/api/matches/${match.id}/players`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ playerId }),
-      });
-
-      if (response.ok) {
-        fetchMatchPlayers(); 
-        setShowAddPlayer(false);
-      }
-    } catch (error) {
-      console.error('Error adding player:', error);
-    }
-  };
 
   const handleRemovePlayer = async (playerId: string) => {
     if (!match) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/matches/${match.id}/players/${playerId}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/matches/${match.id}/players/${playerId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (response.ok) {
-        fetchMatchPlayers(); 
+        fetchMatchPlayers();
       }
     } catch (error) {
-      console.error('Error removing player:', error);
+      console.error("Error removing player:", error);
     }
   };
 
   const handleCreateAndAddPlayer = async () => {
     if (!newPlayerName.trim() || !match) return;
-    
+
     try {
-      console.log('Creating player with name: ', newPlayerName.trim());
-      const createResponse = await fetch('http://localhost:8000/api/players', {
-        method: 'POST',
+      console.log("Creating player with name: ", newPlayerName.trim());
+      const createResponse = await fetch("http://localhost:8000/api/players", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: newPlayerName.trim(),
-          status: 'ACTIVE',
-          paymentStatus: 'BELUM_SETOR'
+          status: "ACTIVE",
+          paymentStatus: "BELUM_SETOR",
         }),
       });
-      console.log('Create response status: ', createResponse.status);
+      console.log("Create response status: ", createResponse.status);
 
       if (createResponse.ok) {
         const newPlayer = await createResponse.json();
         // Then add to match
-        await handleAddPlayer(newPlayer.id);
-        setNewPlayerName('');
-        fetchAllPlayers(); // Refresh all players list
+        const addResponse = await fetch(
+          `http://localhost:8000/api/matches/${match.id}/players`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ playerId: newPlayer.id }),
+          }
+        );
+
+        if (addResponse.ok) {
+          fetchMatchPlayers();
+          setNewPlayerName("");
+          setShowAddPlayer(false);
+        }
       }
     } catch (error) {
-      console.error('Error creating player:', error);
+      console.error("Error creating player:", error);
     }
   };
 
-  const handleTogglePayment = async (playerId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'BELUM_SETOR' ? 'SUDAH_SETOR' : 'BELUM_SETOR';
-    
+  const handleTogglePayment = async (
+    playerId: string,
+    currentStatus: string
+  ) => {
+    const newStatus =
+      currentStatus === "BELUM_SETOR" ? "SUDAH_SETOR" : "BELUM_SETOR";
+
     try {
-      const response = await fetch(`http://localhost:8000/api/players/${playerId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ paymentStatus: newStatus }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/players/${playerId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ paymentStatus: newStatus }),
+        }
+      );
 
       if (response.ok) {
-        fetchMatchPlayers(); 
+        fetchMatchPlayers();
       }
     } catch (error) {
-      console.error('Error updating payment status:', error);
+      console.error("Error updating payment status:", error);
     }
   };
 
-  const handleToggleStatus = async (playerId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'ACTIVE' ? 'TENTATIVE' : 'ACTIVE';
-    
+  const handleToggleStatus = async (
+    playerId: string,
+    currentStatus: string
+  ) => {
+    const newStatus = currentStatus === "ACTIVE" ? "TENTATIVE" : "ACTIVE";
+
     try {
-      const response = await fetch(`http://localhost:8000/api/players/${playerId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/players/${playerId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
 
       if (response.ok) {
-        fetchMatchPlayers(); 
+        fetchMatchPlayers();
       }
     } catch (error) {
-      console.error('Error updating player status:', error);
+      console.error("Error updating player status:", error);
     }
   };
 
   useEffect(() => {
     if (isOpen && match) {
       fetchMatchPlayers();
-      fetchAllPlayers();
     }
   }, [isOpen, match, fetchMatchPlayers]);
 
   if (!isOpen || !match) return null;
-
-  const availablePlayers = allPlayers.filter(
-    player => !players.some(matchPlayer => matchPlayer.id === player.id)
-  );
 
   return (
     <div className="modal-overlay">
       <div className="match-details-modal">
         <div className="modal-header">
           <h2>Match Details</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <div className="match-details-content">
           {/* Match Information */}
           <div className="match-info-section">
-            <h3 className="match-details-title">{match.title}</h3>
+            <div className="match-title-with-status">
+              <h3 className="match-details-title">{match.title}</h3>
+              <span className={`status-badge ${match.status.toLowerCase()}`}>
+                {match.status}
+              </span>
+            </div>
             <div className="match-details-grid">
               <div className="detail-item">
                 <span className="detail-label">Location:</span>
-                <span className="detail-value">📍 {match.location}</span>
+                <span className="detail-value">
+                  <svg
+                    className="h-4 w-4 inline mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  {match.location}
+                </span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Court:</span>
-                <span className="detail-value">#{match.courtNumber}</span>
+                <span className="detail-value">{match.courtNumber}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Date:</span>
@@ -231,12 +255,8 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
               </div>
               <div className="detail-item">
                 <span className="detail-label">Fee:</span>
-                <span className="detail-value fee-value">{formatCurrency(match.fee)}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Status:</span>
-                <span className={`status-badge ${match.status.toLowerCase()}`}>
-                  {match.status}
+                <span className="detail-value fee-value">
+                  {formatCurrency(match.fee)}
                 </span>
               </div>
             </div>
@@ -252,7 +272,7 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
           <div className="players-section">
             <div className="players-header">
               <h3>Players ({players.length})</h3>
-              <button 
+              <button
                 className="add-player-btn"
                 onClick={() => setShowAddPlayer(!showAddPlayer)}
               >
@@ -263,43 +283,22 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
             {/* Add Player Section */}
             {showAddPlayer && (
               <div className="add-player-section">
-                <div className="add-player-options">
-                  <div className="existing-players">
-                    <h4>Add Existing Player:</h4>
-                    <div className="existing-players-list">
-                      {availablePlayers.length > 0 ? (
-                        availablePlayers.map(player => (
-                          <button
-                            key={player.id}
-                            className="existing-player-btn"
-                            onClick={() => handleAddPlayer(player.id)}
-                          >
-                            {player.name}
-                          </button>
-                        ))
-                      ) : (
-                        <p className="no-players">No available players</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="new-player">
-                    <h4>Create New Player:</h4>
-                    <div className="new-player-form">
-                      <input
-                        type="text"
-                        placeholder="Player name"
-                        value={newPlayerName}
-                        onChange={(e) => setNewPlayerName(e.target.value)}
-                        className="form-input"
-                      />
-                      <button
-                        className="create-player-btn"
-                        onClick={handleCreateAndAddPlayer}
-                        disabled={!newPlayerName.trim()}
-                      >
-                        Create & Add
-                      </button>
-                    </div>
+                <div className="new-player">
+                  <div className="new-player-form">
+                    <input
+                      type="text"
+                      placeholder="Player name..."
+                      value={newPlayerName}
+                      onChange={(e) => setNewPlayerName(e.target.value)}
+                      className="form-input"
+                    />
+                    <button
+                      className="create-player-btn"
+                      onClick={handleCreateAndAddPlayer}
+                      disabled={!newPlayerName.trim()}
+                    >
+                      Add Player
+                    </button>
                   </div>
                 </div>
               </div>
@@ -308,7 +307,7 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
             {/* Players Grid */}
             <div className="players-grid">
               {players.length > 0 ? (
-                players.map(player => (
+                players.map((player) => (
                   <div key={player.id} className="player-card">
                     <div className="player-header">
                       <h4 className="player-name">{player.name}</h4>
@@ -335,15 +334,21 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
                     <div className="player-status-buttons">
                       <button
                         className={`status-toggle ${player.status.toLowerCase()}`}
-                        onClick={() => handleToggleStatus(player.id, player.status)}
+                        onClick={() =>
+                          handleToggleStatus(player.id, player.status)
+                        }
                       >
                         {player.status}
                       </button>
                       <button
                         className={`payment-toggle ${player.paymentStatus.toLowerCase()}`}
-                        onClick={() => handleTogglePayment(player.id, player.paymentStatus)}
+                        onClick={() =>
+                          handleTogglePayment(player.id, player.paymentStatus)
+                        }
                       >
-                        {player.paymentStatus === 'BELUM_SETOR' ? 'Belum Setor' : 'Sudah Setor'}
+                        {player.paymentStatus === "BELUM_SETOR"
+                          ? "Belum Setor"
+                          : "Sudah Setor"}
                       </button>
                     </div>
                   </div>
