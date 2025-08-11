@@ -1,5 +1,6 @@
 'use client';
 
+import { create } from 'domain';
 import { useState, useEffect, useCallback } from 'react';
 
 interface Player {
@@ -36,7 +37,6 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState('');
 
-  // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -47,7 +47,6 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
     });
   };
 
-  // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -56,14 +55,12 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
     }).format(amount);
   };
 
-  // Fetch match players
   const fetchMatchPlayers = useCallback(async () => {
     if (!match) return;
     try {
       const response = await fetch(`http://localhost:8000/api/matches/${match.id}`);
       if (response.ok) {
         const matchData = await response.json();
-        // Extract players from match data (assuming players are in matchPlayers relation)
         const matchPlayers = matchData.players?.map((mp: { player: Player }) => mp.player) || [];
         setPlayers(matchPlayers);
       }
@@ -72,20 +69,19 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
     }
   }, [match]);
 
-  // Fetch all players for adding
   const fetchAllPlayers = async () => {
     try {
       const response = await fetch('http://localhost:8000/api/players');
       if (response.ok) {
         const data = await response.json();
         setAllPlayers(data);
+        console.log('Available players: ', data);
       }
     } catch (error) {
       console.error('Error fetching players:', error);
     }
   };
 
-  // Add player to match
   const handleAddPlayer = async (playerId: string) => {
     if (!match) return;
     try {
@@ -98,7 +94,7 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
       });
 
       if (response.ok) {
-        fetchMatchPlayers(); // Refresh players list
+        fetchMatchPlayers(); 
         setShowAddPlayer(false);
       }
     } catch (error) {
@@ -106,7 +102,6 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
     }
   };
 
-  // Remove player from match
   const handleRemovePlayer = async (playerId: string) => {
     if (!match) return;
     try {
@@ -115,19 +110,18 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
       });
 
       if (response.ok) {
-        fetchMatchPlayers(); // Refresh players list
+        fetchMatchPlayers(); 
       }
     } catch (error) {
       console.error('Error removing player:', error);
     }
   };
 
-  // Create new player and add to match
   const handleCreateAndAddPlayer = async () => {
     if (!newPlayerName.trim() || !match) return;
     
     try {
-      // First create the player
+      console.log('Creating player with name: ', newPlayerName.trim());
       const createResponse = await fetch('http://localhost:8000/api/players', {
         method: 'POST',
         headers: {
@@ -139,6 +133,7 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
           paymentStatus: 'BELUM_SETOR'
         }),
       });
+      console.log('Create response status: ', createResponse.status);
 
       if (createResponse.ok) {
         const newPlayer = await createResponse.json();
@@ -152,7 +147,6 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
     }
   };
 
-  // Toggle player payment status
   const handleTogglePayment = async (playerId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'BELUM_SETOR' ? 'SUDAH_SETOR' : 'BELUM_SETOR';
     
@@ -166,14 +160,13 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
       });
 
       if (response.ok) {
-        fetchMatchPlayers(); // Refresh players list
+        fetchMatchPlayers(); 
       }
     } catch (error) {
       console.error('Error updating payment status:', error);
     }
   };
 
-  // Toggle player status
   const handleToggleStatus = async (playerId: string, currentStatus: string) => {
     const newStatus = currentStatus === 'ACTIVE' ? 'TENTATIVE' : 'ACTIVE';
     
@@ -187,7 +180,7 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
       });
 
       if (response.ok) {
-        fetchMatchPlayers(); // Refresh players list
+        fetchMatchPlayers(); 
       }
     } catch (error) {
       console.error('Error updating player status:', error);
@@ -203,7 +196,6 @@ export default function MatchDetailsModal({ isOpen, onClose, match }: MatchDetai
 
   if (!isOpen || !match) return null;
 
-  // Filter available players (not already in match)
   const availablePlayers = allPlayers.filter(
     player => !players.some(matchPlayer => matchPlayer.id === player.id)
   );
