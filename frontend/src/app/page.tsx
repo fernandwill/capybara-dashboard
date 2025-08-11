@@ -200,6 +200,12 @@ export default function Dashboard() {
       match.location.toLowerCase().includes(searchQuery.toLowerCase());
 
     return statusMatch && searchMatch;
+  })
+
+  .sort((latest, earliest) => {
+    const dateLatest = new Date(latest.date);
+    const dateEarliest = new Date(earliest.date);
+    return dateEarliest.getTime() - dateLatest.getTime();
   });
 
   // Format date for display
