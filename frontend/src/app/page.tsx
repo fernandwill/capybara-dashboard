@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
+import {Card, CardContent, CardHeader, CardTitle} from "../components/ui/card";
+import Image from "next/image";
 
 interface Stats {
   totalMatches: number;
@@ -219,92 +221,52 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <header className="header">
         <div className="header-title">
-          <div className="avatar">🐹</div>
+          <div className="avatar"><img src="https://i.pinimg.com/736x/0d/7f/47/0d7f47fee3574ef7a77c79da3a56e2d8.jpg" alt ="icon"/></div>
           Capybara&apos;s Dashboard
         </div>
         <button className="theme-toggle">🌙</button>
       </header>
 
       <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Total Matches</span>
-            <svg
-              className="stat-card-icon"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.totalMatches}</div>
-        </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Matches</CardTitle>
+          <svg className="h-4 w-4 text-muted-foreground">...</svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats.totalMatches}</div>
+        </CardContent>
+      </Card>
 
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Upcoming Matches</span>
-            <svg
-              className="stat-card-icon"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.upcomingMatches}</div>
-        </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Upcoming Matches</CardTitle>
+          <svg className="h-4 w-4 text-muted-foreground">...</svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats.upcomingMatches}</div>
+        </CardContent>
+      </Card>
 
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Completed Matches</span>
-            <svg
-              className="stat-card-icon"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.completedMatches}</div>
-        </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Completed Matches</CardTitle>
+          <svg className="h-4 w-4 text-muted-foreground">...</svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats.completedMatches}</div>
+        </CardContent>
+      </Card>
 
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Hours Played</span>
-            <svg
-              className="stat-card-icon"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.hoursPlayed}</div>
-        </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Hours Played</CardTitle>
+          <svg className="h-4 w-4 text-muted-foreground">...</svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{stats.hoursPlayed}</div>
+        </CardContent>
+      </Card>
       </div>
 
       <div className="search-section">
