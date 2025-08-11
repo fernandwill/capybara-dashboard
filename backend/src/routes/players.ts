@@ -14,5 +14,5 @@ router.get('/:id', getPlayerById)
 router.post('/', createPlayer)
 router.put('/:id', updatePlayer)
 router.delete('/:id', deletePlayer)
-a
+
 export default router
