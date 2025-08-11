@@ -11,12 +11,17 @@
 
 @layer base {
   :root {
-    --background: 10 10 10;
-    --foreground: 255 255 255;
-    --card: 26 26 26;
-    --card-foreground: 255 255 255;
-    --muted: 38 38 38;
-    --muted-foreground: 136 136 136;
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --card-bg: #f8f9fa;
+    --border-color: #e5e7eb;
+  }
+  
+  .dark {
+    --bg-color: #0a0a0a;
+    --text-color: #ffffff;
+    --card-bg: #1a1a1a;
+    --border-color: #333333;
   }
 }
 
@@ -24,8 +29,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  background-color: #0a0a0a;
-  color: #ffffff;
+  background-color: var(--bg-color);
+  color: var(--text-color);
   line-height: 1.6;
 }
 
@@ -48,16 +53,16 @@ body {
   gap: 12px;
   font-size: 28px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-color);
 }
 
 .theme-toggle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  color: #fff;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -80,10 +85,10 @@ body {
 }
 
 .stat-card {
-  background-color: #1a1a1a;
+  background-color: var(--card-bg);
   border-radius: 12px;
   padding: 24px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   position: relative;
 }
 
@@ -109,7 +114,7 @@ body {
 .stat-card-value {
   font-size: 36px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-color);
   line-height: 1;
 }
 
@@ -120,10 +125,10 @@ body {
 .search-input {
   width: 100%;
   padding: 16px 20px;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--text-color);
   font-size: 16px;
   outline: none;
 }
@@ -159,8 +164,8 @@ body {
 }
 
 .tab.active {
-  color: #ffffff;
-  border-bottom-color: #ffffff;
+  color: var(--text-color);
+  border-bottom-color: var(--text-color);
 }
 
 .tab:hover:not(.active) {
@@ -168,8 +173,8 @@ body {
 }
 
 .new-match-btn {
-  background-color: #ffffff;
-  color: #000000;
+  background-color: var(--text-color);
+  color: var(--bg-color);
   border: none;
   padding: 12px 20px;
   border-radius: 8px;
@@ -188,10 +193,10 @@ body {
 }
 
 .matches-container {
-  background-color: #1a1a1a;
+  background-color: var(--bg-color);
   border-radius: 12px;
   padding: 24px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   min-height: 300px;
 }
 
@@ -229,8 +234,8 @@ body {
 }
 
 .match-card {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 20px;
   transition: all 0.2s ease;
@@ -255,7 +260,7 @@ body {
 .match-title {
   font-size: 18px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -286,7 +291,7 @@ body {
 }
 
 .edit-btn:hover {
-  background-color: #333;
+  background-color: var(--card-bg);
   opacity: 1;
   transform: scale(1.1);
 }
@@ -332,7 +337,7 @@ body {
 
 .match-date {
   font-size: 14px;
-  color: #ffffff;
+  color: var(--text-color);
   font-weight: 500;
 }
 
@@ -349,9 +354,16 @@ body {
   line-height: 1.5;
 }
 
-.match-status {
+.match-bottom {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  margin-top: auto;
+}
+
+.match-status-price {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .status-badge {
@@ -407,9 +419,9 @@ body {
 }
 
 .modal-container {
-  background-color: #1a1a1a;
+  background-color: var(--bg-color);
   border-radius: 12px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
@@ -427,7 +439,7 @@ body {
 .modal-header h2 {
   font-size: 20px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -448,8 +460,8 @@ body {
 }
 
 .modal-close:hover {
-  background-color: #333;
-  color: #fff;
+  background-color: var(--card-bg);
+  color: var(--text-color);
 }
 
 .modal-form {
@@ -471,7 +483,7 @@ body {
 .form-group label {
   font-size: 14px;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--text-color);
   margin-bottom: 6px;
 }
 
@@ -479,10 +491,10 @@ body {
 .form-select,
 .form-textarea {
   padding: 12px 16px;
-  background-color: #0a0a0a;
-  border: 1px solid #333;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-color);
   font-size: 14px;
   outline: none;
   transition: border-color 0.2s ease;
@@ -509,8 +521,8 @@ body {
 }
 
 .form-select option {
-  background-color: #1a1a1a;
-  color: #ffffff;
+  background-color: var(--card-bg);
+  color: var(--text-color);
 }
 
 .modal-actions {
@@ -519,30 +531,30 @@ body {
   justify-content: flex-end;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--border-color);
 }
 
 .btn-cancel {
   padding: 12px 24px;
   background-color: transparent;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-color);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-cancel:hover {
-  background-color: #333;
+  background-color: var(--card-bg);
 }
 
 .btn-create {
   padding: 12px 24px;
-  background-color: #ffffff;
+  background-color: var(--text-color);
   border: none;
   border-radius: 8px;
-  color: #000000;
+  color: var(--bg-color);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -555,9 +567,9 @@ body {
 
 /* Success Modal Styles */
 .success-modal-container {
-  background-color: #1a1a1a;
+  background-color: var(--bg-color);
   border-radius: 16px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   width: 100%;
   max-width: 400px;
   padding: 0;
@@ -607,7 +619,7 @@ body {
 .success-title {
   font-size: 20px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -643,9 +655,9 @@ body {
 
 /* Match Details Modal Styles */
 .match-details-modal {
-  background-color: #1a1a1a;
+  background-color: var(--bg-color);
   border-radius: 16px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   width: 100%;
   max-width: 900px;
   max-height: 90vh;
@@ -660,13 +672,13 @@ body {
 .match-info-section {
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .match-details-title {
   font-size: 24px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-color);
   margin-bottom: 20px;
 }
 
@@ -693,7 +705,7 @@ body {
 
 .detail-value {
   font-size: 14px;
-  color: #ffffff;
+  color: var(--text-color);
   font-weight: 500;
 }
 
@@ -709,7 +721,7 @@ body {
 .match-description p {
   margin-top: 8px;
   padding: 12px;
-  background-color: #0a0a0a;
+  background-color: var(--card-bg);
   border-radius: 8px;
   font-size: 14px;
   color: #ccc;
@@ -731,7 +743,7 @@ body {
 .players-header h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-color);
 }
 
 .add-player-btn {
@@ -753,11 +765,11 @@ body {
 
 /* Add Player Section */
 .add-player-section {
-  background-color: #0a0a0a;
+  background-color: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
 }
 
 .add-player-options {
@@ -768,7 +780,7 @@ body {
 
 .add-player-options h4 {
   font-size: 14px;
-  color: #ffffff;
+  color: var(--text-color);
   margin-bottom: 12px;
   font-weight: 600;
 }
@@ -782,8 +794,8 @@ body {
 }
 
 .existing-player-btn {
-  background-color: #333;
-  color: #ffffff;
+  background-color: var(--border-color);
+  color: var(--text-color);
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
@@ -852,8 +864,8 @@ body {
 }
 
 .player-card {
-  background-color: #0a0a0a;
-  border: 1px solid #333;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
   transition: all 0.2s ease;
@@ -873,7 +885,7 @@ body {
 .player-name {
   font-size: 16px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -982,15 +994,15 @@ input[type="time"]::-webkit-datetime-edit-ampm-field {
 }
 
 input[type="time"]::-webkit-datetime-edit-hour-field {
-  color: #ffffff;
+  color: var(--text-color);
 }
 
 input[type="time"]::-webkit-datetime-edit-minute-field {
-  color: #ffffff;
+  color: var(--text-color);
 }
 
 input[type="time"]::-webkit-datetime-edit-text {
-  color: #ffffff;
+  color: var(--text-color);
 }
 
 /* Responsive adjustments */
@@ -1143,8 +1155,5 @@ input[type="time"]::-webkit-datetime-edit-text {
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
