@@ -237,7 +237,11 @@ export default function Dashboard() {
           </div>
           Capybara&apos;s Dashboard
         </div>
-        <button className="theme-toggle">🌙</button>
+        <button className="theme-toggle">
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
       </header>
 
       <div className="stats-grid">
@@ -382,13 +386,21 @@ export default function Dashboard() {
                       }}
                       title="Edit match"
                     >
-                      ✏️
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
                     </button>
                   </div>
                 </div>
                 <div className="match-details">
                   <div className="match-info">
-                    <span className="match-location">📍 {match.location}</span>
+                    <span className="match-location">
+                      <svg className="h-4 w-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                       {match.location}
+                      </span>
                     <span className="match-court">
                       Court #{match.courtNumber}
                     </span>
