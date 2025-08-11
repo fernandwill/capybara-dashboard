@@ -221,7 +221,15 @@ export default function Dashboard() {
     <div className="dashboard-container">
       <header className="header">
         <div className="header-title">
-          <div className="avatar"><img src="https://i.pinimg.com/736x/0d/7f/47/0d7f47fee3574ef7a77c79da3a56e2d8.jpg" alt ="icon"/></div>
+          <div className="avatar">
+          <Image
+            src="/icons/icon.jpg"
+            alt="logo-icon"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          </div>
           Capybara&apos;s Dashboard
         </div>
         <button className="theme-toggle">🌙</button>
