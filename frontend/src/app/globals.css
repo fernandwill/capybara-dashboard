@@ -72,6 +72,13 @@ body {
   margin-bottom: 32px;
 }
 
+.stat-card-shadcn {
+  padding: 24px;
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+}
+
 .stat-card {
   background-color: #1a1a1a;
   border-radius: 12px;
