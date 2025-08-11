@@ -476,7 +476,7 @@ export default function Dashboard() {
                       {match.location}
                     </span>
                     <span className="match-court">
-                      Court #{match.courtNumber}
+                      Court {match.courtNumber}
                     </span>
                   </div>
                 </div>
