@@ -11,8 +11,8 @@ const router = Router()
 
 router.get('/', getAllPlayer)
 router.get('/:id', getPlayerById)
-router.get('/', createPlayer)
-router.get('/:id', updatePlayer)
-router.get('/:id', deletePlayer)
+router.post('/', createPlayer)
+router.put('/:id', updatePlayer)
+router.delete('/:id', deletePlayer)
 
 export default router
