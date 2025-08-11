@@ -234,6 +234,10 @@ body {
   border-radius: 12px;
   padding: 20px;
   transition: all 0.2s ease;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .match-card:hover {
@@ -339,8 +343,6 @@ body {
 
 .match-description {
   margin-bottom: 16px;
-  padding: 12px;
-  background-color: #0a0a0a;
   border-radius: 8px;
   font-size: 14px;
   color: #ccc;
