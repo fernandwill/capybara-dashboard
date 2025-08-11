@@ -4,12 +4,6 @@ import { useState, useEffect } from "react";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
 import Image from "next/image";
 
 interface Stats {
@@ -51,6 +45,21 @@ export default function Dashboard() {
   });
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle("dark");
+  };
+
+  useEffect(() => {
+    // Initialize theme on component mount
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
 
   const handleNewMatch = () => {
     setIsModalOpen(true);
@@ -186,27 +195,28 @@ export default function Dashboard() {
   };
 
   // Filter matches based on active tab and search query
-  const filteredMatches = matches.filter((match) => {
-    // Filter by status (upcoming vs completed)
-    const statusMatch =
-      activeTab === "upcoming"
-        ? match.status === "UPCOMING"
-        : match.status === "COMPLETED";
+  const filteredMatches = matches
+    .filter((match) => {
+      // Filter by status (upcoming vs completed)
+      const statusMatch =
+        activeTab === "upcoming"
+          ? match.status === "UPCOMING"
+          : match.status === "COMPLETED";
 
-    // Filter by search query (title or location)
-    const searchMatch =
-      searchQuery === "" ||
-      match.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      match.location.toLowerCase().includes(searchQuery.toLowerCase());
+      // Filter by search query (title or location)
+      const searchMatch =
+        searchQuery === "" ||
+        match.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        match.location.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return statusMatch && searchMatch;
-  })
+      return statusMatch && searchMatch;
+    })
 
-  .sort((latest, earliest) => {
-    const dateLatest = new Date(latest.date);
-    const dateEarliest = new Date(earliest.date);
-    return dateEarliest.getTime() - dateLatest.getTime();
-  });
+    .sort((latest, earliest) => {
+      const dateLatest = new Date(latest.date);
+      const dateEarliest = new Date(earliest.date);
+      return dateEarliest.getTime() - dateLatest.getTime();
+    });
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -243,10 +253,36 @@ export default function Dashboard() {
           </div>
           Capybara&apos;s Dashboard
         </div>
-        <button className="theme-toggle">
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-          </svg>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {isDarkMode ? (
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
+          )}
         </button>
       </header>
 
@@ -381,9 +417,6 @@ export default function Dashboard() {
                 <div className="match-header">
                   <h3 className="match-title">{match.title}</h3>
                   <div className="match-header-right">
-                    <span className="match-fee">
-                      {formatCurrency(match.fee)}
-                    </span>
                     <button
                       className="edit-btn"
                       onClick={(e) => {
@@ -392,8 +425,18 @@ export default function Dashboard() {
                       }}
                       title="Edit match"
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        ></path>
                       </svg>
                     </button>
                   </div>
@@ -401,12 +444,27 @@ export default function Dashboard() {
                 <div className="match-details">
                   <div className="match-info">
                     <span className="match-location">
-                      <svg className="h-4 w-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <svg
+                        className="h-4 w-4 inline mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
-                       {match.location}
-                      </span>
+                      {match.location}
+                    </span>
                     <span className="match-court">
                       Court #{match.courtNumber}
                     </span>
@@ -419,12 +477,17 @@ export default function Dashboard() {
                 {match.description && (
                   <div className="match-description">{match.description}</div>
                 )}
-                <div className="match-status">
-                  <span
-                    className={`status-badge ${match.status.toLowerCase()}`}
-                  >
-                    {match.status}
-                  </span>
+                <div className="match-bottom">
+                  <div className="match-status-price">
+                    <span
+                      className={`status-badge ${match.status.toLowerCase()}`}
+                    >
+                      {match.status}
+                    </span>
+                    <span className="match-fee">
+                      {formatCurrency(match.fee)}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
