@@ -245,6 +245,12 @@ body {
   justify-content: space-between;
 }
 
+.match-status-top {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
 .match-card:hover {
   border-color: #555;
   transform: translateY(-1px);
@@ -302,11 +308,9 @@ body {
 
 .match-details {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 12px;
-  flex-wrap: wrap;
-  gap: 12px;
 }
 
 .match-info {
@@ -318,6 +322,7 @@ body {
 .match-location {
   font-size: 14px;
   color: #888;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -331,7 +336,7 @@ body {
 .match-datetime {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 4px;
 }
 
@@ -358,6 +363,11 @@ body {
   display: flex;
   justify-content: flex-start;
   margin-top: auto;
+}
+
+.match-price {
+  display: flex;
+  align-items: center;
 }
 
 .match-status-price {

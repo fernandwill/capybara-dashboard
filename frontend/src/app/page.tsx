@@ -221,12 +221,11 @@ export default function Dashboard() {
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+    const day = date.getDate();
+    const month = date.toLocaleDateString("en-US", { month: "long" });
+    const year = date.getFullYear();
+    return `${weekday}, ${day} ${month} ${year}`;
   };
 
   // Format currency
@@ -414,6 +413,13 @@ export default function Dashboard() {
                 className="match-card clickable-card"
                 onClick={() => handleMatchClick(match)}
               >
+                <div className="match-status-top">
+                  <span
+                    className={`status-badge ${match.status.toLowerCase()}`}
+                  >
+                    {match.status}
+                  </span>
+                </div>
                 <div className="match-header">
                   <h3 className="match-title">{match.title}</h3>
                   <div className="match-header-right">
@@ -442,6 +448,10 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="match-details">
+                  <div className="match-datetime">
+                    <span className="match-date">{formatDate(match.date)}</span>
+                    <span className="match-time">{match.time}</span>
+                  </div>
                   <div className="match-info">
                     <span className="match-location">
                       <svg
@@ -469,21 +479,12 @@ export default function Dashboard() {
                       Court #{match.courtNumber}
                     </span>
                   </div>
-                  <div className="match-datetime">
-                    <span className="match-date">{formatDate(match.date)}</span>
-                    <span className="match-time">{match.time}</span>
-                  </div>
                 </div>
                 {match.description && (
                   <div className="match-description">{match.description}</div>
                 )}
                 <div className="match-bottom">
-                  <div className="match-status-price">
-                    <span
-                      className={`status-badge ${match.status.toLowerCase()}`}
-                    >
-                      {match.status}
-                    </span>
+                  <div className="match-price">
                     <span className="match-fee">
                       {formatCurrency(match.fee)}
                     </span>
