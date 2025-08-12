@@ -74,10 +74,23 @@ app.get('/api/stats/monthly', async (req, res) => {
             return acc;
         }, {});
 
-        res.json(matches);
+        res.json(monthlyData);
     } catch (error) {
         console.error('Data not found: ', error)
         res.status(500).json({error: 'Failed to fetch monthly stats'});
+    }
+});
+
+app.put('/api/debug/complete/:id', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const matchStatus = await prisma.match.update({
+            where: {id},
+            data: {status: 'COMPLETED'}
+        });
+        res.json(matchStatus);
+    } catch (error) {
+        res.status(500).json({error: 'Failed to update match'});
     }
 });
 
