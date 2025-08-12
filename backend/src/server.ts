@@ -3,6 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
+import prisma from './utils/database'
 
 import {createServer} from 'http'
 import {Server} from 'socket.io'
@@ -41,8 +42,48 @@ app.get('/api/health', (req, res) => {
     res.json({status: 'OK', message: 'API is running.'})
 })
 
+app.get('/api/stats/monthly', async (req, res) => {
+    try {
+        const matches = await prisma.match.findMany({
+            where: {status: 'COMPLETED'},
+            select: {
+                date: true,
+                time: true,
+            }
+        });
+
+        const monthlyData = matches.reduce((acc: any, match) => {
+            const date = new Date(match.date);
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+            if (!acc[monthKey]) {
+                acc[monthKey] = {count: 0, totalHours: 0};
+            }
+
+            acc[monthKey].count += 1;
+            const [startTime, endTime] = match.time.split('-');
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = endTime.split(':').map(Number);
+
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            const durationHours = (endMinutes - startMinutes) / 60;
+
+            acc[monthKey].totalHours += durationHours;
+
+            return acc;
+        }, {});
+
+        res.json(matches);
+    } catch (error) {
+        console.error('Data not found: ', error)
+        res.status(500).json({error: 'Failed to fetch monthly stats'});
+    }
+});
+
 // Import the stats function directly for the /api/stats route
 import { getStats } from './controllers/MatchController'
+import { dmmfToRuntimeDataModel } from '@prisma/client/runtime/library'
 app.get('/api/stats', getStats)
 
 io.on('connection', (socket) => {
