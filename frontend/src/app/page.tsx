@@ -5,6 +5,7 @@ import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
 import Image from "next/image";
+import StatsChart from "../components/StatsChart";
 
 interface Stats {
   totalMatches: number;
@@ -284,6 +285,8 @@ export default function Dashboard() {
           )}
         </button>
       </header>
+
+      <StatsChart />
 
       <div className="stats-grid">
         <div className="stat-card">
