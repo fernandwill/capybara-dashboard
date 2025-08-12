@@ -1,5 +1,6 @@
 import {BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
 import {useState, useEffect} from 'react';
+import {io} from 'socket.io-client';
 
 export default function StatsChart() {
     interface ChartData {
@@ -27,14 +28,26 @@ export default function StatsChart() {
                 console.error('Error fetching monthly data: ', error)
             }
         };
-        
+
         fetchMonthly();
-    }, [])
+
+        const socket = io('http://localhost:8000');
+        socket.on('matchUpdated', () => {
+            console.log('Match updated, refetching chart data');
+            fetchMonthly();
+        });
+
+        return () => {
+            socket.disconnect();
+        }
+    
+    }, []);
+        
 
     return (
         <div className="monthly-stats-chart">
             <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width={1050} height={300}>
                     <BarChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />

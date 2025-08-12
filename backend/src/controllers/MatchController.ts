@@ -1,6 +1,7 @@
 import prisma from "../utils/database";
 import { Request, Response } from "express";
 import { updateStatus } from "../server";
+import {io} from '../server';
 
 export const getAllMatches = async (req: Request, res: Response) => {
   try {
@@ -125,6 +126,7 @@ export const updateMatch = async (req: Request, res: Response) => {
     });
 
     await updateStatus();
+    io.emit('matchUpdated');
 
     res.json(match);
   } catch (error) {
