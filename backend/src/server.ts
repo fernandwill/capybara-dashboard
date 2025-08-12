@@ -23,6 +23,41 @@ const io = new Server(server, {
     }
 })
 
+const updateStatus = async () => {
+    try {
+        const now = new Date();
+        console.log('Current time: ', now);
+
+        const upcomingMatches = await prisma.match.findMany({
+            where: {status: 'UPCOMING'},
+            select: {id: true, date: true, time: true}
+        });
+
+        console.log('Found upcoming matches: ', upcomingMatches.length);
+
+        for (const match of upcomingMatches) {
+            const matchDate = new Date(match.date);
+            const [, endTime] = match.time.split('-');
+            const [endHour, endMin] = endTime.split(':').map(Number);
+
+            matchDate.setHours(endHour, endMin, 0, 0);
+
+            console.log(`Match ${match.id}: ends at ${matchDate}, now is ${now}`);
+            console.log(`Should complete? ${matchDate < now}`);
+
+            if (matchDate < now) {
+                await prisma.match.update({
+                    where: {id: match.id},
+                    data: {status: 'COMPLETED'}
+                });
+                console.log(`Completed match: ${match.id}`);
+                }
+            }
+        } catch (error) {
+            console.error('Error updating match status: ', error);
+    }
+};
+
 const PORT = process.env.PORT || 8000;
 
 app.use(helmet())
@@ -81,6 +116,18 @@ app.get('/api/stats/monthly', async (req, res) => {
     }
 });
 
+app.get('/api/debug/update-statuses', async (req, res) => {
+    await updateStatus();
+    res.json({message: 'Status update completed'});
+});
+
+app.get('/api/debug/all-matches', async (req, res) => {
+    const matches = await prisma.match.findMany({
+        select: { id: true, date: true, time: true, status: true, title: true }
+    });
+    res.json(matches);
+});
+
 app.put('/api/debug/complete/:id', async (req, res) => {
     try {
         const {id} = req.params;
@@ -95,7 +142,7 @@ app.put('/api/debug/complete/:id', async (req, res) => {
 });
 
 // Import the stats function directly for the /api/stats route
-import { getStats } from './controllers/MatchController'
+import { getStats, updateMatch } from './controllers/MatchController'
 import { dmmfToRuntimeDataModel } from '@prisma/client/runtime/library'
 app.get('/api/stats', getStats)
 
@@ -110,6 +157,9 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
     console.log(`Server on port ${PORT}`)
     console.log('Socket.io server active.')
+
+    setInterval(updateStatus, 24 * 60 * 60 * 1000);
 })
 
 export {io}
+export {updateStatus}
