@@ -1142,3 +1142,14 @@ input[type="time"]::-webkit-datetime-edit-text {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+.monthly-stats-chart {
+  max-width: 1200px;
+  margin: 0 auto 32px auto;
+  padding: 0 24px;
+}
+
+.chart-container {
+  border-radius: 12px;
+  padding: 0;
+}
