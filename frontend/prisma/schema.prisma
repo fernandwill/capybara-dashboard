@@ -8,23 +8,22 @@ datasource db {
 }
 
 model Player {
-  id            String   @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String
-  email         String?  @unique
+  email         String?       @unique
   phone         String?
-  status        String   @default("ACTIVE") // ACTIVE, TENTATIVE, INACTIVE
-  paymentStatus String   @default("BELUM_SETOR") // BELUM_SETOR, SUDAH_SETOR
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  matchPlayers MatchPlayer[]
-  payments     Payment[]
+  status        String        @default("ACTIVE")
+  paymentStatus String        @default("BELUM_SETOR")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  matchPlayers  MatchPlayer[]
+  payments      Payment[]
 
   @@map("players")
 }
 
 model Match {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   title       String
   location    String
   courtNumber String?
@@ -33,11 +32,10 @@ model Match {
   fee         Float
   status      String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  players  MatchPlayer[]
-  payments Payment[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  players     MatchPlayer[]
+  payments    Payment[]
 
   @@map("matches")
 }
@@ -47,28 +45,26 @@ model MatchPlayer {
   matchId  String
   playerId String
   joinedAt DateTime @default(now())
-
-  match  Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  match    Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player   Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@unique([matchId, playerId])
   @@map("match_players")
 }
 
 model Payment {
-  id      String    @id @default(cuid())
-  playerId String
-  matchId String?
-  amount  Float
-  status  String    @default("PENDING")
-  method  String?
-  notes   String?
-  paidAt  DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  match  Match? @relation(fields: [matchId], references: [id])
+  id        String    @id @default(cuid())
+  playerId  String
+  matchId   String?
+  amount    Float
+  status    String    @default("PENDING")
+  method    String?
+  notes     String?
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  match     Match?    @relation(fields: [matchId], references: [id])
+  player    Player    @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
