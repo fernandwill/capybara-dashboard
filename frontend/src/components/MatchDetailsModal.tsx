@@ -61,7 +61,7 @@ export default function MatchDetailsModal({
     if (!match) return;
     try {
       const response = await fetch(
-        `http://localhost:8000/api/matches/${match.id}`
+        `/api/matches/${match.id}`
       );
       if (response.ok) {
         const matchData = await response.json();
@@ -78,7 +78,7 @@ export default function MatchDetailsModal({
     if (!match) return;
     try {
       const response = await fetch(
-        `http://localhost:8000/api/matches/${match.id}/players/${playerId}`,
+        `/api/matches/${match.id}/players/${playerId}`,
         {
           method: "DELETE",
         }
@@ -97,7 +97,7 @@ export default function MatchDetailsModal({
 
     try {
       console.log("Creating player with name: ", newPlayerName.trim());
-      const createResponse = await fetch("http://localhost:8000/api/players", {
+      const createResponse = await fetch("/api/players", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export default function MatchDetailsModal({
         const newPlayer = await createResponse.json();
         // Then add to match
         const addResponse = await fetch(
-          `http://localhost:8000/api/matches/${match.id}/players`,
+          `/api/matches/${match.id}/players`,
           {
             method: "POST",
             headers: {
@@ -144,7 +144,7 @@ export default function MatchDetailsModal({
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/players/${playerId}`,
+        `/api/players/${playerId}`,
         {
           method: "PUT",
           headers: {
@@ -170,7 +170,7 @@ export default function MatchDetailsModal({
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/players/${playerId}`,
+        `/api/players/${playerId}`,
         {
           method: "PUT",
           headers: {
