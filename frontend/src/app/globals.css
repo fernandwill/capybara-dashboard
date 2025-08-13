@@ -1144,7 +1144,7 @@ input[type="time"]::-webkit-datetime-edit-text {
 }
 
 .monthly-stats-chart {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto 32px auto;
   padding: 0 24px;
 }
@@ -1152,4 +1152,27 @@ input[type="time"]::-webkit-datetime-edit-text {
 .chart-container {
   border-radius: 12px;
   padding: 0;
+}
+
+.footer {
+  max-width: 100%;
+  margin: 48px auto 0 auto;
+  padding: 24px;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-color)
+}
+
+.footer p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.footer, .footer-txt {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 8px;
+  opacity: 1;
 }
