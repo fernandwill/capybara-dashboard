@@ -499,6 +499,11 @@ export default function Dashboard() {
         )}
       </div>
 
+      <footer className="footer">
+        <div className="footer-txt">© PB Capybara</div>
+        <p>Badminton Dashboard</p>
+      </footer>
+
       <NewMatchModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
