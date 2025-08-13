@@ -96,7 +96,7 @@ export default function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/stats");
+      const response = await fetch("/api/stats");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -116,7 +116,7 @@ export default function Dashboard() {
 
   const fetchMatches = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/matches");
+      const response = await fetch("/api/matches");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -146,8 +146,8 @@ export default function Dashboard() {
     try {
       const isEditing = editingMatch !== null;
       const url = isEditing
-        ? `http://localhost:8000/api/matches/${editingMatch.id}`
-        : "http://localhost:8000/api/matches";
+        ? `/api/matches/${editingMatch.id}`
+        : "/api/matches";
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
