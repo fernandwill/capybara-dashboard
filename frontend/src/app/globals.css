@@ -1319,8 +1319,15 @@ input[type="time"]::-webkit-datetime-edit-text {
 }
 
 .loading-spinner::before {
-  content: "⏳";
-  animation: spin 2s linear infinite;
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #888;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
 }
 
 @keyframes spin {
