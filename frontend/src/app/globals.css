@@ -218,6 +218,53 @@ body {
   transform: translateY(-1px);
 }
 
+/* Responsive Tabs Section */
+@media (max-width: 768px) {
+  .tabs-section {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    margin-bottom: 20px;
+  }
+  
+  .tabs {
+    justify-content: center;
+    gap: 24px;
+  }
+  
+  .tab {
+    font-size: 15px;
+    padding: 10px 0;
+  }
+  
+  .new-match-btn {
+    align-self: center;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs-section {
+    gap: 12px;
+  }
+  
+  .tabs {
+    gap: 20px;
+  }
+  
+  .tab {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+  
+  .new-match-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+    gap: 6px;
+  }
+}
+
 .matches-container {
   background-color: var(--bg-color);
   border-radius: 12px;
