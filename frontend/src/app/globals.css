@@ -75,6 +75,34 @@ body {
   margin-bottom: 32px;
 }
 
+/* Responsive Stats Grid */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .stat-card {
+    padding: 20px;
+  }
+  
+  .stat-card-value {
+    font-size: 32px;
+  }
+  
+  .stat-card-title {
+    font-size: 13px;
+  }
+}
+
 .stat-card-shadcn {
   padding: 24px;
   background-color: hsl(var(--card));
