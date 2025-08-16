@@ -111,17 +111,6 @@ capybara-dashboard/frontend/
 - **playerId**: Reference to player
 - **joinedAt**: When player joined the match
 
-### Payments Table
-- **id**: Unique identifier (CUID)
-- **playerId**: Reference to player
-- **matchId**: Reference to match (optional)
-- **amount**: Payment amount
-- **status**: Payment status (PENDING/COMPLETED)
-- **method**: Payment method (optional)
-- **notes**: Payment notes (optional)
-- **paidAt**: Payment timestamp (optional)
-- **createdAt/updatedAt**: Timestamps
-
 ## Installation
 
 ### Prerequisites
