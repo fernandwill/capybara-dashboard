@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
+import ErrorModal from "../components/ErrorModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
@@ -44,6 +45,11 @@ export default function Dashboard() {
     title: "",
     message: "",
   });
+  const [errorModal, setErrorModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -78,6 +84,14 @@ export default function Dashboard() {
 
   const handleCloseSuccessModal = () => {
     setSuccessModal({
+      isOpen: false,
+      title: "",
+      message: "",
+    });
+  };
+
+  const handleCloseErrorModal = () => {
+    setErrorModal({
       isOpen: false,
       title: "",
       message: "",
@@ -187,11 +201,13 @@ export default function Dashboard() {
         `Error ${editingMatch ? "updating" : "creating"} match:`,
         error
       );
-      alert(
-        `Failed to ${
+      setErrorModal({
+        isOpen: true,
+        title: "Error!",
+        message: `Failed to ${
           editingMatch ? "update" : "create"
-        } match. Please try again.`
-      );
+        } match. Please try again.`,
+      });
     }
   };
 
@@ -516,6 +532,13 @@ export default function Dashboard() {
         onClose={handleCloseSuccessModal}
         title={successModal.title}
         message={successModal.message}
+      />
+
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={handleCloseErrorModal}
+        title={errorModal.title}
+        message={errorModal.message}
       />
 
       <MatchDetailsModal
