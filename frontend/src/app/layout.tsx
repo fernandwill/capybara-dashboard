@@ -7,6 +7,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Capybara's Dashboard",
   description: "Badminton match tracker and management system",
+  icons: {
+    icon: "/icons/icon.jpg",
+    shortcut: "/icons/icon.jpg",
+    apple: "/icons/icon.jpg",
+  },
 };
 
 export default function RootLayout({
