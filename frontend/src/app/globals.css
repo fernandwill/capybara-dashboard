@@ -962,6 +962,34 @@ body {
   cursor: not-allowed;
 }
 
+/* Players Columns Layout */
+.players-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.players-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.column-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.players-grid-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 /* Players Grid */
 .players-grid {
   display: grid;
@@ -970,6 +998,11 @@ body {
 }
 
 @media (max-width: 768px) {
+  .players-columns {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
   .players-grid {
     grid-template-columns: 1fr;
   }
@@ -1069,9 +1102,9 @@ body {
 }
 
 .status-toggle.tentative {
-  background-color: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  background-color: rgba(161, 98, 7, 0.2);
+  color: #a16207;
+  border: 1px solid rgba(161, 98, 7, 0.3);
 }
 
 .payment-toggle.belum_setor {
