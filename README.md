@@ -227,29 +227,6 @@ The application supports automatic dark/light theme switching based on system pr
 - `JWT_SECRET`: Secret key for authentication (future use)
 - `PORT`: Application port (default: 3000)
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes and test thoroughly
-4. Commit your changes: `git commit -m 'Add feature description'`
-5. Push to the branch: `git push origin feature-name`
-6. Submit a pull request
-
 ## License
 
 This project is private and proprietary. All rights reserved.
-
-## Support
-
-For issues, questions, or feature requests, please create an issue in the repository or contact the development team.
-
-## Changelog
-
-### Version 0.1.0
-- Initial release with core match and player management
-- Statistics dashboard with monthly charts
-- Dark/light theme support
-- Responsive design implementation
-- Database schema and API endpoints
-- Modal-based user interactions
