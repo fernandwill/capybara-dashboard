@@ -1,9 +1,9 @@
 import {
-  BarChart,
+  ComposedChart,
   Bar,
+  Line,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
@@ -104,8 +104,7 @@ export default function StatsChart() {
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-
+          <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <XAxis 
               dataKey="month" 
               stroke="var(--text-color)"
@@ -115,7 +114,7 @@ export default function StatsChart() {
               stroke="var(--text-color)"
               fontSize={12}
               label={{ 
-                value: 'Count', 
+                value: 'Hours Played', 
                 angle: -90, 
                 position: 'insideLeft',
                 style: { textAnchor: 'middle', fill: 'var(--text-color)', fontSize: '12px' }
@@ -130,7 +129,8 @@ export default function StatsChart() {
               }}
             />
             <Bar dataKey="count" fill="var(--primary-color)" name="Matches" radius={[4, 4, 0, 0]} />
-          </BarChart>
+            <Bar dataKey="totalHours" fill="var(--secondary-color)" name="Total Hours" radius={[4, 4, 0, 0]} />
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </div>
