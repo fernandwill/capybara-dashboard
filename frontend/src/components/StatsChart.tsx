@@ -1,7 +1,6 @@
 import {
-  ComposedChart,
+  BarChart,
   Bar,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -105,7 +104,7 @@ export default function StatsChart() {
       </div>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
             <XAxis 
               dataKey="month" 
@@ -116,7 +115,7 @@ export default function StatsChart() {
               stroke="var(--text-color)"
               fontSize={12}
               label={{ 
-                value: 'Hours Played', 
+                value: 'Count', 
                 angle: -90, 
                 position: 'insideLeft',
                 style: { textAnchor: 'middle', fill: 'var(--text-color)', fontSize: '12px' }
@@ -131,16 +130,7 @@ export default function StatsChart() {
               }}
             />
             <Bar dataKey="count" fill="var(--primary-color)" name="Matches" radius={[4, 4, 0, 0]} />
-            <Line 
-              type="monotone" 
-              dataKey="totalHours" 
-              stroke="var(--secondary-color)" 
-              strokeWidth={3}
-              dot={{ fill: 'var(--secondary-color)', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, stroke: 'var(--secondary-color)', strokeWidth: 2 }}
-              name="Total Hours"
-            />
-          </ComposedChart>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>
