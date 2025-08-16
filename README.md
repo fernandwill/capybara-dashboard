@@ -1,6 +1,6 @@
 # Capybara's Dashboard
 
-A comprehensive badminton match tracker and management system built with Next.js, TypeScript, and PostgreSQL. This application provides a complete solution for organizing badminton matches, managing players, tracking payments, and analyzing match statistics.
+A badminton match tracker and management system built with Next.js, TypeScript, and PostgreSQL. This application provides a complete solution for organizing internal badminton matches, managing players, tracking payments, and analyzing match statistics.
 
 ## Features
 
