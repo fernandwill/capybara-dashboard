@@ -128,6 +128,27 @@ export default function Dashboard() {
     }
   };
 
+  const autoUpdateMatches = async () => {
+    try {
+      const response = await fetch("/api/matches/auto-update", {
+        method: "POST",
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Auto-update result:", data);
+      
+      // Refresh matches and stats after auto-update
+      fetchMatches();
+      fetchStats();
+    } catch (error) {
+      console.error("Error auto-updating matches:", error);
+    }
+  };
+
   const fetchMatches = async () => {
     try {
       const response = await fetch("/api/matches");
@@ -145,6 +166,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetchStats();
     fetchMatches();
+    autoUpdateMatches(); // Run auto-update when dashboard loads
   }, []);
 
   const handleSubmitMatch = async (matchData: {
