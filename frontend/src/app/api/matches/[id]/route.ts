@@ -100,26 +100,56 @@ export async function DELETE(
 async function updateMatchStatuses() {
   try {
     const now = new Date();
+    let updatedCount = 0;
     
     const upcomingMatches = await prisma.match.findMany({
-      where: { status: 'UPCOMING' },
-      select: { id: true, date: true, time: true }
+      where: { 
+        status: 'UPCOMING',
+        date: {
+          lte: now // Only check matches that are today or in the past
+        }
+      },
+      select: { 
+        id: true, 
+        date: true, 
+        time: true,
+        title: true // Include title for better logging
+      }
     });
     
     for (const match of upcomingMatches) {
-      const matchDate = new Date(match.date);
-      const [, endTime] = match.time.split('-');
-      const [endHour, endMin] = endTime.split(':').map(Number);
-      
-      matchDate.setHours(endHour, endMin, 0, 0);
-      
-      if (matchDate < now) {
-        await prisma.match.update({
-          where: { id: match.id },
-          data: { status: 'COMPLETED' }
-        });
+      try {
+        // Parse the time string (e.g., "18:00-20:00")
+        const timeParts = match.time.split('-');
+        if (timeParts.length !== 2) {
+          console.warn(`Invalid time format for match ${match.id}: ${match.time}`);
+          continue;
+        }
+        
+        const endTime = timeParts[1]; // Get the end time (e.g., "20:00")
+        const [endHour, endMin] = endTime.split(':').map(Number);
+        
+        // Create a date object for the match end time
+        const matchEndDate = new Date(match.date);
+        matchEndDate.setHours(endHour, endMin, 0, 0);
+        
+        // If the match end time has passed, mark it as completed
+        if (matchEndDate < now) {
+          await prisma.match.update({
+            where: { id: match.id },
+            data: { status: 'COMPLETED' }
+          });
+          
+          console.log(`Auto-completed match: ${match.title} (${match.id})`);
+          updatedCount++;
+        }
+      } catch (parseError) {
+        console.error(`Error parsing time for match ${match.id}:`, parseError);
+        continue;
       }
     }
+    
+    return updatedCount;
   } catch (error) {
     console.error('Error updating match statuses:', error);
   }
