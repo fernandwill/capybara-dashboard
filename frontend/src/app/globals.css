@@ -1258,10 +1258,9 @@ input[type="time"]::-webkit-datetime-edit-text {
   }
 
   .match-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
     gap: 12px;
+    align-items: flex-start;
   }
 
   .match-fee {
