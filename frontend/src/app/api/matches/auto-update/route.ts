@@ -8,7 +8,7 @@ export async function POST() {
       message: `Successfully updated ${updatedCount} matches`, 
       updatedCount 
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in auto-update:', error);
     return NextResponse.json({ error: "Failed to auto-update matches" }, { status: 500 });
   }
@@ -62,15 +62,14 @@ export async function updateMatchStatuses() {
           
           console.log(`Auto-completed match: ${match.title} (${match.id})`);
           updatedCount++;
-        }
-      } catch (parseError) {
+        }\n      } catch (parseError: unknown) {
         console.error(`Error parsing time for match ${match.id}:`, parseError);
         continue;
       }
     }
     
     return updatedCount;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating match statuses:', error);
     throw error;
   }
