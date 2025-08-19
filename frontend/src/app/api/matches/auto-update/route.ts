@@ -14,8 +14,8 @@ export async function POST() {
   }
 }
 
-// Make this function exportable so it can be used elsewhere
-export async function updateMatchStatuses() {
+// Make this function a regular async function so it's not treated as a route handler
+async function updateMatchStatuses() {
   try {
     const now = new Date();
     let updatedCount = 0;
@@ -39,18 +39,21 @@ export async function updateMatchStatuses() {
     
     for (const match of upcomingMatches) {
       try {
+        // Parse the time string (e.g., "18:00-20:00")
         const timeParts = match.time.split('-');
         if (timeParts.length !== 2) {
           console.warn(`Invalid time format for match ${match.id}: ${match.time}`);
           continue;
         }
         
-        const endTime = timeParts[1]; 
+        const endTime = timeParts[1]; // Get the end time (e.g., "20:00")
         const [endHour, endMin] = endTime.split(':').map(Number);
         
+        // Create a date object for the match end time
         const matchEndDate = new Date(match.date);
         matchEndDate.setHours(endHour, endMin, 0, 0);
         
+        // If the match end time has passed, mark it as completed
         if (matchEndDate < now) {
           await prisma.match.update({
             where: { id: match.id },
@@ -59,8 +62,8 @@ export async function updateMatchStatuses() {
           
           console.log(`Auto-completed match: ${match.title} (${match.id})`);
           updatedCount++;
-          }
-        } catch (parseError: unknown) {
+        }
+      } catch (parseError: unknown) {
         console.error(`Error parsing time for match ${match.id}:`, parseError);
         continue;
       }
