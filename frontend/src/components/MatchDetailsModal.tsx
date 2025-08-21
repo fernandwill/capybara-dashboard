@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 interface Player {
   id: string;
@@ -34,6 +34,7 @@ export default function MatchDetailsModal({
   match,
 }: MatchDetailsModalProps) {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
@@ -55,8 +56,11 @@ export default function MatchDetailsModal({
     }).format(amount);
   };
 
-  const fetchMatchPlayers = useCallback(async () => {
+  
+
+  const fetchPlayers = async () => {
     if (!match) return;
+    setLoading(true);
     try {
       const response = await fetch(
         `/api/matches/${match.id}`
@@ -69,8 +73,10 @@ export default function MatchDetailsModal({
       }
     } catch (error) {
       console.error("Error fetching match players:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [match]);
+  };
 
   const handleRemovePlayer = async (playerId: string) => {
     if (!match) return;
@@ -86,7 +92,7 @@ export default function MatchDetailsModal({
       );
 
       if (response.ok) {
-        fetchMatchPlayers();
+        fetchPlayers();
       }
     } catch (error) {
       console.error("Error removing player:", error);
@@ -126,7 +132,7 @@ export default function MatchDetailsModal({
         );
 
         if (addResponse.ok) {
-          fetchMatchPlayers();
+          fetchPlayers();
           setNewPlayerName("");
           setShowAddPlayer(false);
         }
@@ -156,7 +162,7 @@ export default function MatchDetailsModal({
       );
 
       if (response.ok) {
-        fetchMatchPlayers();
+        fetchPlayers();
       }
     } catch (error) {
       console.error("Error updating payment status:", error);
@@ -182,7 +188,7 @@ export default function MatchDetailsModal({
       );
 
       if (response.ok) {
-        fetchMatchPlayers();
+        fetchPlayers();
       }
     } catch (error) {
       console.error("Error updating player status:", error);
@@ -201,9 +207,35 @@ export default function MatchDetailsModal({
 
   useEffect(() => {
     if (isOpen && match) {
-      fetchMatchPlayers();
+      // Fetch players when modal opens
+      const fetchPlayers = async () => {
+        setLoading(true);
+        try {
+          const response = await fetch(
+            `/api/matches/${match.id}`
+          );
+          if (response.ok) {
+            const matchData = await response.json();
+            const matchPlayers =
+              matchData.players?.map((mp: { player: Player }) => mp.player) || [];
+            setPlayers(matchPlayers);
+          }
+        } catch (error) {
+          console.error("Error fetching match players:", error);
+          setPlayers([]); // Reset players on error
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchPlayers();
+    } else {
+      // Reset data when modal closes
+      setPlayers([]);
+      setShowAddPlayer(false);
+      setNewPlayerName("");
     }
-  }, [isOpen, match, fetchMatchPlayers]);
+  }, [isOpen, match]);
 
   if (!isOpen || !match) return null;
 
@@ -315,101 +347,108 @@ export default function MatchDetailsModal({
               </div>
             )}
 
-            <div className="players-columns">
-              <div className="players-column">
-                <h4 className="column-title">Players</h4>
-                <div className="players-grid-column">
-                  {players.filter(player => player.status === "ACTIVE").length > 0 ? (
-                    sortPlayersByPaymentStatus(players.filter(player => player.status === "ACTIVE")).map((player) => (
-                      <div key={player.id} className="player-card">
-                        <div className="player-header">
-                          <h4 className="player-name">{player.name}</h4>
-                          <button
-                            className="remove-player-btn"
-                            onClick={() => handleRemovePlayer(player.id)}
-                            title="Remove player"
-                          >
-                            ×
-                          </button>
+            {/* Loading state */}
+            {loading ? (
+              <div className="no-players-message">
+                <p>Loading players...</p>
+              </div>
+            ) : (
+              <div className="players-columns">
+                <div className="players-column">
+                  <h4 className="column-title">Players</h4>
+                  <div className="players-grid-column">
+                    {players.filter(player => player.status === "ACTIVE").length > 0 ? (
+                      sortPlayersByPaymentStatus(players.filter(player => player.status === "ACTIVE")).map((player) => (
+                        <div key={player.id} className="player-card">
+                          <div className="player-header">
+                            <h4 className="player-name">{player.name}</h4>
+                            <button
+                              className="remove-player-btn"
+                              onClick={() => handleRemovePlayer(player.id)}
+                              title="Remove player"
+                            >
+                              ×
+                            </button>
+                          </div>
+                          <div className="player-status-buttons">
+                            <button
+                              className={`status-toggle ${player.status.toLowerCase()}`}
+                              onClick={() =>
+                                handleToggleStatus(player.id, player.status)
+                              }
+                            >
+                              {player.status}
+                            </button>
+                            <button
+                              className={`payment-toggle ${player.paymentStatus.toLowerCase()}`}
+                              onClick={() =>
+                                handleTogglePayment(player.id, player.paymentStatus)
+                              }
+                            >
+                              {player.paymentStatus === "BELUM_SETOR"
+                                ? "Belum Setor"
+                                : "Sudah Setor"}
+                            </button>
+                          </div>
                         </div>
-                        <div className="player-status-buttons">
-                          <button
-                            className={`status-toggle ${player.status.toLowerCase()}`}
-                            onClick={() =>
-                              handleToggleStatus(player.id, player.status)
-                            }
-                          >
-                            {player.status}
-                          </button>
-                          <button
-                            className={`payment-toggle ${player.paymentStatus.toLowerCase()}`}
-                            onClick={() =>
-                              handleTogglePayment(player.id, player.paymentStatus)
-                            }
-                          >
-                            {player.paymentStatus === "BELUM_SETOR"
-                              ? "Belum Setor"
-                              : "Sudah Setor"}
-                          </button>
-                        </div>
+                      ))
+                    ) : (
+                      <div className="no-players-message">
+                        <p>No active players yet.</p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="no-players-message">
-                      <p>No active players yet.</p>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                </div>
+
+                <div className="players-column">
+                  <h4 className="column-title">Tentative</h4>
+                  <div className="players-grid-column">
+                    {players.filter(player => player.status === "TENTATIVE").length > 0 ? (
+                      sortPlayersByPaymentStatus(players.filter(player => player.status === "TENTATIVE")).map((player) => (
+                        <div key={player.id} className="player-card">
+                          <div className="player-header">
+                            <h4 className="player-name">{player.name}</h4>
+                            <button
+                              className="remove-player-btn"
+                              onClick={() => handleRemovePlayer(player.id)}
+                              title="Remove player"
+                            >
+                              ×
+                            </button>
+                          </div>
+                          <div className="player-status-buttons">
+                            <button
+                              className={`status-toggle ${player.status.toLowerCase()}`}
+                              onClick={() =>
+                                handleToggleStatus(player.id, player.status)
+                              }
+                            >
+                              {player.status}
+                            </button>
+                            <button
+                              className={`payment-toggle ${player.paymentStatus.toLowerCase()}`}
+                              onClick={() =>
+                                handleTogglePayment(player.id, player.paymentStatus)
+                              }
+                            >
+                              {player.paymentStatus === "BELUM_SETOR"
+                                ? "Belum Setor"
+                                : "Sudah Setor"}
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-players-message">
+                        <p>No tentative players yet.</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="players-column">
-                <h4 className="column-title">Tentative</h4>
-                <div className="players-grid-column">
-                  {players.filter(player => player.status === "TENTATIVE").length > 0 ? (
-                    sortPlayersByPaymentStatus(players.filter(player => player.status === "TENTATIVE")).map((player) => (
-                      <div key={player.id} className="player-card">
-                        <div className="player-header">
-                          <h4 className="player-name">{player.name}</h4>
-                          <button
-                            className="remove-player-btn"
-                            onClick={() => handleRemovePlayer(player.id)}
-                            title="Remove player"
-                          >
-                            ×
-                          </button>
-                        </div>
-                        <div className="player-status-buttons">
-                          <button
-                            className={`status-toggle ${player.status.toLowerCase()}`}
-                            onClick={() =>
-                              handleToggleStatus(player.id, player.status)
-                            }
-                          >
-                            {player.status}
-                          </button>
-                          <button
-                            className={`payment-toggle ${player.paymentStatus.toLowerCase()}`}
-                            onClick={() =>
-                              handleTogglePayment(player.id, player.paymentStatus)
-                            }
-                          >
-                            {player.paymentStatus === "BELUM_SETOR"
-                              ? "Belum Setor"
-                              : "Sudah Setor"}
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="no-players-message">
-                      <p>No tentative players yet.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {players.length === 0 && (
+            {!loading && players.length === 0 && (
               <div className="no-players-message">
                 <p>No players added to this match yet.</p>
                 <p>Click &quot;Add Player&quot; to get started!</p>
