@@ -961,6 +961,32 @@ body {
   transform: translateY(-1px);
 }
 
+/* Responsive Players Section */
+@media (max-width: 768px) {
+  .players-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .add-player-btn {
+    align-self: flex-start;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .players-header {
+    gap: 8px;
+  }
+  
+  .add-player-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
 /* Add Player Section */
 .add-player-section {
   background-color: var(--card-bg);
@@ -1036,6 +1062,37 @@ body {
 .create-player-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Responsive Add Player Section */
+@media (max-width: 768px) {
+  .add-player-section {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .new-player-form {
+    flex-direction: column;
+  }
+  
+  .new-player-form input {
+    margin-bottom: 12px;
+  }
+  
+  .create-player-btn {
+    align-self: flex-start;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-player-section {
+    padding: 12px;
+  }
+  
+  .new-player-form input {
+    margin-bottom: 10px;
+  }
 }
 
 /* Players Columns Layout */
