@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 interface ChartData {
   month: string;
@@ -64,7 +65,10 @@ export default function StatsChart() {
           <h3>Monthly Statistics</h3>
         </div>
         <div className="chart-container loading">
-          <div className="loading-spinner">Loading chart data...</div>
+          <div className="flex flex-col items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-3" />
+            <p className="text-muted-foreground">Loading chart data...</p>
+          </div>
         </div>
       </div>
     );

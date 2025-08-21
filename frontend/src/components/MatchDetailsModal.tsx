@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 interface Player {
   id: string;
@@ -351,6 +352,7 @@ export default function MatchDetailsModal({
             {loading ? (
               <div className="no-players-message">
                 <p>Loading players...</p>
+                <Loader2 className="h-6 w-6 animate-spin text-blue-500 mx-auto mt-3" />
               </div>
             ) : (
               <div className="players-columns">
