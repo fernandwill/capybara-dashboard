@@ -352,7 +352,7 @@ export default function MatchDetailsModal({
             {loading ? (
               <div className="no-players-message">
                 <p>Loading players...</p>
-                <Loader2 className="h-6 w-6 animate-spin text-blue-500 mx-auto mt-3" />
+                <Loader2 className="h-6 w-6 animate-spin text-blue-500 mx-auto mt-2" />
               </div>
             ) : (
               <div className="players-columns">
