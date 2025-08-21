@@ -1,6 +1,6 @@
 # Capybara's Dashboard
 
-A badminton match tracker and management system built with Next.js, TypeScript, and PostgreSQL. This application provides a complete solution for organizing internal badminton matches, managing players, tracking payments, and analyzing match statistics.
+A badminton match tracker and management system built with Next.js, Express.js, TypeScript, and PostgreSQL. This application provides a complete solution for organizing internal badminton matches, managing players, tracking payments, and analyzing match statistics.
 
 ## Features
 
@@ -31,6 +31,19 @@ A badminton match tracker and management system built with Next.js, TypeScript, 
 - Professional error and success notifications
 - Intuitive navigation and user experience
 
+## Recent Improvements
+
+### Data Fetching Optimization
+- Implemented fresh data fetching every time the match details modal is opened
+- Added proper data cleanup when the modal is closed to prevent cached data issues
+- Added loading states for better user experience during data fetching
+- Improved player data refresh after all player operations (add, remove, status updates)
+
+### Mobile Responsiveness
+- Enhanced mobile layout for the "Add Player" section
+- Improved form styling for better touch interaction on mobile devices
+- Adjusted responsive breakpoints for various screen sizes
+
 ## Technology Stack
 
 ### Frontend
@@ -42,44 +55,56 @@ A badminton match tracker and management system built with Next.js, TypeScript, 
 - **Recharts 3.1.2** - Data visualization library
 - **Lucide React** - Icon library
 
-### Backend & Database
-- **Next.js API Routes** - Serverless API endpoints
+### Backend
+- **Express.js** - REST API server
 - **Prisma 6.14.0** - Database ORM and migration tool
 - **PostgreSQL** - Primary database (Supabase compatible)
+- **Socket.IO** - Real-time communication
 
 ### Development Tools
 - **ESLint** - Code linting and formatting
 - **PostCSS** - CSS processing
-- **Sharp** - Image optimization
+- **Concurrently** - Run multiple commands simultaneously
 
 ## Project Structure
 
 ```
-capybara-dashboard/frontend/
-├── src/
-│   ├── app/
-│   │   ├── api/                    # API routes
-│   │   │   ├── matches/           # Match CRUD operations
-│   │   │   ├── players/           # Player management
-│   │   │   └── stats/             # Statistics endpoints
-│   │   ├── globals.css            # Global styles and theme variables
-│   │   ├── layout.tsx             # Root layout with metadata
-│   │   └── page.tsx               # Main dashboard page
-│   ├── components/
-│   │   ├── ui/                    # Reusable UI components
-│   │   ├── ErrorModal.tsx         # Error notification modal
-│   │   ├── MatchDetailsModal.tsx  # Match details and player management
-│   │   ├── NewMatchModal.tsx      # Match creation/editing form
-│   │   ├── StatsChart.tsx         # Monthly statistics chart
-│   │   └── SuccessModal.tsx       # Success notification modal
-│   └── lib/
-│       └── database.ts            # Database connection utilities
-├── prisma/
-│   └── schema.prisma              # Database schema definition
-├── public/
-│   └── icons/                     # Application icons and favicon
-├── package.json                   # Dependencies and scripts
-└── README.md                      # Project documentation
+capybara-dashboard/
+├── backend/                       # Backend API server
+│   ├── src/
+│   │   ├── server.ts             # Express server entry point
+│   │   ├── routes/               # API route definitions
+│   │   ├── controllers/          # Request handlers
+│   │   ├── middleware/           # Custom middleware
+│   │   └── utils/                # Utility functions
+│   ├── prisma/                   # Prisma schema and migrations
+│   └── package.json              # Backend dependencies
+├── frontend/                      # Next.js frontend application
+│   ├── src/
+│   │   ├── app/                  # App router pages and API routes
+│   │   │   ├── api/              # Frontend API routes
+│   │   │   │   ├── matches/      # Match CRUD operations
+│   │   │   │   ├── players/      # Player management
+│   │   │   │   └── stats/        # Statistics endpoints
+│   │   │   ├── globals.css       # Global styles and theme variables
+│   │   │   ├── layout.tsx        # Root layout with metadata
+│   │   │   └── page.tsx          # Main dashboard page
+│   │   ├── components/           # React components
+│   │   │   ├── ui/               # Reusable UI components
+│   │   │   ├── ErrorModal.tsx    # Error notification modal
+│   │   │   ├── MatchDetailsModal.tsx  # Match details and player management
+│   │   │   ├── NewMatchModal.tsx # Match creation/editing form
+│   │   │   ├── StatsChart.tsx    # Monthly statistics chart
+│   │   │   └── SuccessModal.tsx  # Success notification modal
+│   │   └── lib/                  # Library functions
+│   │       └── database.ts       # Database connection utilities
+│   ├── prisma/                   # Prisma client generation
+│   ├── public/                   # Static assets
+│   │   └── icons/                # Application icons and favicon
+│   ├── package.json              # Frontend dependencies
+│   └── README.md                 # Frontend documentation
+├── package.json                  # Root monorepo configuration
+└── README.md                     # Project documentation
 ```
 
 ## Database Schema
@@ -123,67 +148,87 @@ capybara-dashboard/frontend/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd capybara-dashboard/frontend
+   cd capybara-dashboard
    ```
 
-2. **Install dependencies**
+2. **Install dependencies for both frontend and backend**
    ```bash
    npm install
    ```
 
 3. **Environment Configuration**
-   Create a `.env` file in the frontend directory:
+   Create a `.env` file in the backend directory:
    ```env
    DATABASE_URL="postgresql://username:password@localhost:5432/badminton_db"
+   PORT=3001
    JWT_SECRET="your-jwt-secret-key"
-   PORT=3000
    ```
 
 4. **Database Setup**
    ```bash
    # Generate Prisma client
-   npx prisma generate
+   npm run db:generate --workspace=backend
    
    # Push schema to database
-   npx prisma db push
+   npm run db:push --workspace=backend
    
    # Optional: Open Prisma Studio
-   npx prisma studio
+   npm run db:studio --workspace=backend
    ```
 
-5. **Start Development Server**
+5. **Start Development Servers**
    ```bash
+   # Start both frontend and backend servers simultaneously
    npm run dev
    ```
 
-   The application will be available at `http://localhost:3000`
+   The frontend application will be available at `http://localhost:3000`
+   The backend API will be available at `http://localhost:3001`
 
 ## Available Scripts
 
-- **`npm run dev`** - Start development server
-- **`npm run build`** - Build production application
-- **`npm run start`** - Start production server
-- **`npm run lint`** - Run ESLint code analysis
-- **`npx prisma studio`** - Open database management interface
-- **`npx prisma db push`** - Push schema changes to database
+### Monorepo Scripts (Root)
+- **`npm run dev`** - Start both frontend and backend development servers
+- **`npm run dev:frontend`** - Start frontend development server only
+- **`npm run dev:backend`** - Start backend development server only
+- **`npm run build`** - Build both frontend and backend applications
+- **`npm run build:frontend`** - Build frontend application only
+- **`npm run build:backend`** - Build backend application only
+- **`npm run start`** - Start both frontend and backend production servers
+- **`npm run start:frontend`** - Start frontend production server only
+- **`npm run start:backend`** - Start backend production server only
+
+### Frontend Scripts
+- **`npm run dev --workspace=frontend`** - Start frontend development server
+- **`npm run build --workspace=frontend`** - Build production frontend application
+- **`npm run start --workspace=frontend`** - Start production frontend server
+- **`npm run lint --workspace=frontend`** - Run ESLint code analysis
+
+### Backend Scripts
+- **`npm run dev --workspace=backend`** - Start backend development server with nodemon
+- **`npm run build --workspace=backend`** - Compile TypeScript to JavaScript
+- **`npm run start --workspace=backend`** - Start production backend server
+- **`npm run db:studio --workspace=backend`** - Open database management interface
+- **`npm run db:push --workspace=backend`** - Push schema changes to database
+- **`npm run db:migrate --workspace=backend`** - Create and apply migrations
 
 ## API Endpoints
 
 ### Matches
 - `GET /api/matches` - Retrieve all matches
 - `POST /api/matches` - Create new match
-- `GET /api/matches/[id]` - Get specific match
-- `PUT /api/matches/[id]` - Update match
-- `DELETE /api/matches/[id]` - Delete match
-- `POST /api/matches/[id]/players` - Add player to match
-- `DELETE /api/matches/[id]/players/[playerId]` - Remove player from match
+- `GET /api/matches/:id` - Get specific match
+- `PUT /api/matches/:id` - Update match
+- `DELETE /api/matches/:id` - Delete match
+- `POST /api/matches/:id/players` - Add player to match
+- `DELETE /api/matches/:id/players/:playerId` - Remove player from match
 
 ### Players
 - `GET /api/players` - Retrieve all players
 - `POST /api/players` - Create new player
-- `GET /api/players/[id]` - Get specific player
-- `PUT /api/players/[id]` - Update player
-- `DELETE /api/players/[id]` - Delete player
+- `GET /api/players/:id` - Get specific player
+- `PUT /api/players/:id` - Update player
+- `DELETE /api/players/:id` - Delete player
 
 ### Statistics
 - `GET /api/stats` - Get dashboard statistics
@@ -191,14 +236,14 @@ capybara-dashboard/frontend/
 
 ## Deployment
 
-### Vercel Deployment (Recommended)
+### Vercel Deployment (Frontend)
 1. Connect your repository to Vercel
 2. Configure environment variables in Vercel dashboard
 3. Deploy automatically on git push
 
 ### Manual Deployment
-1. Build the application: `npm run build`
-2. Start production server: `npm run start`
+1. Build both frontend and backend applications
+2. Start both servers in production mode
 3. Configure reverse proxy (nginx/Apache) if needed
 
 ## Configuration
@@ -214,7 +259,7 @@ The application supports automatic dark/light theme switching based on system pr
 ### Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string
 - `JWT_SECRET`: Secret key for authentication (future use)
-- `PORT`: Application port (default: 3000)
+- `PORT`: Backend server port (default: 3001)
 
 ## License
 
