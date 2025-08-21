@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
@@ -108,7 +108,7 @@ export default function Dashboard() {
     setSelectedMatch(null);
   };
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const response = await fetch("/api/stats");
       if (!response.ok) {
@@ -126,9 +126,23 @@ export default function Dashboard() {
         hoursPlayed: "0.0",
       });
     }
-  };
+  }, []);
 
-  const autoUpdateMatches = async () => {
+  const fetchMatches = useCallback(async () => {
+    try {
+      const response = await fetch("/api/matches");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setMatches(data);
+    } catch (error) {
+      console.error("Error fetching matches:", error);
+      setMatches([]);
+    }
+  }, []);
+
+  const autoUpdateMatches = useCallback(async () => {
     try {
       const response = await fetch("/api/matches/auto-update", {
         method: "POST",
@@ -147,27 +161,13 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Error auto-updating matches:", error);
     }
-  };
-
-  const fetchMatches = async () => {
-    try {
-      const response = await fetch("/api/matches");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setMatches(data);
-    } catch (error) {
-      console.error("Error fetching matches:", error);
-      setMatches([]);
-    }
-  };
+  }, [fetchMatches, fetchStats]);
 
   useEffect(() => {
     fetchStats();
     fetchMatches();
     autoUpdateMatches(); // Run auto-update when dashboard loads
-  }, []);
+  }, [fetchStats, fetchMatches, autoUpdateMatches]);
 
   const handleSubmitMatch = async (matchData: {
     title: string;
