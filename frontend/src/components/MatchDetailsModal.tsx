@@ -350,9 +350,9 @@ export default function MatchDetailsModal({
 
             {/* Loading state */}
             {loading ? (
-              <div className="no-players-message">
+              <div className="no-players-message flex flex-col items-center justify-center">
                 <p>Loading players...</p>
-                <Loader2 className="h-6 w-6 animate-spin text-blue-500 mx-auto mt-2" />
+                <Loader2 className="h-6 w-6 animate-spin text-blue-500 mt-2" />
               </div>
             ) : (
               <div className="players-columns">
