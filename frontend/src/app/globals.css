@@ -511,6 +511,15 @@ body {
   color: #888;
 }
 
+.match-players {
+  font-size: 14px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
 .match-datetime {
   display: flex;
   flex-direction: column;
