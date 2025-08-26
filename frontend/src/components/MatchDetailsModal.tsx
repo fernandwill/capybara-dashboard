@@ -35,12 +35,14 @@ interface MatchDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   match: Match | null;
+  onMatchUpdate?: () => void;
 }
 
 export default function MatchDetailsModal({
   isOpen,
   onClose,
   match,
+  onMatchUpdate,
 }: MatchDetailsModalProps) {
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
@@ -172,6 +174,10 @@ export default function MatchDetailsModal({
 
       if (response.ok) {
         fetchPlayers();
+        // Trigger dashboard refresh to update fee indicators
+        if (onMatchUpdate) {
+          onMatchUpdate();
+        }
       }
     } catch (error) {
       console.error("Error updating payment status:", error);
