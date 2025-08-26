@@ -302,6 +302,16 @@ export default function Dashboard() {
     }).format(amount);
   };
 
+  // Check if all players have paid (status is "SUDAH_SETOR")
+  const areAllPlayersPaid = (match: Match): boolean => {
+    if (!match.players || match.players.length === 0) {
+      return false; // No players means not fully paid
+    }
+    return match.players.every(playerMatch => 
+      playerMatch.player.paymentStatus === "SUDAH_SETOR"
+    );
+  };
+
   return (
     <div className="dashboard-container">
       <header className="header">
@@ -618,7 +628,7 @@ export default function Dashboard() {
                 )}
                 <div className="match-bottom">
                   <div className="match-price">
-                    <span className="match-fee">
+                    <span className={`match-fee ${areAllPlayersPaid(match) ? 'fee-paid' : 'fee-unpaid'}`}>
                       {formatCurrency(match.fee)}
                     </span>
                   </div>
@@ -659,6 +669,7 @@ export default function Dashboard() {
         isOpen={isDetailsModalOpen}
         onClose={handleCloseDetailsModal}
         match={selectedMatch}
+        onMatchUpdate={fetchMatches}
       />
     </div>
   );

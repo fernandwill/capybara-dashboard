@@ -457,6 +457,19 @@ body {
   border-radius: 6px;
 }
 
+/* Fee payment status colors */
+.match-fee.fee-paid {
+  color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.match-fee.fee-unpaid {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
 .edit-btn {
   background: none;
   border: none;
