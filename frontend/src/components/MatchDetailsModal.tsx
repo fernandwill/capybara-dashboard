@@ -21,6 +21,14 @@ interface Match {
   status: string;
   description?: string;
   createdAt: string;
+  players?: {
+    player: {
+      id: string;
+      name: string;
+      status: string;
+      paymentStatus: string;
+    };
+  }[];
 }
 
 interface MatchDetailsModalProps {
