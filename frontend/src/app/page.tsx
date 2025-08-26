@@ -312,6 +312,67 @@ export default function Dashboard() {
     );
   };
 
+  // Get the closest upcoming match
+  const getClosestUpcomingMatch = (): Match | null => {
+    const upcomingMatches = matches
+      .filter(match => match.status === "UPCOMING")
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    return upcomingMatches.length > 0 ? upcomingMatches[0] : null;
+  };
+
+  const closestMatch = getClosestUpcomingMatch();
+
+  // Countdown timer calculation
+  const [countdown, setCountdown] = useState<string>("");
+
+  useEffect(() => {
+    if (!closestMatch) return;
+
+    const updateCountdown = () => {
+      try {
+        // Parse the date and time more carefully
+        const matchDate = new Date(closestMatch.date);
+        const timeString = closestMatch.time.split('-')[0].trim(); // Get start time
+        const [hours, minutes] = timeString.split(':').map(Number);
+        
+        // Create the full match datetime
+        const matchDateTime = new Date(matchDate);
+        matchDateTime.setHours(hours, minutes, 0, 0);
+        
+        const now = new Date();
+        const timeDiff = matchDateTime.getTime() - now.getTime();
+
+        if (timeDiff <= 0) {
+          setCountdown("Match Started");
+          return;
+        }
+
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        const hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+        if (days > 0) {
+          setCountdown(`${days}d ${hoursLeft}h ${minutesLeft}m`);
+        } else if (hoursLeft > 0) {
+          setCountdown(`${hoursLeft}h ${minutesLeft}m`);
+        } else if (minutesLeft > 0) {
+          setCountdown(`${minutesLeft}m`);
+        } else {
+          setCountdown("Starting soon");
+        }
+      } catch (error) {
+        console.error('Error calculating countdown:', error);
+        setCountdown("Time pending");
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [closestMatch]);
+
   return (
     <div className="dashboard-container">
       <header className="header">
@@ -359,6 +420,44 @@ export default function Dashboard() {
           )}
         </button>
       </header>
+
+      {closestMatch && (
+        <div className="upcoming-match-banner">
+          <div className="upcoming-match-content">
+            <div className="upcoming-match-header">
+              <h2 className="upcoming-match-title">UPCOMING MATCH</h2>
+              <span className="upcoming-match-date">{formatDate(closestMatch.date)}</span>
+            </div>
+            <div className="upcoming-match-details">
+              <div className="upcoming-match-info">
+                <h3 className="match-name">{closestMatch.title}</h3>
+                <div className="match-meta">
+                  <span className="match-time">
+                    <svg className="h-4 w-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {closestMatch.time}
+                  </span>
+                  <span className="match-location">
+                    <svg className="h-4 w-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {closestMatch.location}
+                  </span>
+                  <span className="match-court">Court {closestMatch.courtNumber}</span>
+                </div>
+              </div>
+              <div className="upcoming-match-countdown">
+                <div className="countdown-display">
+                  <span className="countdown-label">Time Until Match</span>
+                  <span className="countdown-timer">{countdown}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <StatsChart />
 
