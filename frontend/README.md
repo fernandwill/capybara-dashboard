@@ -5,6 +5,7 @@ This is the frontend application for the Capybara Dashboard, a badminton match t
 ## Features
 
 ### Match Management
+
 - Create, edit, and delete badminton matches
 - Track match details including location, court number, date, time, and fees
 - Automatic match status updates (upcoming/completed based on date)
@@ -12,6 +13,7 @@ This is the frontend application for the Capybara Dashboard, a badminton match t
 - Detailed match view with player management
 
 ### Player Management
+
 - Add players to matches with contact information
 - Toggle player status between Active and Tentative
 - Two-column layout separating confirmed and tentative players
@@ -19,12 +21,14 @@ This is the frontend application for the Capybara Dashboard, a badminton match t
 - Player removal from matches
 
 ### Statistics & Analytics
+
 - Monthly statistics dashboard with interactive charts
 - Total matches, upcoming matches, and completed matches counters
 - Hours played tracking and visualization
 - Responsive chart display showing match count and hours by month
 
 ### User Interface
+
 - Dark/Light theme toggle with system preference detection
 - Fully responsive design for desktop, tablet, and mobile
 - Modern modal-based interactions
@@ -34,12 +38,14 @@ This is the frontend application for the Capybara Dashboard, a badminton match t
 ## Recent Improvements
 
 ### Data Fetching Optimization
+
 - Implemented fresh data fetching every time the match details modal is opened
 - Added proper data cleanup when the modal is closed to prevent cached data issues
 - Added loading states for better user experience during data fetching
 - Improved player data refresh after all player operations (add, remove, status updates)
 
 ### Mobile Responsiveness
+
 - Enhanced mobile layout for the "Add Player" section
 - Improved form styling for better touch interaction on mobile devices
 - Adjusted responsive breakpoints for various screen sizes
@@ -98,6 +104,7 @@ npm install
 
 Environment Configuration:
 Create a `.env` file in the frontend directory:
+
 ```env
 NEXT_PUBLIC_API_URL="http://localhost:3001"
 ```

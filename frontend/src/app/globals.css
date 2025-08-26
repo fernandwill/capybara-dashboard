@@ -280,6 +280,104 @@ body {
   justify-content: center;
 }
 
+/* Matches Header with Inline Sort */
+.matches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.matches-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.sort-section-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+.sort-select-inline {
+  min-width: 180px;
+  padding: 8px 12px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.sort-select-inline:focus {
+  border-color: #555;
+}
+
+.sort-select-inline option {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  padding: 6px;
+}
+
+/* Responsive Inline Sort */
+@media (max-width: 768px) {
+  .matches-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .matches-title {
+    font-size: 16px;
+  }
+  
+  .sort-section-inline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .sort-select-inline {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .matches-header {
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .matches-title {
+    font-size: 15px;
+  }
+  
+  .sort-label {
+    font-size: 12px;
+  }
+  
+  .sort-select-inline {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
 /* Match List Styles */
 .no-matches {
   text-align: center;

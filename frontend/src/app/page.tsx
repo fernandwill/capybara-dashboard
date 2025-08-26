@@ -5,8 +5,11 @@ import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
+import { Select } from "../components/ui/select";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
+
+type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 
 interface Stats {
   totalMatches: number;
@@ -53,6 +56,7 @@ export default function Dashboard() {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [sortBy, setSortBy] = useState<SortOption>("date-earliest");
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -233,9 +237,27 @@ export default function Dashboard() {
     }
   };
 
+  // Helper function to sort matches based on selected option
+  const sortMatches = (matches: Match[], sortOption: SortOption): Match[] => {
+    return [...matches].sort((a, b) => {
+      switch (sortOption) {
+        case "date-earliest":
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        case "date-latest":
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        case "fee-low":
+          return a.fee - b.fee;
+        case "fee-high":
+          return b.fee - a.fee;
+        default:
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+    });
+  };
+
   // Filter matches based on active tab and search query
-  const filteredMatches = matches
-    .filter((match) => {
+  const filteredMatches = sortMatches(
+    matches.filter((match) => {
       // Filter by status (upcoming vs completed)
       const statusMatch =
         activeTab === "upcoming"
@@ -249,13 +271,9 @@ export default function Dashboard() {
         match.location.toLowerCase().includes(searchQuery.toLowerCase());
 
       return statusMatch && searchMatch;
-    })
-
-    .sort((latest, earliest) => {
-      const dateLatest = new Date(latest.date);
-      const dateEarliest = new Date(earliest.date);
-      return dateEarliest.getTime() - dateLatest.getTime();
-    });
+    }),
+    sortBy
+  );
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -440,6 +458,26 @@ export default function Dashboard() {
       </div>
 
       <div className="matches-container">
+        <div className="matches-header">
+          <h3 className="matches-title">Matches List</h3>
+          <div className="sort-section-inline">
+            <label htmlFor="sort-select" className="sort-label">
+              Sort by:
+            </label>
+            <Select
+              id="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="sort-select-inline"
+            >
+              <option value="date-earliest">Date: Earliest to Latest</option>
+              <option value="date-latest">Date: Latest to Earliest</option>
+              <option value="fee-low">Fee: Low to High</option>
+              <option value="fee-high">Fee: High to Low</option>
+            </Select>
+          </div>
+        </div>
+        
         {filteredMatches.length === 0 ? (
           <div className="no-matches">
             {activeTab === "upcoming"
