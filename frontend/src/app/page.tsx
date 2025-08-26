@@ -476,25 +476,27 @@ export default function Dashboard() {
       </div>
 
       <div className="matches-container">
-        <div className="matches-header">
-          <h3 className="matches-title">Matches List</h3>
-          <div className="sort-section-inline">
-            <label htmlFor="sort-select" className="sort-label">
-              Sort by:
-            </label>
-            <Select
-              id="sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="sort-select-inline"
-            >
-              <option value="date-earliest">Date: Earliest to Latest</option>
-              <option value="date-latest">Date: Latest to Earliest</option>
-              <option value="fee-low">Fee: Low to High</option>
-              <option value="fee-high">Fee: High to Low</option>
-            </Select>
+        {filteredMatches.length > 0 && (
+          <div className="matches-header">
+            <h3 className="matches-title">Matches List</h3>
+            <div className="sort-section-inline">
+              <label htmlFor="sort-select" className="sort-label">
+                Sort by:
+              </label>
+              <Select
+                id="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="sort-select-inline"
+              >
+                <option value="date-earliest">Date: Earliest to Latest</option>
+                <option value="date-latest">Date: Latest to Earliest</option>
+                <option value="fee-low">Fee: Low to High</option>
+                <option value="fee-high">Fee: High to Low</option>
+              </Select>
+            </div>
           </div>
-        </div>
+        )}
         
         {filteredMatches.length === 0 ? (
           <div className="no-matches">
