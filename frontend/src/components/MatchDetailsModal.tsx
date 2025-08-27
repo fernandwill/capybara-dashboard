@@ -104,6 +104,10 @@ export default function MatchDetailsModal({
 
       if (response.ok) {
         fetchPlayers();
+        // Trigger dashboard refresh to update player counts
+        if (onMatchUpdate) {
+          onMatchUpdate();
+        }
       }
     } catch (error) {
       console.error("Error removing player:", error);
@@ -146,6 +150,10 @@ export default function MatchDetailsModal({
           fetchPlayers();
           setNewPlayerName("");
           setShowAddPlayer(false);
+          // Trigger dashboard refresh to update player counts
+          if (onMatchUpdate) {
+            onMatchUpdate();
+          }
         }
       }
     } catch (error) {
