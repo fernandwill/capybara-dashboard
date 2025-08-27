@@ -161,43 +161,12 @@ export default function MatchDetailsModal({
     }
   };
 
-  const handleTogglePayment = async (
+
+
+  const handleSetPlayerStatus = async (
     playerId: string,
-    currentStatus: string
+    newStatus: string
   ) => {
-    const newStatus =
-      currentStatus === "BELUM_SETOR" ? "SUDAH_SETOR" : "BELUM_SETOR";
-
-    try {
-      const response = await fetch(
-        `/api/players/${playerId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ paymentStatus: newStatus }),
-        }
-      );
-
-      if (response.ok) {
-        fetchPlayers();
-        // Trigger dashboard refresh to update fee indicators
-        if (onMatchUpdate) {
-          onMatchUpdate();
-        }
-      }
-    } catch (error) {
-      console.error("Error updating payment status:", error);
-    }
-  };
-
-  const handleToggleStatus = async (
-    playerId: string,
-    currentStatus: string
-  ) => {
-    const newStatus = currentStatus === "ACTIVE" ? "TENTATIVE" : "ACTIVE";
-
     try {
       const response = await fetch(
         `/api/players/${playerId}`,
@@ -215,6 +184,34 @@ export default function MatchDetailsModal({
       }
     } catch (error) {
       console.error("Error updating player status:", error);
+    }
+  };
+
+  const handleSetPaymentStatus = async (
+    playerId: string,
+    newPaymentStatus: string
+  ) => {
+    try {
+      const response = await fetch(
+        `/api/players/${playerId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ paymentStatus: newPaymentStatus }),
+        }
+      );
+
+      if (response.ok) {
+        fetchPlayers();
+        // Trigger dashboard refresh to update fee indicators
+        if (onMatchUpdate) {
+          onMatchUpdate();
+        }
+      }
+    } catch (error) {
+      console.error("Error updating payment status:", error);
     }
   };
 
@@ -394,24 +391,30 @@ export default function MatchDetailsModal({
                               ×
                             </button>
                           </div>
-                          <div className="player-status-buttons">
+                          <div className="player-status-controls">
                             <button
-                              className={`status-toggle ${player.status.toLowerCase()}`}
-                              onClick={() =>
-                                handleToggleStatus(player.id, player.status)
-                              }
+                              className={`status-btn ${player.status === 'ACTIVE' ? 'active' : 'inactive'}`}
+                              onClick={() => handleSetPlayerStatus(player.id, 'ACTIVE')}
                             >
-                              {player.status}
+                              ACTIVE
                             </button>
                             <button
-                              className={`payment-toggle ${player.paymentStatus.toLowerCase()}`}
-                              onClick={() =>
-                                handleTogglePayment(player.id, player.paymentStatus)
-                              }
+                              className={`status-btn ${player.status === 'TENTATIVE' ? 'tentative' : 'no-color'}`}
+                              onClick={() => handleSetPlayerStatus(player.id, 'TENTATIVE')}
                             >
-                              {player.paymentStatus === "BELUM_SETOR"
-                                ? "Belum Setor"
-                                : "Sudah Setor"}
+                              SET PLAYER AS TENTATIVE
+                            </button>
+                            <button
+                              className={`payment-btn ${player.paymentStatus === 'BELUM_SETOR' ? 'belum-setor' : 'no-color'}`}
+                              onClick={() => handleSetPaymentStatus(player.id, 'BELUM_SETOR')}
+                            >
+                              BELUM SETOR
+                            </button>
+                            <button
+                              className={`payment-btn ${player.paymentStatus === 'SUDAH_SETOR' ? 'sudah-setor' : 'no-color'}`}
+                              onClick={() => handleSetPaymentStatus(player.id, 'SUDAH_SETOR')}
+                            >
+                              SUDAH SETOR
                             </button>
                           </div>
                         </div>
@@ -440,24 +443,30 @@ export default function MatchDetailsModal({
                               ×
                             </button>
                           </div>
-                          <div className="player-status-buttons">
+                          <div className="player-status-controls">
                             <button
-                              className={`status-toggle ${player.status.toLowerCase()}`}
-                              onClick={() =>
-                                handleToggleStatus(player.id, player.status)
-                              }
+                              className={`status-btn ${player.status === 'ACTIVE' ? 'active' : 'no-color'}`}
+                              onClick={() => handleSetPlayerStatus(player.id, 'ACTIVE')}
                             >
-                              {player.status}
+                              SET PLAYER AS ACTIVE
                             </button>
                             <button
-                              className={`payment-toggle ${player.paymentStatus.toLowerCase()}`}
-                              onClick={() =>
-                                handleTogglePayment(player.id, player.paymentStatus)
-                              }
+                              className={`status-btn ${player.status === 'TENTATIVE' ? 'tentative' : 'no-color'}`}
+                              onClick={() => handleSetPlayerStatus(player.id, 'TENTATIVE')}
                             >
-                              {player.paymentStatus === "BELUM_SETOR"
-                                ? "Belum Setor"
-                                : "Sudah Setor"}
+                              TENTATIVE
+                            </button>
+                            <button
+                              className={`payment-btn ${player.paymentStatus === 'BELUM_SETOR' ? 'belum-setor' : 'no-color'}`}
+                              onClick={() => handleSetPaymentStatus(player.id, 'BELUM_SETOR')}
+                            >
+                              BELUM SETOR
+                            </button>
+                            <button
+                              className={`payment-btn ${player.paymentStatus === 'SUDAH_SETOR' ? 'sudah-setor' : 'no-color'}`}
+                              onClick={() => handleSetPaymentStatus(player.id, 'SUDAH_SETOR')}
+                            >
+                              SUDAH SETOR
                             </button>
                           </div>
                         </div>
