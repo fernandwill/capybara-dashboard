@@ -312,6 +312,16 @@ export default function Dashboard() {
     );
   };
 
+  // Count players with BELUM_SETOR status
+  const getPendingPaymentCount = (match: Match): number => {
+    if (!match.players || match.players.length === 0) {
+      return 0;
+    }
+    return match.players.filter(playerMatch => 
+      playerMatch.player.paymentStatus === "BELUM_SETOR"
+    ).length;
+  };
+
   // Get the closest upcoming match
   const getClosestUpcomingMatch = (): Match | null => {
     const upcomingMatches = matches
@@ -729,9 +739,16 @@ export default function Dashboard() {
                 )}
                 <div className="match-bottom">
                   <div className="match-price">
-                    <span className={`match-fee ${areAllPlayersPaid(match) ? 'fee-paid' : 'fee-unpaid'}`}>
-                      {formatCurrency(match.fee)}
-                    </span>
+                    <div className="fee-section">
+                      <span className={`match-fee ${areAllPlayersPaid(match) ? 'fee-paid' : 'fee-unpaid'}`}>
+                        {formatCurrency(match.fee)}
+                      </span>
+                      {getPendingPaymentCount(match) > 0 && (
+                        <span className="pending-payment">
+                          Pending payment: {getPendingPaymentCount(match)} player{getPendingPaymentCount(match) > 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

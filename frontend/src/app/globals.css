@@ -671,6 +671,16 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+.pending-payment {
+  font-size: 12px;
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  font-weight: 500;
+}
+
 .edit-btn {
   background: none;
   border: none;
@@ -774,7 +784,16 @@ body {
 
 .match-price {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fee-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 .match-status-price {
@@ -1676,6 +1695,11 @@ input[type="time"]::-webkit-datetime-edit-text {
 
   .match-fee {
     align-self: flex-start;
+  }
+
+  .pending-payment {
+    font-size: 10px;
+    padding: 1px 6px;
   }
 
   .match-header-right {
