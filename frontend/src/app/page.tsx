@@ -71,6 +71,15 @@ export default function Dashboard() {
     document.documentElement.classList.toggle("dark");
   };
 
+  // Set default sort order based on active tab
+  useEffect(() => {
+    if (activeTab === "past") {
+      setSortBy("date-latest");
+    } else {
+      setSortBy("date-earliest");
+    }
+  }, [activeTab]);
+
   useEffect(() => {
     // Initialize theme on component mount
     if (isDarkMode) {
