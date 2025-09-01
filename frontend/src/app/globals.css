@@ -2000,3 +2000,48 @@ input[type="time"]::-webkit-datetime-edit-text {
   margin-bottom: 8px;
   opacity: 1;
 }
+
+/* Mobile Header Styles */
+.header-mobile {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.header-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.dashboard-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  text-align: center;
+}
+
+.avatar.centered {
+  display: flex;
+  justify-content: center;
+}
+
+/* Responsive Header */
+@media (max-width: 768px) {
+  .header-mobile {
+    display: flex;
+  }
+  
+  .header-desktop {
+    display: none;
+  }
+  
+  .dashboard-title {
+    font-size: 20px;
+  }
+}
