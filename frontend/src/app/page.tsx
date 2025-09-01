@@ -782,7 +782,7 @@ export default function Dashboard() {
 
       <footer className="footer">
         <div className="footer-txt">© PB Capybara</div>
-        <p>Badminton Dashboard</p>
+        <p>Badminton Management Dashboard</p>
       </footer>
 
       <NewMatchModal
