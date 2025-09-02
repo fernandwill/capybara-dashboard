@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 interface SplashPageProps {
@@ -12,7 +12,7 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isDismissing, setIsDismissing] = useState(false);
-  
+
   // Minimum swipe distance for gesture recognition
   const minSwipeDistance = 50;
 
@@ -21,19 +21,19 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
     setTouchEnd(0);
     setTouchStart(e.targetTouches[0].clientY);
   };
-  
+
   // Handle touch move
   const onTouchMove = (e: React.TouchEvent) => {
     setTouchEnd(e.targetTouches[0].clientY);
   };
-  
+
   // Handle touch end
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isUpSwipe = distance > minSwipeDistance;
-    
+
     if (isUpSwipe) {
       setIsDismissing(true);
       setTimeout(() => {
@@ -41,7 +41,7 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
       }, 300); // Match the CSS animation duration
     }
   };
-  
+
   // Handle click/tap for non-touch devices
   const handleClick = () => {
     setIsDismissing(true);
@@ -49,10 +49,10 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
       onDismiss();
     }, 300); // Match the CSS animation duration
   };
-  
+
   return (
-    <div 
-      className={`splash-container ${isDismissing ? 'dismiss' : ''}`}
+    <div
+      className={`splash-container ${isDismissing ? "dismiss" : ""}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -69,20 +69,35 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
           />
         </div>
         <h1 className="app-title">Capybara&apos;s Dashboard</h1>
-        <p className="swipe-instruction">
+        <div className="swipe-instruction">
           <span>Swipe up to continue</span>
-          <svg 
-            className="swipe-icon" 
-            width="20" 
-            height="20" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2"
-          >
-            <path d="M12 5v14M5 12l7 7 7-7" />
-          </svg>
-        </p>
+          <div className="swipe-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="swipe-arrow"
+            >
+              <path
+                d="M7 14L12 9L17 14"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M7 18L12 13L17 18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.6"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
   );
