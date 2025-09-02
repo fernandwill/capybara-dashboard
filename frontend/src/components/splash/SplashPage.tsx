@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import "./splash.css";
 
 interface SplashPageProps {
   onDismiss: () => void;
@@ -67,53 +68,26 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
   };
 
   return (
-    <div
-      className={`splash-container ${isDismissing ? "dismiss" : ""}`}
+    <div 
+      className={`splash-container ${isDismissing ? 'dismiss' : ''}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       onClick={handleClick}
     >
-      <div className="splash-content">
-        <div className="logo-container">
-          <Image
-            src="/icons/icon.jpg"
-            alt="Capybara Logo"
-            width={120}
-            height={120}
-            className="splash-logo"
-          />
-        </div>
-        <h1 className="app-title">Capybara&apos;s Dashboard</h1>
-        <div className="swipe-instruction">
-          <span>{isMobile ? "Swipe up to continue" : "Click to continue"}</span>
-          <div className="swipe-icon">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="swipe-arrow"
-            >
-              <path
-                d="M7 14L12 9L17 14"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M7 18L12 13L17 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity="0.5"
-              />
-            </svg>
-          </div>
-        </div>
+      <div className="logo-container">
+        <Image
+          src="/icons/icon.jpg"
+          alt="Capybara Logo"
+          width={120}
+          height={120}
+          className="splash-logo"
+        />
+      </div>
+      <h1 className="app-title">Capybara&apos;s Dashboard</h1>
+      <div className="swipe-instruction">
+        <span>{isMobile ? 'Swipe up to continue' : 'Do the tap magic'}</span>
+        {isMobile && <div className="swipe-icon">{'>'}</div>}
       </div>
     </div>
   );

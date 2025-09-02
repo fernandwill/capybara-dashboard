@@ -3,7 +3,6 @@
 import { useState } from "react";
 import SplashPage from "../components/splash/SplashPage";
 import { Dashboard } from "./Dashboard";
-import "../components/splash/splash.css";
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
