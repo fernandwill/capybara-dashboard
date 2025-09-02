@@ -89,9 +89,17 @@
 
 .swipe-icon {
   animation: bounce 1.5s ease-in-out infinite;
-  font-size: 2rem;
-  font-weight: bold;
-  transform: rotate(-90deg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.swipe-arrow {
+  color: var(--text-color);
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease;
 }
 
 @keyframes bounce {
@@ -128,6 +136,42 @@
   .splash-logo {
     width: 100px;
     height: 100px;
+  }
+  
+  .swipe-instruction {
+    font-size: 0.9rem;
+    margin-top: 1.5rem;
+  }
+  
+  .swipe-arrow {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .swipe-icon {
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+  .splash-content {
+    padding: 1rem;
+    width: 95%;
+  }
+  
+  .app-title {
+    font-size: 1.3rem;
+  }
+  
+  .swipe-instruction {
+    font-size: 0.85rem;
+    gap: 0.5rem;
+  }
+  
+  .swipe-arrow {
+    width: 28px;
+    height: 28px;
   }
 }
 
