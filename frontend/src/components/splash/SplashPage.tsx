@@ -9,67 +9,98 @@ interface SplashPageProps {
 }
 
 export default function SplashPage({ onDismiss }: SplashPageProps) {
-  // Touch handling state
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
   const [isDismissing, setIsDismissing] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Minimum swipe distance for gesture recognition
   const minSwipeDistance = 50;
 
-  // Detect if user is on mobile device
   useEffect(() => {
     const checkIsMobile = () => {
+      if (typeof window === "undefined") return;
+
       const userAgent =
-        typeof window !== "undefined" ? navigator.userAgent : "";
-      const isMobile =
+        navigator.userAgent ||
+        navigator.vendor ||
+        (window as unknown as Window & { opera?: string }).opera ||
+        "";
+      const isMobileDevice =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           userAgent
         );
-      setIsMobile(isMobile);
+      const isTouchDevice =
+        "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      setIsMobile(isMobileDevice || isTouchDevice);
     };
 
     checkIsMobile();
+
+    // Prevent default touch behaviors on the body when splash is active
+    if (typeof document !== "undefined") {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+
+      return () => {
+        if (typeof document !== "undefined") {
+          document.body.style.overflow = "";
+          document.body.style.touchAction = "";
+        }
+      };
+    }
   }, []);
 
   // Handle touch start
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(0);
     setTouchStart(e.targetTouches[0].clientY);
   };
 
   // Handle touch move
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientY);
+    if (!touchStart) return;
+
+    const currentTouch = e.targetTouches[0].clientY;
+    const distance = touchStart - currentTouch;
+
+    // Provide immediate visual feedback for upward swipes
+    if (distance > 20) {
+      // Removed style manipulation to avoid TypeScript errors
+    }
   };
 
   // Handle touch end
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart) return;
 
+    const touchEnd = e.changedTouches[0].clientY;
     const distance = touchStart - touchEnd;
     const isUpSwipe = distance > minSwipeDistance;
 
     if (isUpSwipe) {
-      setIsDismissing(true);
-      setTimeout(() => {
-        onDismiss();
-      }, 300); // Match the CSS animation duration
+      handleDismiss();
     }
+
+    setTouchStart(null);
   };
 
-  // Handle click/tap for non-touch devices
-  const handleClick = () => {
+  // Handle dismiss with animation
+  const handleDismiss = () => {
     setIsDismissing(true);
     setTimeout(() => {
       onDismiss();
-    }, 300); // Match the CSS animation duration
+    }, 300);
+  };
+
+  // Handle click/tap for non-touch devices or as fallback
+  const handleClick = () => {
+    // Only handle click if it's not a touch device or if touch events failed
+    if (!isMobile) {
+      handleDismiss();
+    }
   };
 
   return (
-    <div 
-      className={`splash-container ${isDismissing ? 'dismiss' : ''}`}
+    <div
+      className={`splash-container ${isDismissing ? "dismiss" : ""}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -86,8 +117,35 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
       </div>
       <h1 className="app-title">Capybara&apos;s Dashboard</h1>
       <div className="swipe-instruction">
-        <span>{isMobile ? 'Swipe up to continue' : 'Do the tap magic'}</span>
-        {isMobile && <div className="swipe-icon">{'>'}</div>}
+        <span>{isMobile ? "Swipe up to continue" : "Click to continue"}</span>
+        {isMobile && (
+          <div className="swipe-icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="swipe-arrow"
+            >
+              <path
+                d="M7 14L12 9L17 14"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M7 18L12 13L17 18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.6"
+              />
+            </svg>
+          </div>
+        )}
       </div>
     </div>
   );

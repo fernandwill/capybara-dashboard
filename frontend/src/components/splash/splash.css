@@ -81,9 +81,12 @@
 
 .swipe-icon {
   animation: bounce 1.5s ease-in-out infinite;
-  font-size: 2rem;
-  font-weight: bold;
-  transform: rotate(-90deg);
+}
+
+.swipe-arrow {
+  width: 32px;
+  height: 32px;
+  color: white;
 }
 
 @keyframes bounce {
