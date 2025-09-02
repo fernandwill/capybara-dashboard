@@ -6,7 +6,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a2a6c, #2a4a8c, #3a6aad);
+  background-color: var(--bg-color);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,15 +17,17 @@
 
 .splash-content {
   text-align: center;
-  color: white;
+  color: var(--text-color);
   padding: 2rem;
   border-radius: 16px;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: var(--card-bg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   max-width: 90%;
   width: 400px;
+  position: relative;
 }
+
+
 
 .logo-container {
   display: flex;
@@ -36,22 +38,22 @@
 .splash-logo {
   border-radius: 50%;
   animation: heartbeat 2s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
 }
 
 @keyframes heartbeat {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.05);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
 }
 
@@ -59,7 +61,6 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.5px;
 }
 
@@ -88,16 +89,9 @@
 
 .swipe-icon {
   animation: bounce 1.5s ease-in-out infinite;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.swipe-arrow {
-  color: white;
-  width: 32px;
-  height: 32px;
+  font-size: 2rem;
+  font-weight: bold;
+  transform: rotate(-90deg);
 }
 
 @keyframes bounce {
@@ -134,5 +128,34 @@
   .splash-logo {
     width: 100px;
     height: 100px;
+  }
+}
+
+/* Dark mode specific styles */
+.dark .splash-container {
+  background-color: var(--bg-color);
+}
+
+.dark .splash-content {
+  background: var(--card-bg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.dark .splash-logo {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.05);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
   }
 }
