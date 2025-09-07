@@ -94,7 +94,7 @@ export default function NewMatchModal({
 
     // Combine date and time for the API
     const matchData = {
-      title: formData.title,
+      title: formData.location, // Use location as title for backward compatibility
       location: formData.location,
       courtNumber: formData.courtNumber,
       date: formData.date,
@@ -146,19 +146,6 @@ export default function NewMatchModal({
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="title">Title</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="form-input"
-                placeholder="Match title"
-              />
-            </div>
-            <div className="form-group">
               <label htmlFor="location">Location</label>
               <input
                 type="text"
@@ -171,9 +158,6 @@ export default function NewMatchModal({
                 placeholder="Court location"
               />
             </div>
-          </div>
-
-          <div className="form-row">
             <div className="form-group">
               <label htmlFor="courtNumber">Court #</label>
               <input
@@ -187,6 +171,9 @@ export default function NewMatchModal({
                 placeholder="1"
               />
             </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-group">
               <label htmlFor="date">Date</label>
               <input
