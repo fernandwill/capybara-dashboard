@@ -216,6 +216,62 @@ export const removePlayerFromMatch = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to remove player from match." });
   }
 };
+
+export const getPlayersFromPastMatches = async (req: Request, res: Response) => {
+  try {
+    const { matchId } = req.params;
+    
+    // First, get the current match to know its date
+    const currentMatch = await prisma.match.findUnique({
+      where: { id: matchId },
+    });
+
+    if (!currentMatch) {
+      return res.status(404).json({ error: "Match not found." });
+    }
+
+    // Get the 3 most recent matches before the current match date
+    const pastMatches = await prisma.match.findMany({
+      where: {
+        date: {
+          lt: currentMatch.date,
+        },
+        status: "COMPLETED",
+      },
+      orderBy: {
+        date: "desc",
+      },
+      take: 3,
+      include: {
+        players: {
+          include: {
+            player: true,
+          },
+        },
+      },
+    });
+
+    // Extract unique players from past matches
+    const playerMap = new Map();
+    pastMatches.forEach(match => {
+      match.players.forEach(playerMatch => {
+        // Only add if not already in the map (to ensure uniqueness)
+        if (!playerMap.has(playerMatch.player.id)) {
+          playerMap.set(playerMatch.player.id, playerMatch.player);
+        }
+      });
+    });
+
+    // Convert map values to array
+    const uniquePlayers = Array.from(playerMap.values());
+
+    res.json(uniquePlayers);
+  } catch (error) {
+    console.error("Error fetching players from past matches:", error);
+    res.status(500).json({ error: "Failed to fetch players from past matches." });
+  }
+};
+
 export const getStats = async (req: Request, res: Response) => {
   try {
     const totalMatches = await prisma.match.count();

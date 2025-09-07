@@ -7,7 +7,8 @@ import {
   deleteMatch,
   addPlayerToMatch,
   removePlayerFromMatch,
-  getStats
+  getStats,
+  getPlayersFromPastMatches
 } from '../controllers/MatchController'
 
 const router = Router()
@@ -15,6 +16,7 @@ const router = Router()
 router.get('/stats', getStats)
 router.get('/', getAllMatches)
 router.get('/:id', getMatchById)
+router.get('/:id/players/past', getPlayersFromPastMatches)
 router.post('/', createMatch)
 router.put('/:id', updateMatch)
 router.delete('/:id', deleteMatch)
