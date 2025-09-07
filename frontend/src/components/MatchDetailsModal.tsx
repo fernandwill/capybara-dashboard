@@ -59,6 +59,37 @@ export default function MatchDetailsModal({
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Prevent background scrolling
+      document.body.style.overflow = 'hidden';
+      // Also handle mobile safari issues
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${window.scrollY}px`;
+      document.body.style.width = '100%';
+    } else {
+      // Restore scrolling when modal closes
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      // Restore scroll position
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+    
+    // Cleanup function
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
