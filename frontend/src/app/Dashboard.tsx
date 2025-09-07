@@ -312,6 +312,43 @@ export function Dashboard() {
     }).format(amount);
   };
 
+  const formatTimeWithDuration = (timeString: string) => {
+    if (!timeString || !timeString.includes('-')) {
+      return timeString;
+    }
+    try {
+      const [startTime, endTime] = timeString.split('-').map(t => t.trim());
+      const [startHours, startMinutes] = startTime.split(':').map(Number);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+      if (isNaN(startHours) || isNaN(startMinutes) || isNaN(endHours) || isNaN(endMinutes)) {
+        return timeString;
+      }
+
+      const startDate = new Date();
+      startDate.setHours(startHours, startMinutes, 0, 0);
+
+      const endDate = new Date();
+      endDate.setHours(endHours, endMinutes, 0, 0);
+
+      let durationMillis = endDate.getTime() - startDate.getTime();
+      if (durationMillis < 0) {
+        // Handle overnight case
+        const dayInMillis = 24 * 60 * 60 * 1000;
+        durationMillis += dayInMillis;
+      }
+      
+      const durationHours = durationMillis / (1000 * 60 * 60);
+      // round to 1 decimal place
+      const roundedDuration = Math.round(durationHours * 10) / 10;
+
+      return `${timeString} (${roundedDuration} hrs)`;
+    } catch (error) {
+      console.error("Error formatting time with duration:", error);
+      return timeString;
+    }
+  };
+
   // Check if all players have paid (status is "SUDAH_SETOR")
   const areAllPlayersPaid = (match: Match): boolean => {
     if (!match.players || match.players.length === 0) {
@@ -695,7 +732,7 @@ export function Dashboard() {
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      {match.time}
+                      {formatTimeWithDuration(match.time)}
                     </span>
                     <span className="match-court">
                       <svg
