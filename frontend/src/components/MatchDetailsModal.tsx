@@ -53,6 +53,12 @@ export default function MatchDetailsModal({
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
 
+  // State for payment status filters - by default show all players
+  const [showSudahSetor, setShowSudahSetor] = useState(true);
+  const [showBelumSetor, setShowBelumSetor] = useState(true);
+  const [showSudahSetorTentative, setShowSudahSetorTentative] = useState(true);
+  const [showBelumSetorTentative, setShowBelumSetorTentative] = useState(true);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
@@ -444,49 +450,72 @@ export default function MatchDetailsModal({
             ) : (
               <div className="players-columns">
                 <div className="players-column">
-                  <h4 className="column-title">Players</h4>
+                  <div className="column-header">
+                    <h4 className="column-title">Players</h4>
+                    <div className="payment-filters">
+                      <button 
+                        className={`payment-filter ${showSudahSetor ? 'active' : ''}`}
+                        onClick={() => setShowSudahSetor(!showSudahSetor)}
+                      >
+                        Sudah Setor
+                      </button>
+                      <button 
+                        className={`payment-filter ${showBelumSetor ? 'active' : ''}`}
+                        onClick={() => setShowBelumSetor(!showBelumSetor)}
+                      >
+                        Belum Setor
+                      </button>
+                    </div>
+                  </div>
                   <div className="players-grid-column">
                     {players.filter(player => player.status === "ACTIVE").length > 0 ? (
-                      sortPlayersByPaymentStatus(players.filter(player => player.status === "ACTIVE")).map((player) => (
-                        <div key={player.id} className="player-card">
-                          <div className="player-header">
-                            <h4 className="player-name">{player.name}</h4>
-                            <button
-                              className="remove-player-btn"
-                              onClick={() => handleRemovePlayer(player.id)}
-                              title="Remove player"
-                            >
-                              ×
-                            </button>
+                      sortPlayersByPaymentStatus(players.filter(player => player.status === "ACTIVE"))
+                        .filter(player => {
+                          // Show based on toggle state
+                          if (showSudahSetor && player.paymentStatus === "SUDAH_SETOR") return true;
+                          if (showBelumSetor && player.paymentStatus === "BELUM_SETOR") return true;
+                          return false;
+                        })
+                        .map((player) => (
+                          <div key={player.id} className="player-card">
+                            <div className="player-header">
+                              <h4 className="player-name">{player.name}</h4>
+                              <button
+                                className="remove-player-btn"
+                                onClick={() => handleRemovePlayer(player.id)}
+                                title="Remove player"
+                              >
+                                ×
+                              </button>
+                            </div>
+                            <div className="player-status-controls">
+                              <button
+                                className={`status-btn ${player.status === 'ACTIVE' ? 'active' : 'inactive'}`}
+                                onClick={() => handleSetPlayerStatus(player.id, 'ACTIVE')}
+                              >
+                                ACTIVE
+                              </button>
+                              <button
+                                className={`status-btn ${player.status === 'TENTATIVE' ? 'tentative' : 'no-color'}`}
+                                onClick={() => handleSetPlayerStatus(player.id, 'TENTATIVE')}
+                              >
+                                SET PLAYER AS TENTATIVE
+                              </button>
+                              <button
+                                className={`payment-btn ${player.paymentStatus === 'BELUM_SETOR' ? 'belum-setor' : 'no-color'}`}
+                                onClick={() => handleSetPaymentStatus(player.id, 'BELUM_SETOR')}
+                              >
+                                BELUM SETOR
+                              </button>
+                              <button
+                                className={`payment-btn ${player.paymentStatus === 'SUDAH_SETOR' ? 'sudah-setor' : 'no-color'}`}
+                                onClick={() => handleSetPaymentStatus(player.id, 'SUDAH_SETOR')}
+                              >
+                                SUDAH SETOR
+                              </button>
+                            </div>
                           </div>
-                          <div className="player-status-controls">
-                            <button
-                              className={`status-btn ${player.status === 'ACTIVE' ? 'active' : 'inactive'}`}
-                              onClick={() => handleSetPlayerStatus(player.id, 'ACTIVE')}
-                            >
-                              ACTIVE
-                            </button>
-                            <button
-                              className={`status-btn ${player.status === 'TENTATIVE' ? 'tentative' : 'no-color'}`}
-                              onClick={() => handleSetPlayerStatus(player.id, 'TENTATIVE')}
-                            >
-                              SET PLAYER AS TENTATIVE
-                            </button>
-                            <button
-                              className={`payment-btn ${player.paymentStatus === 'BELUM_SETOR' ? 'belum-setor' : 'no-color'}`}
-                              onClick={() => handleSetPaymentStatus(player.id, 'BELUM_SETOR')}
-                            >
-                              BELUM SETOR
-                            </button>
-                            <button
-                              className={`payment-btn ${player.paymentStatus === 'SUDAH_SETOR' ? 'sudah-setor' : 'no-color'}`}
-                              onClick={() => handleSetPaymentStatus(player.id, 'SUDAH_SETOR')}
-                            >
-                              SUDAH SETOR
-                            </button>
-                          </div>
-                        </div>
-                      ))
+                        ))
                     ) : (
                       <div className="no-players-message">
                         <p>No active players yet.</p>
@@ -495,57 +524,83 @@ export default function MatchDetailsModal({
                   </div>
                 </div>
 
-                <div className="players-column">
-                  <h4 className="column-title">Tentative</h4>
-                  <div className="players-grid-column">
-                    {players.filter(player => player.status === "TENTATIVE").length > 0 ? (
-                      sortPlayersByPaymentStatus(players.filter(player => player.status === "TENTATIVE")).map((player) => (
-                        <div key={player.id} className="player-card">
-                          <div className="player-header">
-                            <h4 className="player-name">{player.name}</h4>
-                            <button
-                              className="remove-player-btn"
-                              onClick={() => handleRemovePlayer(player.id)}
-                              title="Remove player"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div className="player-status-controls">
-                            <button
-                              className={`status-btn ${player.status === 'ACTIVE' ? 'active' : 'no-color'}`}
-                              onClick={() => handleSetPlayerStatus(player.id, 'ACTIVE')}
-                            >
-                              SET PLAYER AS ACTIVE
-                            </button>
-                            <button
-                              className={`status-btn ${player.status === 'TENTATIVE' ? 'tentative' : 'no-color'}`}
-                              onClick={() => handleSetPlayerStatus(player.id, 'TENTATIVE')}
-                            >
-                              TENTATIVE
-                            </button>
-                            <button
-                              className={`payment-btn ${player.paymentStatus === 'BELUM_SETOR' ? 'belum-setor' : 'no-color'}`}
-                              onClick={() => handleSetPaymentStatus(player.id, 'BELUM_SETOR')}
-                            >
-                              BELUM SETOR
-                            </button>
-                            <button
-                              className={`payment-btn ${player.paymentStatus === 'SUDAH_SETOR' ? 'sudah-setor' : 'no-color'}`}
-                              onClick={() => handleSetPaymentStatus(player.id, 'SUDAH_SETOR')}
-                            >
-                              SUDAH SETOR
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="no-players-message">
-                        <p>No tentative players yet.</p>
+                {/* Tentative Column - Only show if there are tentative players */}
+                {players.some(player => player.status === "TENTATIVE") && (
+                  <div className="players-column">
+                    <div className="column-header">
+                      <h4 className="column-title">Tentative</h4>
+                      <div className="payment-filters">
+                        <button 
+                          className={`payment-filter ${showSudahSetorTentative ? 'active' : ''}`}
+                          onClick={() => setShowSudahSetorTentative(!showSudahSetorTentative)}
+                        >
+                          Sudah Setor
+                        </button>
+                        <button 
+                          className={`payment-filter ${showBelumSetorTentative ? 'active' : ''}`}
+                          onClick={() => setShowBelumSetorTentative(!showBelumSetorTentative)}
+                        >
+                          Belum Setor
+                        </button>
                       </div>
-                    )}
+                    </div>
+                    <div className="players-grid-column">
+                      {players.filter(player => player.status === "TENTATIVE").length > 0 ? (
+                        sortPlayersByPaymentStatus(players.filter(player => player.status === "TENTATIVE"))
+                          .filter(player => {
+                            // Show based on toggle state
+                            if (showSudahSetorTentative && player.paymentStatus === "SUDAH_SETOR") return true;
+                            if (showBelumSetorTentative && player.paymentStatus === "BELUM_SETOR") return true;
+                            return false;
+                          })
+                          .map((player) => (
+                            <div key={player.id} className="player-card">
+                              <div className="player-header">
+                                <h4 className="player-name">{player.name}</h4>
+                                <button
+                                  className="remove-player-btn"
+                                  onClick={() => handleRemovePlayer(player.id)}
+                                  title="Remove player"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                              <div className="player-status-controls">
+                                <button
+                                  className={`status-btn ${player.status === 'ACTIVE' ? 'active' : 'no-color'}`}
+                                  onClick={() => handleSetPlayerStatus(player.id, 'ACTIVE')}
+                                >
+                                  SET PLAYER AS ACTIVE
+                                </button>
+                                <button
+                                  className={`status-btn ${player.status === 'TENTATIVE' ? 'tentative' : 'no-color'}`}
+                                  onClick={() => handleSetPlayerStatus(player.id, 'TENTATIVE')}
+                                >
+                                  TENTATIVE
+                                </button>
+                                <button
+                                  className={`payment-btn ${player.paymentStatus === 'BELUM_SETOR' ? 'belum-setor' : 'no-color'}`}
+                                  onClick={() => handleSetPaymentStatus(player.id, 'BELUM_SETOR')}
+                                >
+                                  BELUM SETOR
+                                </button>
+                                <button
+                                  className={`payment-btn ${player.paymentStatus === 'SUDAH_SETOR' ? 'sudah-setor' : 'no-color'}`}
+                                  onClick={() => handleSetPaymentStatus(player.id, 'SUDAH_SETOR')}
+                                >
+                                  SUDAH SETOR
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="no-players-message">
+                          <p>No tentative players yet.</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
