@@ -67,7 +67,42 @@ export default function MatchDetailsModal({
     }).format(amount);
   };
 
-  
+  const formatTimeWithDuration = (timeString: string) => {
+    if (!timeString || !timeString.includes('-')) {
+      return timeString;
+    }
+    try {
+      const [startTime, endTime] = timeString.split('-').map(t => t.trim());
+      const [startHours, startMinutes] = startTime.split(':').map(Number);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+
+      if (isNaN(startHours) || isNaN(startMinutes) || isNaN(endHours) || isNaN(endMinutes)) {
+        return timeString;
+      }
+
+      const startDate = new Date();
+      startDate.setHours(startHours, startMinutes, 0, 0);
+
+      const endDate = new Date();
+      endDate.setHours(endHours, endMinutes, 0, 0);
+
+      let durationMillis = endDate.getTime() - startDate.getTime();
+      if (durationMillis < 0) {
+        // Handle overnight case
+        const dayInMillis = 24 * 60 * 60 * 1000;
+        durationMillis += dayInMillis;
+      }
+      
+      const durationHours = durationMillis / (1000 * 60 * 60);
+      // round to 1 decimal place
+      const roundedDuration = Math.round(durationHours * 10) / 10;
+
+      return `${timeString} (${roundedDuration} hrs)`;
+    } catch (error) {
+      console.error("Error formatting time with duration:", error);
+      return timeString;
+    }
+  };
 
   const fetchPlayers = async () => {
     if (!match) return;
@@ -273,48 +308,19 @@ export default function MatchDetailsModal({
           {/* Match Information */}
           <div className="match-info-section">
             <div className="match-title-with-status">
-              <h3 className="match-details-title">{match.location} - {formatDate(match.date)}</h3>
+              <h3 className="match-details-title">{match.title}</h3>
               <span className={`status-badge ${match.status.toLowerCase()}`}>
                 {match.status}
               </span>
             </div>
             <div className="match-details-grid">
               <div className="detail-item">
-                <span className="detail-label">Location:</span>
-                <span className="detail-value">
-                  <svg
-                    className="h-4 w-4 inline mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  {match.location}
-                </span>
-              </div>
-              <div className="detail-item">
                 <span className="detail-label">Court:</span>
                 <span className="detail-value">{match.courtNumber}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Date:</span>
-                <span className="detail-value">{formatDate(match.date)}</span>
-              </div>
-              <div className="detail-item">
                 <span className="detail-label">Time:</span>
-                <span className="detail-value">{match.time}</span>
+                <span className="detail-value">{formatTimeWithDuration(match.time)}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Fee:</span>
