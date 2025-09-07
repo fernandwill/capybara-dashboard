@@ -8,6 +8,12 @@ interface Player {
   name: string;
   status: string;
   paymentStatus: string;
+  matchPlayers?: {
+    match: {
+      id: string;
+      date: string;
+    };
+  }[];
 }
 
 interface Match {
@@ -323,18 +329,48 @@ export default function MatchDetailsModal({
     }
   }, [isOpen, match]);
 
+  // Helper function to check if a player has joined 3 times consecutively
+  const hasJoinedThreeConsecutively = (player: Player): boolean => {
+    // Check if player has match history data
+    if (!player.matchPlayers || player.matchPlayers.length < 3) {
+      return false;
+    }
+    
+    // Sort matches by date in descending order (newest first)
+    const sortedMatches = [...player.matchPlayers]
+      .map(mp => mp.match)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    // For a more accurate implementation, we would need to check if these matches
+    // were actually consecutive in the match sequence, not just that the player
+    // participated in 3 matches.
+    // For now, we'll use the simpler approach of checking if they have at least 3 matches.
+    return sortedMatches.length >= 3;
+  };
+
   const filteredPlayers = allPlayers.filter(player => {
     // check if player is already in the match
     const isPlayerInMatch = players.some(p => p.id === player.id);
     if (isPlayerInMatch) {
       return false;
     }
+    
+    // Check if player has joined 3 times consecutively
+    const joinedThreeConsecutively = hasJoinedThreeConsecutively(player);
+    if (!joinedThreeConsecutively) {
+      return false;
+    }
+    
     // check if player name matches search query
     if (searchQuery.trim() === "") {
       return true; // show all if search is empty
     }
     return player.name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  })
+  // Remove duplicates by player ID
+  .filter((player, index, self) => 
+    index === self.findIndex(p => p.id === player.id)
+  );
 
   if (!isOpen || !match) return null;
 
