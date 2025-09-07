@@ -51,10 +51,9 @@ export default function MatchDetailsModal({
   onMatchUpdate,
 }: MatchDetailsModalProps) {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-
+  const [pastPlayers, setPastPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingPastPlayers, setLoadingPastPlayers] = useState(false);
 
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
@@ -161,6 +160,17 @@ export default function MatchDetailsModal({
       console.error("Error fetching match players:", error);
     } finally {
       setLoading(false);
+    }
+    
+    // Also refresh past players
+    try {
+      const response = await fetch(`/api/matches/${match.id}/players/past`);
+      if (response.ok) {
+        const data = await response.json();
+        setPastPlayers(data);
+      }
+    } catch (error) {
+      console.error("Error fetching past players:", error);
     }
   };
 
@@ -330,72 +340,33 @@ export default function MatchDetailsModal({
         }
       };
 
-      const fetchAllPlayers = async () => {
+      // Fetch players from past matches
+      const fetchPastPlayers = async () => {
+        setLoadingPastPlayers(true);
         try {
-          const response = await fetch('/api/players');
-          if(response.ok) {
+          const response = await fetch(`/api/matches/${match.id}/players/past`);
+          if (response.ok) {
             const data = await response.json();
-            setAllPlayers(data);
+            setPastPlayers(data);
           }
         } catch (error) {
-          console.error("Error fetching all players:", error);
+          console.error("Error fetching past players:", error);
+          setPastPlayers([]);
+        } finally {
+          setLoadingPastPlayers(false);
         }
-      }
+      };
 
       fetchMatchPlayers();
-      fetchAllPlayers();
+      fetchPastPlayers();
     } else {
       // Reset data when modal closes
       setPlayers([]);
+      setPastPlayers([]);
       setShowAddPlayer(false);
       setNewPlayerName("");
-      setAllPlayers([]);
-      setSearchQuery("");
     }
   }, [isOpen, match]);
-
-  // Helper function to check if a player has joined 3 times consecutively
-  const hasJoinedThreeConsecutively = (player: Player): boolean => {
-    // Check if player has match history data
-    if (!player.matchPlayers || player.matchPlayers.length < 3) {
-      return false;
-    }
-    
-    // Sort matches by date in descending order (newest first)
-    const sortedMatches = [...player.matchPlayers]
-      .map(mp => mp.match)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    
-    // For a more accurate implementation, we would need to check if these matches
-    // were actually consecutive in the match sequence, not just that the player
-    // participated in 3 matches.
-    // For now, we'll use the simpler approach of checking if they have at least 3 matches.
-    return sortedMatches.length >= 3;
-  };
-
-  const filteredPlayers = allPlayers.filter(player => {
-    // check if player is already in the match
-    const isPlayerInMatch = players.some(p => p.id === player.id);
-    if (isPlayerInMatch) {
-      return false;
-    }
-    
-    // Check if player has joined 3 times consecutively
-    const joinedThreeConsecutively = hasJoinedThreeConsecutively(player);
-    if (!joinedThreeConsecutively) {
-      return false;
-    }
-    
-    // check if player name matches search query
-    if (searchQuery.trim() === "") {
-      return true; // show all if search is empty
-    }
-    return player.name.toLowerCase().includes(searchQuery.toLowerCase());
-  })
-  // Remove duplicates by player ID
-  .filter((player, index, self) => 
-    index === self.findIndex(p => p.id === player.id)
-  );
 
   if (!isOpen || !match) return null;
 
@@ -458,26 +429,31 @@ export default function MatchDetailsModal({
             {showAddPlayer && (
               <div className="add-player-section">
                 <div className="add-player-options">
-                  <h4>Add Existing Player</h4>
-                  <input
-                    type="text"
-                    placeholder="Search existing players..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="form-input"
-                  />
-                  <div className="existing-players-list">
-                    {filteredPlayers.length > 0 ? (
-                      filteredPlayers.map(player => (
-                        <div key={player.id} className="existing-player-item">
-                          <span>{player.name}</span>
-                          <button onClick={() => handleAddPlayer(player.id)} className="add-player-btn-small">Add</button>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="no-players">No matching players found.</p>
-                    )}
-                  </div>
+                  <h4>Players from Past Matches</h4>
+                  {loadingPastPlayers ? (
+                    <div className="loading-past-players">
+                      <p>Loading players from past matches...</p>
+                    </div>
+                  ) : pastPlayers.length > 0 ? (
+                    <div className="existing-players-list">
+                      {pastPlayers
+                        .filter(player => !players.some(p => p.id === player.id)) // Filter out players already in match
+                        .map(player => (
+                          <div key={player.id} className="existing-player-item">
+                            <span>{player.name}</span>
+                            <button 
+                              onClick={() => handleAddPlayer(player.id)} 
+                              className="add-player-btn-small"
+                            >
+                              Add
+                            </button>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  ) : (
+                    <p className="no-players">No players found in recent matches.</p>
+                  )}
                 </div>
                 <div className="or-divider">OR</div>
                 <div className="new-player">
