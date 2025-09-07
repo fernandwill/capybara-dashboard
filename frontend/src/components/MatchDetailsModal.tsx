@@ -45,6 +45,9 @@ export default function MatchDetailsModal({
   onMatchUpdate,
 }: MatchDetailsModalProps) {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   const [showAddPlayer, setShowAddPlayer] = useState(false);
@@ -124,6 +127,32 @@ export default function MatchDetailsModal({
     }
   };
 
+  const handleAddPlayer = async (playerId: string) => {
+    if (!match) return;
+    try {
+      const response = await fetch(
+        `/api/matches/${match.id}/players`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ playerId }),
+        }
+      );
+
+      if (response.ok) {
+        fetchPlayers();
+        // Trigger dashboard refresh to update player counts
+        if (onMatchUpdate) {
+          onMatchUpdate();
+        }
+      }
+    } catch (error) {
+      console.error("Error adding player:", error);
+    }
+  };
+
   const handleRemovePlayer = async (playerId: string) => {
     if (!match) return;
     try {
@@ -170,33 +199,14 @@ export default function MatchDetailsModal({
       if (createResponse.ok) {
         const newPlayer = await createResponse.json();
         // Then add to match
-        const addResponse = await fetch(
-          `/api/matches/${match.id}/players`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ playerId: newPlayer.id }),
-          }
-        );
-
-        if (addResponse.ok) {
-          fetchPlayers();
-          setNewPlayerName("");
-          setShowAddPlayer(false);
-          // Trigger dashboard refresh to update player counts
-          if (onMatchUpdate) {
-            onMatchUpdate();
-          }
-        }
+        await handleAddPlayer(newPlayer.id);
+        setNewPlayerName("");
+        setShowAddPlayer(false);
       }
     } catch (error) {
       console.error("Error creating player:", error);
     }
   };
-
-
 
   const handleSetPlayerStatus = async (
     playerId: string,
@@ -263,7 +273,7 @@ export default function MatchDetailsModal({
   useEffect(() => {
     if (isOpen && match) {
       // Fetch players when modal opens
-      const fetchPlayers = async () => {
+      const fetchMatchPlayers = async () => {
         setLoading(true);
         try {
           const response = await fetch(
@@ -283,14 +293,42 @@ export default function MatchDetailsModal({
         }
       };
 
-      fetchPlayers();
+      const fetchAllPlayers = async () => {
+        try {
+          const response = await fetch('/api/players');
+          if(response.ok) {
+            const data = await response.json();
+            setAllPlayers(data);
+          }
+        } catch (error) {
+          console.error("Error fetching all players:", error);
+        }
+      }
+
+      fetchMatchPlayers();
+      fetchAllPlayers();
     } else {
       // Reset data when modal closes
       setPlayers([]);
       setShowAddPlayer(false);
       setNewPlayerName("");
+      setAllPlayers([]);
+      setSearchQuery("");
     }
   }, [isOpen, match]);
+
+  const filteredPlayers = allPlayers.filter(player => {
+    // check if player is already in the match
+    const isPlayerInMatch = players.some(p => p.id === player.id);
+    if (isPlayerInMatch) {
+      return false;
+    }
+    // check if player name matches search query
+    if (searchQuery.trim() === "") {
+      return true; // show all if search is empty
+    }
+    return player.name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   if (!isOpen || !match) return null;
 
@@ -308,7 +346,7 @@ export default function MatchDetailsModal({
           {/* Match Information */}
           <div className="match-info-section">
             <div className="match-title-with-status">
-              <h3 className="match-details-title">{match.title}</h3>
+              <h3 className="match-details-title">{match.location} - {formatDate(match.date)}</h3>
               <span className={`status-badge ${match.status.toLowerCase()}`}>
                 {match.status}
               </span>
@@ -352,7 +390,31 @@ export default function MatchDetailsModal({
             {/* Add Player Section */}
             {showAddPlayer && (
               <div className="add-player-section">
+                <div className="add-player-options">
+                  <h4>Add Existing Player</h4>
+                  <input
+                    type="text"
+                    placeholder="Search existing players..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="form-input"
+                  />
+                  <div className="existing-players-list">
+                    {filteredPlayers.length > 0 ? (
+                      filteredPlayers.map(player => (
+                        <div key={player.id} className="existing-player-item">
+                          <span>{player.name}</span>
+                          <button onClick={() => handleAddPlayer(player.id)} className="add-player-btn-small">Add</button>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="no-players">No matching players found.</p>
+                    )}
+                  </div>
+                </div>
+                <div className="or-divider">OR</div>
                 <div className="new-player">
+                  <h4>Create New Player</h4>
                   <div className="new-player-form">
                     <input
                       type="text"
@@ -366,7 +428,7 @@ export default function MatchDetailsModal({
                       onClick={handleCreateAndAddPlayer}
                       disabled={!newPlayerName.trim()}
                     >
-                      Add Player
+                      Create and Add Player
                     </button>
                   </div>
                 </div>
