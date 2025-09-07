@@ -24,13 +24,24 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
         navigator.vendor ||
         (window as unknown as Window & { opera?: string }).opera ||
         "";
+
+      // More accurate mobile detection
       const isMobileDevice =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
           userAgent
         );
+      
+      // Check for touch capability AND small screen size
       const isTouchDevice =
         "ontouchstart" in window || navigator.maxTouchPoints > 0;
-      setIsMobile(isMobileDevice || isTouchDevice);
+      
+      // Additional check for screen size (typical mobile screens are smaller)
+      const isSmallScreen = window.innerWidth <= 768;
+      
+      // Consider it mobile only if it's detected as mobile device OR
+      // it has touch capability AND is a small screen
+      // This prevents desktop touchscreens from being classified as mobile
+      setIsMobile(isMobileDevice || (isTouchDevice && isSmallScreen));
     };
 
     checkIsMobile();
