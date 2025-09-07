@@ -733,6 +733,9 @@ body {
 .match-court {
   font-size: 14px;
   color: #888;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .match-players {

@@ -273,7 +273,7 @@ export default function MatchDetailsModal({
           {/* Match Information */}
           <div className="match-info-section">
             <div className="match-title-with-status">
-              <h3 className="match-details-title">{match.title}</h3>
+              <h3 className="match-details-title">{match.location} - {formatDate(match.date)}</h3>
               <span className={`status-badge ${match.status.toLowerCase()}`}>
                 {match.status}
               </span>

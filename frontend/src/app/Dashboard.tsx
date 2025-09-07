@@ -64,6 +64,7 @@ export function Dashboard() {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+
   const [sortBy, setSortBy] = useState<SortOption>("date-earliest");
 
   const toggleTheme = () => {
@@ -652,7 +653,7 @@ export function Dashboard() {
                   </span>
                 </div>
                 <div className="match-header">
-                  <h3 className="match-title">{match.title}</h3>
+                  <h3 className="match-title">{match.location} - {formatDate(match.date)}</h3>
                   <div className="match-header-right">
                     <button
                       className="edit-btn"
@@ -679,23 +680,7 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div className="match-details">
-                  <div className="match-datetime">
-                    <span className="match-date">
-                      <svg
-                        className="h-4 w-4 inline mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      {formatDate(match.date)}
-                    </span>
+                  <div className="match-info">
                     <span className="match-time">
                       <svg
                         className="h-4 w-4 inline mr-1"
@@ -712,31 +697,21 @@ export function Dashboard() {
                       </svg>
                       {match.time}
                     </span>
-                  </div>
-                  <div className="match-info">
-                    <span className="match-location">
+                    <span className="match-court">
                       <svg
-                        className="h-4 w-4 inline mr-1"
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
+                        <line x1="4" x2="20" y1="9" y2="9" />
+                        <line x1="4" x2="20" y1="15" y2="15" />
+                        <line x1="10" x2="8" y1="3" y2="21" />
+                        <line x1="16" x2="14" y1="3" y2="21" />
                       </svg>
-                      {match.location}
-                    </span>
-                    <span className="match-court">
                       Court {match.courtNumber}
                     </span>
                     <span className="match-players">
