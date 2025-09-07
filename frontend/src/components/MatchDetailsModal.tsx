@@ -59,12 +59,6 @@ export default function MatchDetailsModal({
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
 
-  // State for payment status filters - by default show all players
-  const [showSudahSetor, setShowSudahSetor] = useState(true);
-  const [showBelumSetor, setShowBelumSetor] = useState(true);
-  const [showSudahSetorTentative, setShowSudahSetorTentative] = useState(true);
-  const [showBelumSetorTentative, setShowBelumSetorTentative] = useState(true);
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
@@ -486,32 +480,9 @@ export default function MatchDetailsModal({
             ) : (
               <div className="players-columns">
                 <div className="players-column">
-                  <div className="column-header">
-                    <h4 className="column-title">Players</h4>
-                    <div className="payment-filters">
-                      <button 
-                        className={`payment-filter ${showSudahSetor ? 'active' : ''}`}
-                        onClick={() => setShowSudahSetor(!showSudahSetor)}
-                      >
-                        Sudah Setor
-                      </button>
-                      <button 
-                        className={`payment-filter ${showBelumSetor ? 'active' : ''}`}
-                        onClick={() => setShowBelumSetor(!showBelumSetor)}
-                      >
-                        Belum Setor
-                      </button>
-                    </div>
-                  </div>
                   <div className="players-grid-column">
                     {players.filter(player => player.status === "ACTIVE").length > 0 ? (
                       sortPlayersByPaymentStatus(players.filter(player => player.status === "ACTIVE"))
-                        .filter(player => {
-                          // Show based on toggle state
-                          if (showSudahSetor && player.paymentStatus === "SUDAH_SETOR") return true;
-                          if (showBelumSetor && player.paymentStatus === "BELUM_SETOR") return true;
-                          return false;
-                        })
                         .map((player) => (
                           <div key={player.id} className="player-card">
                             <div className="player-header">
@@ -563,32 +534,9 @@ export default function MatchDetailsModal({
                 {/* Tentative Column - Only show if there are tentative players */}
                 {players.some(player => player.status === "TENTATIVE") && (
                   <div className="players-column">
-                    <div className="column-header">
-                      <h4 className="column-title">Tentative</h4>
-                      <div className="payment-filters">
-                        <button 
-                          className={`payment-filter ${showSudahSetorTentative ? 'active' : ''}`}
-                          onClick={() => setShowSudahSetorTentative(!showSudahSetorTentative)}
-                        >
-                          Sudah Setor
-                        </button>
-                        <button 
-                          className={`payment-filter ${showBelumSetorTentative ? 'active' : ''}`}
-                          onClick={() => setShowBelumSetorTentative(!showBelumSetorTentative)}
-                        >
-                          Belum Setor
-                        </button>
-                      </div>
-                    </div>
                     <div className="players-grid-column">
                       {players.filter(player => player.status === "TENTATIVE").length > 0 ? (
                         sortPlayersByPaymentStatus(players.filter(player => player.status === "TENTATIVE"))
-                          .filter(player => {
-                            // Show based on toggle state
-                            if (showSudahSetorTentative && player.paymentStatus === "SUDAH_SETOR") return true;
-                            if (showBelumSetorTentative && player.paymentStatus === "BELUM_SETOR") return true;
-                            return false;
-                          })
                           .map((player) => (
                             <div key={player.id} className="player-card">
                               <div className="player-header">
