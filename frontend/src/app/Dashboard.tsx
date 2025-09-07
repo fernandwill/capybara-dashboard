@@ -373,7 +373,33 @@ export function Dashboard() {
   const getClosestUpcomingMatch = (): Match | null => {
     const upcomingMatches = matches
       .filter(match => match.status === "UPCOMING")
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .sort((a, b) => {
+        // First sort by date
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        
+        if (dateA !== dateB) {
+          return dateA - dateB;
+        }
+        
+        // If same date, sort by time (start time)
+        try {
+          const timeA = a.time.split('-')[0].trim(); // Get start time
+          const timeB = b.time.split('-')[0].trim(); // Get start time
+          
+          const [hoursA, minutesA] = timeA.split(':').map(Number);
+          const [hoursB, minutesB] = timeB.split(':').map(Number);
+          
+          if (hoursA !== hoursB) {
+            return hoursA - hoursB;
+          }
+          
+          return minutesA - minutesB;
+        } catch (error) {
+          // Fallback to original date sorting if time parsing fails
+          return dateA - dateB;
+        }
+      });
     
     return upcomingMatches.length > 0 ? upcomingMatches[0] : null;
   };
