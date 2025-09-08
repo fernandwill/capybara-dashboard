@@ -263,15 +263,75 @@ export function Dashboard() {
     return [...matches].sort((a, b) => {
       switch (sortOption) {
         case "date-earliest":
-          return parseDate(a.date) - parseDate(b.date);
+          // First sort by date
+          const dateDiff = parseDate(a.date) - parseDate(b.date);
+          if (dateDiff !== 0) return dateDiff;
+          
+          // If same date, sort by time (start time)
+          try {
+            const timeA = a.time.split('-')[0].trim(); // Get start time
+            const timeB = b.time.split('-')[0].trim(); // Get start time
+            
+            const [hoursA, minutesA] = timeA.split(':').map(Number);
+            const [hoursB, minutesB] = timeB.split(':').map(Number);
+            
+            if (hoursA !== hoursB) {
+              return hoursA - hoursB;
+            }
+            
+            return minutesA - minutesB;
+          } catch (error) {
+            // Fallback to original date sorting if time parsing fails
+            return dateDiff;
+          }
         case "date-latest":
-          return parseDate(b.date) - parseDate(a.date);
+          // First sort by date (reverse)
+          const dateDiffLatest = parseDate(b.date) - parseDate(a.date);
+          if (dateDiffLatest !== 0) return dateDiffLatest;
+          
+          // If same date, sort by time (start time) in reverse
+          try {
+            const timeA = a.time.split('-')[0].trim(); // Get start time
+            const timeB = b.time.split('-')[0].trim(); // Get start time
+            
+            const [hoursA, minutesA] = timeA.split(':').map(Number);
+            const [hoursB, minutesB] = timeB.split(':').map(Number);
+            
+            if (hoursA !== hoursB) {
+              return hoursB - hoursA; // Reverse order
+            }
+            
+            return minutesB - minutesA; // Reverse order
+          } catch (error) {
+            // Fallback to original date sorting if time parsing fails
+            return dateDiffLatest;
+          }
         case "fee-low":
           return a.fee - b.fee;
         case "fee-high":
           return b.fee - a.fee;
         default:
-          return parseDate(a.date) - parseDate(b.date);
+          // First sort by date
+          const defaultDateDiff = parseDate(a.date) - parseDate(b.date);
+          if (defaultDateDiff !== 0) return defaultDateDiff;
+          
+          // If same date, sort by time (start time)
+          try {
+            const timeA = a.time.split('-')[0].trim(); // Get start time
+            const timeB = b.time.split('-')[0].trim(); // Get start time
+            
+            const [hoursA, minutesA] = timeA.split(':').map(Number);
+            const [hoursB, minutesB] = timeB.split(':').map(Number);
+            
+            if (hoursA !== hoursB) {
+              return hoursA - hoursB;
+            }
+            
+            return minutesA - minutesB;
+          } catch (error) {
+            // Fallback to original date sorting if time parsing fails
+            return defaultDateDiff;
+          }
       }
     });
   };
