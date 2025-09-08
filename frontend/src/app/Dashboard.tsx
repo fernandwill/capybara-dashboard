@@ -72,13 +72,10 @@ export function Dashboard() {
     document.documentElement.classList.toggle("dark");
   };
 
-  // Set default sort order based on active tab
+  // Set default sort order based on active tab - with explicit dependency tracking
   useEffect(() => {
-    if (activeTab === "past") {
-      setSortBy("date-latest");
-    } else {
-      setSortBy("date-earliest");
-    }
+    const newSortBy: SortOption = activeTab === "past" ? "date-latest" : "date-earliest";
+    setSortBy(newSortBy);
   }, [activeTab]);
 
   useEffect(() => {
@@ -255,20 +252,26 @@ export function Dashboard() {
     }
   };
 
+  // Helper function to parse dates safely
+  const parseDate = (dateString: string): number => {
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 0 : date.getTime();
+  };
+
   // Helper function to sort matches based on selected option
   const sortMatches = (matches: Match[], sortOption: SortOption): Match[] => {
     return [...matches].sort((a, b) => {
       switch (sortOption) {
         case "date-earliest":
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
+          return parseDate(a.date) - parseDate(b.date);
         case "date-latest":
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
+          return parseDate(b.date) - parseDate(a.date);
         case "fee-low":
           return a.fee - b.fee;
         case "fee-high":
           return b.fee - a.fee;
         default:
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
+          return parseDate(a.date) - parseDate(b.date);
       }
     });
   };
@@ -295,7 +298,12 @@ export function Dashboard() {
 
   // Format date for display
   const formatDate = (dateString: string) => {
+    // Handle invalid date strings
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return "Invalid Date";
+    }
+    
     const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
     const day = date.getDate();
     const month = date.toLocaleDateString("en-US", { month: "long" });
