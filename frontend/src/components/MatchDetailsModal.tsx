@@ -485,9 +485,9 @@ export default function MatchDetailsModal({
                 <Loader2 className="h-6 w-6 animate-spin text-blue-500 mt-2" />
               </div>
             ) : (
-              <div className="players-columns">
+              <div className={players.some(p => p.status === 'TENTATIVE') ? "players-columns" : ""}>
                 <div className="players-column">
-                  <div className="players-grid-column">
+                  <div className={!players.some(p => p.status === 'TENTATIVE') ? 'grid grid-cols-2 gap-4' : 'players-grid-column'}>
                     {players.filter(player => player.status === "ACTIVE").length > 0 ? (
                       sortPlayersByPaymentStatus(players.filter(player => player.status === "ACTIVE"))
                         .map((player) => (
