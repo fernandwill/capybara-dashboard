@@ -1,7 +1,6 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/authService'
 import { supabase } from '@/lib/supabaseClient'
 import { User } from '@supabase/supabase-js'
@@ -17,11 +16,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
 
   useEffect(() => {
     const checkUser = async () => {
-      const { success, data, error } = await getCurrentUser()
+      const { success, data } = await getCurrentUser()
       
       if (success && data) {
         setUser(data)

@@ -1,0 +1,6 @@
+./src/app/Dashboard.tsx
+135:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+273:20  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+295:20  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+321:20  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+456:18  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
