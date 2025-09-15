@@ -22,8 +22,8 @@ export default function LoginPage() {
       const { success, error: errorMsg } = await signInWithEmail(email, password);
 
       if (success) {
-        // Redirect to root (which will show dashboard for authenticated users)
-        router.push('/');
+        // Redirect to dashboard
+        router.push('/dashboard');
       } else {
         setError(errorMsg || 'Login failed');
       }
