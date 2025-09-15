@@ -1,8 +1,9 @@
 import { supabase } from '@/lib/supabaseClient'
+import { AuthResponse, UserResponse, AuthError } from '@supabase/supabase-js'
 
-export async function signInWithEmail(email: string, password: string) {
+export async function signInWithEmail(email: string, password: string): Promise<{ success: boolean; data?: AuthResponse['data']; error?: string }> {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error }: AuthResponse = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -12,14 +13,15 @@ export async function signInWithEmail(email: string, password: string) {
     }
 
     return { success: true, data }
-  } catch (error: any) {
-    return { success: false, error: error.message }
+  } catch (error: unknown) {
+    console.error('Error signing in:', error);
+    return { success: false, error: 'An unexpected error occurred' }
   }
 }
 
-export async function signUpWithEmail(email: string, password: string, name: string) {
+export async function signUpWithEmail(email: string, password: string, name: string): Promise<{ success: boolean; data?: AuthResponse['data']; error?: string }> {
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error }: AuthResponse = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -34,35 +36,38 @@ export async function signUpWithEmail(email: string, password: string, name: str
     }
 
     return { success: true, data }
-  } catch (error: any) {
-    return { success: false, error: error.message }
+  } catch (error: unknown) {
+    console.error('Error signing up:', error);
+    return { success: false, error: 'An unexpected error occurred' }
   }
 }
 
-export async function signOut() {
+export async function signOut(): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase.auth.signOut()
+    const { error }: { error: AuthError | null } = await supabase.auth.signOut()
     
     if (error) {
       return { success: false, error: error.message }
     }
 
     return { success: true }
-  } catch (error: any) {
-    return { success: false, error: error.message }
+  } catch (error: unknown) {
+    console.error('Error signing out:', error);
+    return { success: false, error: 'An unexpected error occurred' }
   }
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<{ success: boolean; data?: UserResponse['data']['user']; error?: string }> {
   try {
-    const { data, error } = await supabase.auth.getUser()
+    const { data, error }: UserResponse = await supabase.auth.getUser()
     
     if (error) {
       return { success: false, error: error.message }
     }
 
     return { success: true, data: data.user }
-  } catch (error: any) {
-    return { success: false, error: error.message }
+  } catch (error: unknown) {
+    console.error('Error getting current user:', error);
+    return { success: false, error: 'An unexpected error occurred' }
   }
 }

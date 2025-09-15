@@ -1,19 +1,21 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+// In a production environment, these values should come from environment variables
+// and never be committed to version control
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'capybara389@gmail.com';
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2a$12$MrcqahlPcaiCf9mO71kTLeUv/JABy0N41K0IaRWFW4uXqLSg3nmu6';
 
 export async function authenticateAdmin(email: string, password: string) {
   try {
-    // For now, we'll check against a fixed email and password
-    // In a real application, you would store admins in the database
-    const storedEmail = 'capybara389@gmail.com';
-    const storedHash = '$2a$12$MrcqahlPcaiCf9mO71kTLeUv/JABy0N41K0IaRWFW4uXqLSg3nmu6'; // Hash of 'your_password_here'
-
-    if (email === storedEmail && await bcrypt.compare(password, storedHash)) {
+    // In a real application, you would:
+    // 1. Query your database for the admin user
+    // 2. Compare the provided password with the stored hash
+    
+    // For demo purposes, we're using environment variables or fallback values
+    if (email === ADMIN_EMAIL && await bcrypt.compare(password, ADMIN_PASSWORD_HASH)) {
       return {
         id: 'admin-1',
-        email: storedEmail,
+        email: ADMIN_EMAIL,
         name: 'Capybara Admin',
       };
     }
@@ -27,19 +29,19 @@ export async function authenticateAdmin(email: string, password: string) {
 
 export async function createAdmin(email: string, password: string, name: string) {
   try {
-    // For now, we'll just check if this is the same admin we already have
-    const storedEmail = 'capybara389@gmail.com';
+    // In a real application, you would:
+    // 1. Check if admin already exists
+    // 2. Hash the password
+    // 3. Store in database
     
-    if (email !== storedEmail) {
+    // For demo purposes, we're just validating against our environment variable
+    if (email !== ADMIN_EMAIL) {
       throw new Error('Only the main admin can be created in this demo');
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // In a real application, you would store this in the database
-    console.log('Admin created with email:', email);
-    console.log('Password hash:', hashedPassword);
+    // In a real application, you would hash and store the password
+    // For demo, we're just validating
+    console.log('Admin creation requested for:', email);
     
     return {
       id: 'admin-1',
