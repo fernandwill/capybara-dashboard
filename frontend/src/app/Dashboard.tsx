@@ -130,20 +130,11 @@ export function Dashboard() {
   const fetchStats = useCallback(async () => {
     try {
       const response = await fetch("/api/stats");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
       const data = await response.json();
       setStats(data);
     } catch (error) {
+      // Error handling
       console.error("Error fetching stats:", error);
-      // Keep default values if API fails
-      setStats({
-        totalMatches: 0,
-        upcomingMatches: 0,
-        completedMatches: 0,
-        hoursPlayed: "0.0",
-      });
     }
   }, []);
 
@@ -282,6 +273,7 @@ export function Dashboard() {
             return minutesA - minutesB;
           } catch (error) {
             // Fallback to original date sorting if time parsing fails
+            console.error("Error parsing time for sorting:", error);
             return dateDiff;
           }
         case "date-latest":
@@ -304,6 +296,7 @@ export function Dashboard() {
             return minutesB - minutesA; // Reverse order
           } catch (error) {
             // Fallback to original date sorting if time parsing fails
+            console.error("Error parsing time for sorting:", error);
             return dateDiffLatest;
           }
         case "fee-low":
@@ -330,6 +323,7 @@ export function Dashboard() {
             return minutesA - minutesB;
           } catch (error) {
             // Fallback to original date sorting if time parsing fails
+            console.error("Error parsing time for sorting:", error);
             return defaultDateDiff;
           }
       }
@@ -465,6 +459,7 @@ export function Dashboard() {
           return minutesA - minutesB;
         } catch (error) {
           // Fallback to original date sorting if time parsing fails
+          console.error("Error parsing time for sorting:", error);
           return dateA - dateB;
         }
       });

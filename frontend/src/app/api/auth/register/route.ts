@@ -17,11 +17,11 @@ export async function POST(request: Request) {
         name: admin.name,
       }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Registration error:', error);
     return NextResponse.json({ 
       success: false, 
-      message: error.message || 'An error occurred during registration' 
+      message: 'An error occurred during registration' 
     }, { status: 500 });
   }
 }
