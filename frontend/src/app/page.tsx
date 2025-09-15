@@ -1,29 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { useAuth } from '@/contexts/AuthContext';
+import { Dashboard } from './Dashboard';
 import { signInWithEmail } from '@/lib/authService';
 import './login/login.css';
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setLoginLoading(true);
     setError('');
     
     try {
       const { success, error: errorMsg } = await signInWithEmail(email, password);
 
       if (success) {
-        // Redirect to dashboard
-        router.push('/dashboard');
+        // User state will be updated by AuthContext, which will re-render this component
+        // and show the Dashboard instead of the login form
       } else {
         setError(errorMsg || 'Login failed');
       }
@@ -31,10 +34,29 @@ export default function Home() {
       setError('An unexpected error occurred');
       console.error('Login error:', err);
     } finally {
-      setLoading(false);
+      setLoginLoading(false);
     }
   };
 
+  useEffect(() => {
+    // If user is authenticated, we can stay on this page and show dashboard
+    // If not authenticated, we show the login form
+  }, [user, router]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // If user is authenticated, show the dashboard
+  if (user) {
+    return <Dashboard />;
+  }
+
+  // If not authenticated, show the login form
   return (
     <div className="login-container">
       <div className="logo-container">
@@ -65,8 +87,8 @@ export default function Home() {
           className="form-input"
           required
         />
-        <button type="submit" className="login-btn" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+        <button type="submit" className="login-btn" disabled={loginLoading}>
+          {loginLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>
