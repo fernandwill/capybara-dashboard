@@ -44,6 +44,21 @@ interface MatchDetailsModalProps {
   onMatchUpdate?: () => void;
 }
 
+const getUniquePlayersByName = (players: Player[]) => {
+  const seen = new Set<string>();
+  return players.filter((player) => {
+    const normalizedName = player.name.trim().toLowerCase();
+    const key = normalizedName.length > 0 ? normalizedName : player.id;
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+};
+
 export default function MatchDetailsModal({
   isOpen,
   onClose,
@@ -167,8 +182,8 @@ export default function MatchDetailsModal({
     try {
       const response = await fetch(`/api/matches/${match.id}/players/past`);
       if (response.ok) {
-        const data = await response.json();
-        setPastPlayers(data);
+        const data: Player[] = await response.json();
+        setPastPlayers(getUniquePlayersByName(data));
       }
     } catch (error) {
       console.error("Error fetching past players:", error);
@@ -391,8 +406,8 @@ export default function MatchDetailsModal({
         try {
           const response = await fetch(`/api/matches/${match.id}/players/past`);
           if (response.ok) {
-            const data = await response.json();
-            setPastPlayers(data);
+            const data: Player[] = await response.json();
+            setPastPlayers(getUniquePlayersByName(data));
           }
         } catch (error) {
           console.error("Error fetching past players:", error);

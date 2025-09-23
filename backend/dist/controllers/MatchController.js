@@ -197,10 +197,14 @@ const removePlayerFromMatch = async (req, res) => {
 exports.removePlayerFromMatch = removePlayerFromMatch;
 const getPlayersFromPastMatches = async (req, res) => {
     try {
-        const { matchId } = req.params;
+        const { matchId, id } = req.params;
+        const targetMatchId = matchId ?? id;
+        if (!targetMatchId) {
+            return res.status(400).json({ error: "Match ID is required." });
+        }
         // First, get the current match to know its date
         const currentMatch = await database_1.default.match.findUnique({
-            where: { id: matchId },
+            where: { id: targetMatchId },
         });
         if (!currentMatch) {
             return res.status(404).json({ error: "Match not found." });
@@ -229,9 +233,12 @@ const getPlayersFromPastMatches = async (req, res) => {
         const playerMap = new Map();
         pastMatches.forEach(match => {
             match.players.forEach(playerMatch => {
+                const player = playerMatch.player;
+                const normalizedName = player.name.trim().toLowerCase();
+                const key = normalizedName.length > 0 ? normalizedName : player.id;
                 // Only add if not already in the map (to ensure uniqueness)
-                if (!playerMap.has(playerMatch.player.id)) {
-                    playerMap.set(playerMatch.player.id, playerMatch.player);
+                if (!playerMap.has(key)) {
+                    playerMap.set(key, player);
                 }
             });
         });

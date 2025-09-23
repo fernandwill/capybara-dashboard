@@ -1,4 +1,5 @@
 import prisma from "../utils/database";
+import { Player as PrismaPlayer } from "@prisma/client";
 import { Request, Response } from "express";
 import { updateStatus } from "../server";
 import {io} from '../server';
@@ -219,11 +220,16 @@ export const removePlayerFromMatch = async (req: Request, res: Response) => {
 
 export const getPlayersFromPastMatches = async (req: Request, res: Response) => {
   try {
-    const { matchId } = req.params;
-    
+    const { matchId, id } = req.params as { matchId?: string; id?: string };
+    const targetMatchId = matchId ?? id;
+
+    if (!targetMatchId) {
+      return res.status(400).json({ error: "Match ID is required." });
+    }
+
     // First, get the current match to know its date
     const currentMatch = await prisma.match.findUnique({
-      where: { id: matchId },
+      where: { id: targetMatchId },
     });
 
     if (!currentMatch) {
@@ -252,12 +258,16 @@ export const getPlayersFromPastMatches = async (req: Request, res: Response) => 
     });
 
     // Extract unique players from past matches
-    const playerMap = new Map();
+    const playerMap = new Map<string, PrismaPlayer>();
     pastMatches.forEach(match => {
       match.players.forEach(playerMatch => {
+        const player = playerMatch.player;
+        const normalizedName = player.name.trim().toLowerCase();
+        const key = normalizedName.length > 0 ? normalizedName : player.id;
+
         // Only add if not already in the map (to ensure uniqueness)
-        if (!playerMap.has(playerMatch.player.id)) {
-          playerMap.set(playerMatch.player.id, playerMatch.player);
+        if (!playerMap.has(key)) {
+          playerMap.set(key, player);
         }
       });
     });
