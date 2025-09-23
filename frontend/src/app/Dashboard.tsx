@@ -10,6 +10,7 @@ import { Select } from "../components/ui/select";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
+import { Loader2, LogOut } from "lucide-react";
 
 type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 
@@ -584,8 +585,14 @@ export function Dashboard() {
               className="logout-button"
               onClick={handleLogout}
               disabled={isLoggingOut}
+              aria-label={isLoggingOut ? "Logging out" : "Logout"}
+              title={isLoggingOut ? "Logging out" : "Logout"}
             >
-              {isLoggingOut ? "Logging out..." : "Logout"}
+              {isLoggingOut ? (
+                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+              ) : (
+                <LogOut className="h-5 w-5" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>
@@ -638,8 +645,14 @@ export function Dashboard() {
               className="logout-button"
               onClick={handleLogout}
               disabled={isLoggingOut}
+              aria-label={isLoggingOut ? "Logging out" : "Logout"}
+              title={isLoggingOut ? "Logging out" : "Logout"}
             >
-              {isLoggingOut ? "Logging out..." : "Logout"}
+              {isLoggingOut ? (
+                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+              ) : (
+                <LogOut className="h-5 w-5" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>
