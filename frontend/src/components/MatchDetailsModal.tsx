@@ -54,6 +54,7 @@ export default function MatchDetailsModal({
   const [pastPlayers, setPastPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPastPlayers, setLoadingPastPlayers] = useState(false);
+  const [deletingMatch, setDeletingMatch] = useState(false);
 
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
@@ -202,6 +203,14 @@ export default function MatchDetailsModal({
 
   const handleRemovePlayer = async (playerId: string) => {
     if (!match) return;
+
+    const player = players.find(p => p.id === playerId);
+    const playerLabel = player ? player.name : "this player";
+    const confirmed = window.confirm(`Remove ${playerLabel} from this match?`);
+    if (!confirmed) {
+      return;
+    }
+
     try {
       const response = await fetch(
         `/api/matches/${match.id}/players/${playerId}`,
@@ -219,12 +228,48 @@ export default function MatchDetailsModal({
         if (onMatchUpdate) {
           onMatchUpdate();
         }
+      } else {
+        console.error("Failed to remove player from match.");
+        window.alert("Failed to remove player. Please try again.");
       }
     } catch (error) {
       console.error("Error removing player:", error);
+      window.alert("An unexpected error occurred while removing the player.");
     }
   };
+  const handleDeleteMatch = async () => {
+    if (!match) return;
 
+    const confirmed = window.confirm(
+      `Delete match "${match.location}" scheduled for ${formatDate(match.date)}? This action cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingMatch(true);
+    try {
+      const response = await fetch(`/api/matches/${match.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        if (onMatchUpdate) {
+          onMatchUpdate();
+        }
+        onClose();
+      } else {
+        console.error("Failed to delete match.");
+        window.alert("Failed to delete match. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting match:", error);
+      window.alert("An unexpected error occurred while deleting the match.");
+    } finally {
+      setDeletingMatch(false);
+    }
+  };
   const handleCreateAndAddPlayer = async () => {
     if (!newPlayerName.trim() || !match) return;
 
@@ -365,6 +410,7 @@ export default function MatchDetailsModal({
       setPastPlayers([]);
       setShowAddPlayer(false);
       setNewPlayerName("");
+      setDeletingMatch(false);
     }
   }, [isOpen, match]);
 
@@ -375,9 +421,19 @@ export default function MatchDetailsModal({
       <div className="match-details-modal">
         <div className="modal-header">
           <h2>Match Details</h2>
-          <button className="modal-close" onClick={onClose}>
-            ×
-          </button>
+          <div className="modal-header-actions">
+            <button
+              type="button"
+              className="delete-match-btn"
+              onClick={handleDeleteMatch}
+              disabled={deletingMatch}
+            >
+              {deletingMatch ? "Deleting..." : "Delete Match"}
+            </button>
+            <button className="modal-close" onClick={onClose}>
+              A-
+            </button>
+          </div>
         </div>
 
         <div className="match-details-content">
@@ -607,3 +663,4 @@ export default function MatchDetailsModal({
     </div>
   );
 }
+
