@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
@@ -8,6 +9,7 @@ import MatchDetailsModal from "../components/MatchDetailsModal";
 import { Select } from "../components/ui/select";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
+import { signOut } from "@/lib/authService";
 
 type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 
@@ -40,6 +42,7 @@ interface Match {
 }
 
 export function Dashboard() {
+  const { setUser } = useAuth();
   const [stats, setStats] = useState<Stats>({
     totalMatches: 0,
     upcomingMatches: 0,
@@ -64,6 +67,7 @@ export function Dashboard() {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const [sortBy, setSortBy] = useState<SortOption>("date-earliest");
 
@@ -72,20 +76,31 @@ export function Dashboard() {
     document.documentElement.classList.toggle("dark");
   };
 
-  // Set default sort order based on active tab - with explicit dependency tracking
-  useEffect(() => {
-    const newSortBy: SortOption = activeTab === "past" ? "date-latest" : "date-earliest";
-    setSortBy(newSortBy);
-  }, [activeTab]);
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const { success, error } = await signOut();
+      if (!success) {
+        setErrorModal({
+          isOpen: true,
+          title: "Logout Failed",
+          message: error || "Failed to sign out. Please try again.",
+        });
+        return;
+      }
 
-  useEffect(() => {
-    // Initialize theme on component mount
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+      setUser(null);
+    } catch (logoutError) {
+      console.error("Error signing out:", logoutError);
+      setErrorModal({
+        isOpen: true,
+        title: "Logout Failed",
+        message: "An unexpected error occurred while signing out.",
+      });
+    } finally {
+      setIsLoggingOut(false);
     }
-  }, [isDarkMode]);
+  };
 
   const handleNewMatch = () => {
     setIsModalOpen(true);
@@ -533,6 +548,46 @@ export function Dashboard() {
             />
           </div>
           <h1 className="dashboard-title">Capybara&apos;s Dashboard</h1>
+          <div className="header-actions">
+            <button className="theme-toggle" onClick={toggleTheme}>
+              {isDarkMode ? (
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
+                </svg>
+              )}
+            </button>
+            <button
+              className="logout-button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? "Logging out..." : "Logout"}
+            </button>
+          </div>
         </div>
         <div className="header-desktop">
           <div className="header-title">
@@ -547,37 +602,46 @@ export function Dashboard() {
             </div>
             Capybara&apos;s Dashboard
           </div>
-          <button className="theme-toggle" onClick={toggleTheme}>
-            {isDarkMode ? (
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-            )}
-          </button>
+          <div className="header-actions">
+            <button className="theme-toggle" onClick={toggleTheme}>
+              {isDarkMode ? (
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
+                </svg>
+              )}
+            </button>
+            <button
+              className="logout-button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? "Logging out..." : "Logout"}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -946,3 +1010,4 @@ export function Dashboard() {
     </div>
   );
 }
+
