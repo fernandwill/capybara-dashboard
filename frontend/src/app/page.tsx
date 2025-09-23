@@ -45,8 +45,16 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+      <div className="login-container" role="status" aria-label="Authenticating">
+        <div className="logo-container">
+          <Image
+            src="/icons/icon.jpg"
+            alt="Capybara Logo"
+            width={120}
+            height={120}
+            className="login-logo"
+          />
+        </div>
       </div>
     );
   }
@@ -94,3 +102,5 @@ export default function Home() {
     </div>
   );
 }
+
+
