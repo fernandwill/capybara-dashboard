@@ -4148,7 +4148,7 @@ input[type="time"]::-webkit-datetime-edit-text {
   color: #ff0000;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
 .logout-button svg {
@@ -4159,6 +4159,7 @@ input[type="time"]::-webkit-datetime-edit-text {
 .logout-button:hover svg {
   width: 30px;
   height: 30px;
+  transition: width 0.2s ease, height 0.2s ease;
 }
 
 .logout-button:disabled {
