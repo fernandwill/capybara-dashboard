@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { X } from "lucide-react";
 
 interface Player {
   id: string;
@@ -441,7 +442,7 @@ export default function MatchDetailsModal({
           <h2>Match Details</h2>
           <div className="modal-header-actions">
             <button className="modal-close" onClick={onClose}>
-              X
+              < X />
             </button>
           </div>
         </div>
