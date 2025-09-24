@@ -176,8 +176,8 @@ export default function MatchDetailsModal({
   };
 
   const deduplicatePlayers = (playersList: Player[]): Player[] => {
-    const seenIds = new Set<String>();
-    const seenNames = new Set<String>();
+    const seenIds = new Set<string>();
+    const seenNames = new Set<string>();
     const deduplicatedPlayers: Player[] = [];
     for (const player of playersList) {
       const trimmedName = player.name.trim();
