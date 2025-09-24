@@ -422,16 +422,8 @@ export default function MatchDetailsModal({
         <div className="modal-header">
           <h2>Match Details</h2>
           <div className="modal-header-actions">
-            <button
-              type="button"
-              className="delete-match-btn"
-              onClick={handleDeleteMatch}
-              disabled={deletingMatch}
-            >
-              {deletingMatch ? "Deleting..." : "Delete Match"}
-            </button>
             <button className="modal-close" onClick={onClose}>
-              A-
+              X
             </button>
           </div>
         </div>
@@ -658,6 +650,16 @@ export default function MatchDetailsModal({
               </div>
             )}
           </div>
+        </div>
+        <div className="match-details-footer">
+          <button
+            type="button"
+            className="delete-match-btn"
+            onClick={handleDeleteMatch}
+            disabled={deletingMatch}
+          >
+            {deletingMatch ? "Deleting..." : "Delete Match"}
+          </button>
         </div>
       </div>
     </div>
