@@ -979,6 +979,10 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
+modal-actions.modal-actions-centered {
+  justify-content: center;
+}
+
 .btn-cancel {
   padding: 12px 24px;
   background-color: transparent;

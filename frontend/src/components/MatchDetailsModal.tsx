@@ -62,6 +62,7 @@ export default function MatchDetailsModal({
   const [playerRemove, setPlayerRemove] = useState<
   {id: string; name: string;} | null>(null);
   const [removePlayer, setRemovePlayer] = useState(false);
+  const [deleteMatch, setDeleteMatch] = useState(false);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -274,15 +275,16 @@ export default function MatchDetailsModal({
   }
 
   const handleDeleteMatch = async () => {
+    setDeleteMatch(true);
+    };
+
+    const handleCancelDeleteMatch = () => {
+      if (deleteMatch) return;
+        setDeleteMatch(false);
+    };
+
+    const handleConfirmDeleteMatch = async () => {
     if (!match) return;
-
-    const confirmed = window.confirm(
-      `Delete match "${match.location}" scheduled for ${formatDate(match.date)}? This action cannot be undone.`
-    );
-
-    if (!confirmed) {
-      return;
-    }
 
     setDeletingMatch(true);
     try {
@@ -294,6 +296,7 @@ export default function MatchDetailsModal({
         if (onMatchUpdate) {
           onMatchUpdate();
         }
+        setDeleteMatch(false);
         onClose();
       } else {
         console.error("Failed to delete match.");
@@ -447,6 +450,9 @@ export default function MatchDetailsModal({
       setShowAddPlayer(false);
       setNewPlayerName("");
       setDeletingMatch(false);
+      setPlayerRemove(null);
+      setRemovePlayer(false);
+      setDeleteMatch(false);
     }
   }, [isOpen, match]);
 
@@ -584,7 +590,7 @@ export default function MatchDetailsModal({
                                 onClick={() => handleRemovePlayer(player.id)}
                                 title="Remove player"
                               >
-                                ×
+                                < X />
                               </button>
                             </div>
                             <div className="player-status-controls">
@@ -638,7 +644,7 @@ export default function MatchDetailsModal({
                                   onClick={() => handleRemovePlayer(player.id)}
                                   title="Remove player"
                                 >
-                                  ×
+                                  < X />
                                 </button>
                               </div>
                               <div className="player-status-controls">
@@ -703,51 +709,99 @@ export default function MatchDetailsModal({
 
     {playerRemove && (
         <div className="modal-overlay">
-          <div className="modal-container">
-            <div className="modal-header">
-              <h2>Remove Player</h2>
-              <button
-                className="modal-close"
-                onClick={handleCancelRemovePlayer}
-                disabled={removePlayer}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-form">
-              <p>
-                Are you sure you want to remove{" "}
-                <strong>{playerRemove.name}</strong> from this match?
-              </p>
-            </div>
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="btn-cancel"
-                onClick={handleCancelRemovePlayer}
-                disabled={removePlayer}
-              >
-                No
-              </button>
-              <button
-                type="button"
-                className="delete-match-btn"
-                onClick={handleConfirmRemovePlayer}
-                disabled={removePlayer}
-              >
-                {removePlayer ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Removing...
-                  </span>
-                ) : (
-                  "Yes"
-                )}
-              </button>
-            </div>
+        <div className="modal-container">
+          <div className="modal-header">
+            <h2>Remove Player</h2>
+            <button
+              className="modal-close"
+              onClick={handleCancelRemovePlayer}
+              disabled={removePlayer}
+            >
+              < X />
+            </button>
+          </div>
+          <div className="modal-form">
+            <p>
+              Are you sure you want to remove <strong>{playerRemove.name}</strong> from this match?
+            </p>
+          </div>
+          <div className="modal-actions modal-actions-centered">
+            <button
+              type="button"
+              className="btn-cancel"
+              onClick={handleCancelRemovePlayer}
+              disabled={removePlayer}
+            >
+              No
+            </button>
+            <button
+              type="button"
+              className="delete-match-btn"
+              onClick={handleConfirmRemovePlayer}
+              disabled={removePlayer}
+            >
+              {removePlayer ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Removing...
+                </span>
+              ) : (
+                "Yes"
+              )}
+            </button>
           </div>
         </div>
-      )}
+    </div>
+    )}
+
+    {deleteMatch && (
+      <div className="modal-overlay">
+        <div className="modal-container">
+          <div className="modal-header">
+            <h2>Delete Match</h2>
+            <button
+              className="modal-close"
+              onClick={handleCancelDeleteMatch}
+              disabled={deletingMatch}
+            >
+              < X />
+            </button>
+          </div>
+          <div className="modal-form">
+            <p>
+              Are you sure you want to delete the match at <strong>{match.location}</strong> on
+              {" "}
+              <strong>{formatDate(match.date)}</strong>? This action cannot be undone.
+            </p>
+          </div>
+          <div className="modal-actions modal-actions-centered">
+            <button
+              type="button"
+              className="btn-cancel"
+              onClick={handleCancelDeleteMatch}
+              disabled={deletingMatch}
+            >
+              No
+            </button>
+            <button
+              type="button"
+              className="delete-match-btn"
+              onClick={handleConfirmDeleteMatch}
+              disabled={deletingMatch}
+            >
+              {deletingMatch ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Deleting...
+                </span>
+              ) : (
+                "Yes"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
