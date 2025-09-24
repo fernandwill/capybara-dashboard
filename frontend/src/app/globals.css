@@ -4145,9 +4145,7 @@ input[type="time"]::-webkit-datetime-edit-text {
   width: 40px;
   height: 40px;
   padding: 0;
-  border-radius: 8px;
-  background-color: #ef4444;
-  color: #ffffff;
+  color: #ef4444;
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease, opacity 0.2s ease;
