@@ -1203,10 +1203,21 @@ body {
   max-height: 90vh;
   overflow-y: auto;
   animation: modalSlideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 .match-details-content {
+  flex: 1 1 auto;
   padding: 0 24px 24px 24px;
+}
+
+.match-details-footer {
+  margin-top: auto;
+  padding: 16px 24px 24px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-start;
 }
 
 .match-info-section {
@@ -2616,11 +2627,23 @@ body {
   max-height: 90vh;
   overflow-y: auto;
   animation: modalSlideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 .match-details-content {
+  flex: 1 1 auto;
   padding: 0 24px 24px 24px;
 }
+
+.match-details-footer {
+  margin-top: auto;
+  padding: 16px 24px 24px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-start;
+}
+
 
 .match-info-section {
   margin-bottom: 32px;
