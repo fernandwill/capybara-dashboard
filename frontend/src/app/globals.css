@@ -4156,10 +4156,9 @@ input[type="time"]::-webkit-datetime-edit-text {
   height: 20px;
 }
 
-.logout-button:hover {
-  background-color: #dc2626;
-  opacity: 0.4;
-  border-radius: 25px;
+.logout-button:hover svg {
+  width: 30px;
+  height: 30px;
 }
 
 .logout-button:disabled {
