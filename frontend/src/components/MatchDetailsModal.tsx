@@ -59,6 +59,9 @@ export default function MatchDetailsModal({
 
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
+  const [playerRemove, setPlayerRemove] = useState<
+  {id: string; name: string;} | null>(null);
+  const [removePlayer, setRemovePlayer] = useState(false);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -220,19 +223,29 @@ export default function MatchDetailsModal({
     }
   };
 
-  const handleRemovePlayer = async (playerId: string) => {
-    if (!match) return;
-
+    const handleRemovePlayer = (playerId: string) => {
     const player = players.find(p => p.id === playerId);
-    const playerLabel = player ? player.name : "this player";
-    const confirmed = window.confirm(`Remove ${playerLabel} from this match?`);
-    if (!confirmed) {
-      return;
-    }
+    
+    setRemovePlayer(false);
+    setPlayerRemove({
+      id: playerId,
+      name: player ? player.name : "this player",
+    });
+  };
+
+  const handleCancelRemovePlayer = () => {
+    if (removePlayer) return;
+      setPlayerRemove(null);
+    };
+
+    const handleConfirmRemovePlayer = async () => {
+      if (!match || !playerRemove) return;
+
+      setRemovePlayer(true);
 
     try {
       const response = await fetch(
-        `/api/matches/${match.id}/players/${playerId}`,
+        `/api/matches/${match.id}/players/${playerRemove.id}`,
         {
           method: "DELETE",
           headers: {
@@ -247,6 +260,7 @@ export default function MatchDetailsModal({
         if (onMatchUpdate) {
           onMatchUpdate();
         }
+        setPlayerRemove(null);
       } else {
         console.error("Failed to remove player from match.");
         window.alert("Failed to remove player. Please try again.");
@@ -254,8 +268,11 @@ export default function MatchDetailsModal({
     } catch (error) {
       console.error("Error removing player:", error);
       window.alert("An unexpected error occurred while removing the player.");
+    } finally {
+      setRemovePlayer(false);
     }
-  };
+  }
+
   const handleDeleteMatch = async () => {
     if (!match) return;
 
@@ -436,6 +453,7 @@ export default function MatchDetailsModal({
   if (!isOpen || !match) return null;
 
   return (
+  <>
     <div className="modal-overlay">
       <div className="match-details-modal">
         <div className="modal-header">
@@ -682,6 +700,54 @@ export default function MatchDetailsModal({
         </div>
       </div>
     </div>
+
+    {playerRemove && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h2>Remove Player</h2>
+              <button
+                className="modal-close"
+                onClick={handleCancelRemovePlayer}
+                disabled={removePlayer}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-form">
+              <p>
+                Are you sure you want to remove{" "}
+                <strong>{playerRemove.name}</strong> from this match?
+              </p>
+            </div>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={handleCancelRemovePlayer}
+                disabled={removePlayer}
+              >
+                No
+              </button>
+              <button
+                type="button"
+                className="delete-match-btn"
+                onClick={handleConfirmRemovePlayer}
+                disabled={removePlayer}
+              >
+                {removePlayer ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Removing...
+                  </span>
+                ) : (
+                  "Yes"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
-
