@@ -3,10 +3,10 @@ import prisma from "@/lib/database";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } } // ✅ not a Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const currentMatch = await prisma.match.findUnique({
       where: { id },
@@ -41,7 +41,7 @@ export async function GET(
 
     const updatedAtOrEpoch = (p: PlayerRecord): number => {
       // if your Player model lacks updatedAt, change to createdAt or remove freshness logic
-      const d = (p as any)?.updatedAt as Date | undefined;
+      const d = p?.updatedAt as Date | undefined;
       return d instanceof Date ? d.getTime() : 0;
     };
 
