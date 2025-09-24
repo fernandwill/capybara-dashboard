@@ -279,7 +279,7 @@ export default function MatchDetailsModal({
     };
 
     const handleCancelDeleteMatch = () => {
-      if (deleteMatch) return;
+      if (deletingMatch) return;
         setDeleteMatch(false);
     };
 
