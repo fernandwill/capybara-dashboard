@@ -175,15 +175,23 @@ export default function MatchDetailsModal({
     }
   };
 
-  const deduplicatePlayers = (playersList: Player[]) => {
-    const uniquePlayersMap = new Map<string, Player>();
-    playersList.forEach((player) => {
-      if (!uniquePlayersMap.has(player.id)) {
-      uniquePlayersMap.set(player.id, player);
-      }
-    });
-    return Array.from(uniquePlayersMap.values());
-  }
+  const deduplicatePlayers = (playersList: Player[]): Player[] => {
+    const seenIds = new Set<String>();
+    const seenNames = new Set<String>();
+    const deduplicatedPlayers: Player[] = [];
+    for (const player of playersList) {
+      const trimmedName = player.name.trim();
+      const normalizedName = trimmedName.toLowerCase();
+
+      if (seenIds.has(player.id) || seenNames.has(normalizedName)) continue;
+
+      seenIds.add(player.id);
+      seenNames.add(normalizedName);
+      deduplicatedPlayers.push({...player, name: trimmedName});
+    }
+
+    return deduplicatedPlayers;
+  };
 
   const handleAddPlayer = async (playerId: string) => {
     if (!match) return;
