@@ -167,13 +167,23 @@ export default function MatchDetailsModal({
     try {
       const response = await fetch(`/api/matches/${match.id}/players/past`);
       if (response.ok) {
-        const data = await response.json();
-        setPastPlayers(data);
+        const data = (await response.json() as Player[]);
+        setPastPlayers(deduplicatePlayers(data));
       }
     } catch (error) {
       console.error("Error fetching past players:", error);
     }
   };
+
+  const deduplicatePlayers = (playersList: Player[]) => {
+    const uniquePlayersMap = new Map<string, Player>();
+    playersList.forEach((player) => {
+      if (!uniquePlayersMap.has(player.id)) {
+      uniquePlayersMap.set(player.id, player);
+      }
+    });
+    return Array.from(uniquePlayersMap.values());
+  }
 
   const handleAddPlayer = async (playerId: string) => {
     if (!match) return;
@@ -391,8 +401,8 @@ export default function MatchDetailsModal({
         try {
           const response = await fetch(`/api/matches/${match.id}/players/past`);
           if (response.ok) {
-            const data = await response.json();
-            setPastPlayers(data);
+            const data = (await response.json()) as Player[];
+            setPastPlayers(deduplicatePlayers(data));
           }
         } catch (error) {
           console.error("Error fetching past players:", error);
