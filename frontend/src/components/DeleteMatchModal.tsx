@@ -1,4 +1,5 @@
 "use client";
+import { X, Trash2 } from "lucide-react";
 
 interface DeleteMatchModalProps {
   isOpen: boolean;
@@ -19,52 +20,51 @@ export default function DeleteMatchModal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container">
-        <div className="modal-header">
-          <h2>Delete Match</h2>
+      <div className="modal-container delete-modal">
           <button
-            className="modal-close"
+            className="modal-close delete-modal-close"
             onClick={onClose}
             disabled={isLoading}
           >
-            ×
+            <X />
           </button>
+          <div className="delete-modal-content">
+            <div className="delete-modal-icon" aria-hidden="true">
+              <Trash2 size={72} />
+            </div>
+            <p className="delete-modal-message">
+              Delete
+              {matchTitle ? (
+                <>
+                  {" "}
+                  <strong>{matchTitle}</strong>?
+                </>
+              ) : (
+                " this match?"
+              )}
+            </p>
         </div>
-        <div className="modal-form">
-          <p>
-            Are you sure you want to delete
-            {matchTitle ? (
-              <>
-                {" "}
-                <strong>{matchTitle}</strong>?
-              </>
-            ) : (
-              " this match?"
-            )}
-          </p>
-          <p className="mt-4 text-sm text-muted-foreground">
-            This action cannot be undone and will remove all associated data.
-          </p>
-        </div>
-        <div className="modal-actions">
-          <button
-            type="button"
-            className="btn-cancel"
-            onClick={onClose}
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="delete-btn"
-            onClick={onConfirm}
-            disabled={isLoading}
-          >
-            {isLoading ? "Deleting..." : "Delete"}
-          </button>
+         <div className="delete-modal-actions">
+            <button
+              type="button"
+              className="delete-modal-button delete-modal-button-cancel"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="delete-modal-button delete-modal-button-confirm"
+              onClick={onConfirm}
+              disabled={isLoading}
+            >
+              {isLoading ? "Deleting..." : "Delete"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
   );
 }
+
+
