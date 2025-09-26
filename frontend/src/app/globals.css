@@ -753,6 +753,34 @@ body {
   font-weight: 500;
 }
 
+.delete-match-btn {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.match-card:hover .delete-match-btn {
+  opacity: 0.7;
+  visibility: visible;
+}
+
+.delete-match-btn:hover {
+  background-color: var(--card-bg);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.delete-match-btn:active {
+  transform: scale(0.95);
+}
+
 .edit-btn {
   background: none;
   border: none;
