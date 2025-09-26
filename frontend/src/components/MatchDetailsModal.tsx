@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+
 
 interface Player {
   id: string;
@@ -459,8 +459,8 @@ export default function MatchDetailsModal({
   if (!isOpen || !match) return null;
 
   return (
-  <>
-    <div className="modal-overlay">
+    <>
+      <div className="modal-overlay">
       <div className="match-details-modal">
         <div className="modal-header">
           <h2>Match Details</h2>
@@ -699,26 +699,24 @@ export default function MatchDetailsModal({
 
     {playerRemove && (
         <div className="modal-overlay">
-        <div className="modal-container">
-          <div className="modal-header">
-            <h2>Remove Player</h2>
+        <div className="modal-container delete-modal">
             <button
-              className="modal-close"
+              className="modal-close delete-modal-close"
               onClick={handleCancelRemovePlayer}
               disabled={removePlayer}
             >
               < X />
             </button>
-          </div>
-          <div className="modal-form">
+            <div className="delete-modal-content">
+              <div className="delete-modal-message">
             <p>
-              Are you sure you want to remove <strong>{playerRemove.name}</strong> from this match?
+              Remove {" "}<strong>{playerRemove.name}</strong> {"from this match?"} 
             </p>
           </div>
-          <div className="modal-actions modal-actions-centered">
+          <div className="delete-modal-actions">
             <button
               type="button"
-              className="btn-cancel"
+              className="delete-modal-button delete-modal-button-cancel"
               onClick={handleCancelRemovePlayer}
               disabled={removePlayer}
             >
@@ -726,7 +724,7 @@ export default function MatchDetailsModal({
             </button>
             <button
               type="button"
-              className="delete-btn"
+              className="delete-modal-button delete-modal-button-confirm"
               onClick={handleConfirmRemovePlayer}
               disabled={removePlayer}
             >
@@ -742,7 +740,8 @@ export default function MatchDetailsModal({
           </div>
         </div>
       </div>
-    )}
+    </div>
+      )}
     </>
   );
 }
