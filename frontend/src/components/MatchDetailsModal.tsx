@@ -694,16 +694,6 @@ export default function MatchDetailsModal({
             )}
           </div>
         </div>
-        <div className="match-details-footer">
-          <button
-            type="button"
-            className="delete-match-btn"
-            onClick={handleDeleteMatch}
-            disabled={deletingMatch}
-          >
-            {deletingMatch ? "Deleting..." : "Delete Match"}
-          </button>
-        </div>
       </div>
     </div>
 
@@ -736,7 +726,7 @@ export default function MatchDetailsModal({
             </button>
             <button
               type="button"
-              className="delete-match-btn"
+              className="delete-btn"
               onClick={handleConfirmRemovePlayer}
               disabled={removePlayer}
             >
@@ -744,55 +734,6 @@ export default function MatchDetailsModal({
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Removing...
-                </span>
-              ) : (
-                "Yes"
-              )}
-            </button>
-          </div>
-        </div>
-    </div>
-    )}
-
-    {deleteMatch && (
-      <div className="modal-overlay">
-        <div className="modal-container">
-          <div className="modal-header">
-            <h2>Delete Match</h2>
-            <button
-              className="modal-close"
-              onClick={handleCancelDeleteMatch}
-              disabled={deletingMatch}
-            >
-              < X />
-            </button>
-          </div>
-          <div className="modal-form">
-            <p>
-              Are you sure you want to delete the match at <strong>{match.location}</strong> on
-              {" "}
-              <strong>{formatDate(match.date)}</strong>? This action cannot be undone.
-            </p>
-          </div>
-          <div className="modal-actions modal-actions-centered">
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={handleCancelDeleteMatch}
-              disabled={deletingMatch}
-            >
-              No
-            </button>
-            <button
-              type="button"
-              className="delete-match-btn"
-              onClick={handleConfirmDeleteMatch}
-              disabled={deletingMatch}
-            >
-              {deletingMatch ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Deleting...
                 </span>
               ) : (
                 "Yes"
