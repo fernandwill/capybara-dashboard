@@ -166,7 +166,7 @@ export const addPlayerToMatch = async (req: Request, res: Response) => {
         .status(400)
         .json({ error: "Player is already in this match." });
     }
-
+    
     const matchPlayer = await prisma.matchPlayer.create({
       data: {
         matchId,
