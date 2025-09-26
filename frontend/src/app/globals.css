@@ -984,7 +984,6 @@ body {
   position: absolute;
   top: 16px;
   right: 16px;
-  color: #9ca3af;
 }
 
 .delete-modal-close:hover {
@@ -1041,17 +1040,27 @@ body {
 }
 
 .delete-modal-button-cancel {
-  background-color: var(--text-color);
-  color: var(--bg-color);
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
 .delete-modal-button-cancel:hover:not(:disabled) {
-  background-color: #d1d5db;
+  background-color: var(--card-bg);
 }
 
 .delete-modal-button-confirm {
   background-color: #ef4444;
   color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
 .delete-modal-button-confirm:hover:not(:disabled) {
