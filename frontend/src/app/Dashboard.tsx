@@ -10,7 +10,7 @@ import { Select } from "../components/ui/select";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
-import { Loader2, LogOut } from "lucide-react";
+import { Loader2, LogOut, Trash2 } from "lucide-react";
 
 type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 
@@ -141,6 +141,50 @@ export function Dashboard() {
   const handleCloseDetailsModal = () => {
     setIsDetailsModalOpen(false);
     setSelectedMatch(null);
+  };
+
+  const handleDeleteMatch = async (match: Match) => {
+    const shouldDelete = window.confirm(
+      `Are you sure you want to delete "${match.title}"?`
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/matches/${match.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      setMatches((prevMatches) =>
+        prevMatches.filter((existingMatch) => existingMatch.id !== match.id)
+      );
+
+      if (selectedMatch?.id === match.id) {
+        handleCloseDetailsModal();
+      }
+
+      fetchMatches();
+      fetchStats();
+
+      setSuccessModal({
+        isOpen: true,
+        title: "Success!",
+        message: "Match deleted successfully!",
+      });
+    } catch (error) {
+      console.error("Error deleting match:", error);
+      setErrorModal({
+        isOpen: true,
+        title: "Error!",
+        message: "Failed to delete match. Please try again.",
+      });
+    }
   };
 
   const fetchStats = useCallback(async () => {
@@ -881,6 +925,22 @@ export function Dashboard() {
                     {match.status}
                   </span>
                 </div>
+                <button
+                  className="edit-btn delete-match-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteMatch(match);
+                  }}
+                  title="Delete match"
+                  style={{ 
+                    position: 'absolute', 
+                    top: '16px', 
+                    right: '56px',
+                    zIndex: 10
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
                 <button
                   className="edit-btn"
                   onClick={(e) => {
