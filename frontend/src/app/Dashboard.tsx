@@ -6,6 +6,7 @@ import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
+import DeleteMatchModal from "../components/DeleteMatchModal";
 import { Select } from "../components/ui/select";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
@@ -69,6 +70,11 @@ export function Dashboard() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(
+    null
+  );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeletingMatch, setIsDeletingMatch] = useState(false);
 
   const [sortBy, setSortBy] = useState<SortOption>("date-earliest");
 
@@ -143,17 +149,25 @@ export function Dashboard() {
     setSelectedMatch(null);
   };
 
-  const handleDeleteMatch = async (match: Match) => {
-    const shouldDelete = window.confirm(
-      `Are you sure you want to delete "${match.title}"?`
-    );
+  const handleRequestDeleteMatch = (match: Match) => {
+    setMatchPendingDeletion(match);
+    setIsDeleteModalOpen(true);
+  };
 
-    if (!shouldDelete) {
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setMatchPendingDeletion(null);
+  };
+
+  const handleConfirmDeleteMatch = async () => {
+    if (!matchPendingDeletion) {
       return;
     }
 
+    setIsDeletingMatch(true);
+
     try {
-      const response = await fetch(`/api/matches/${match.id}`, {
+      const response = await fetch(`/api/matches/${matchPendingDeletion.id}`, {
         method: "DELETE",
       });
 
@@ -162,15 +176,19 @@ export function Dashboard() {
       }
 
       setMatches((prevMatches) =>
-        prevMatches.filter((existingMatch) => existingMatch.id !== match.id)
+        prevMatches.filter(
+          (existingMatch) => existingMatch.id !== matchPendingDeletion.id
+        )
       );
 
-      if (selectedMatch?.id === match.id) {
+      if (selectedMatch?.id === matchPendingDeletion.id) {
         handleCloseDetailsModal();
       }
 
       fetchMatches();
       fetchStats();
+
+      handleCloseDeleteModal();
 
       setSuccessModal({
         isOpen: true,
@@ -184,6 +202,8 @@ export function Dashboard() {
         title: "Error!",
         message: "Failed to delete match. Please try again.",
       });
+    } finally {
+      setIsDeletingMatch(false);
     }
   };
 
@@ -929,11 +949,11 @@ export function Dashboard() {
                   className="delete-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDeleteMatch(match);
+                    handleRequestDeleteMatch(match);
                   }}
                   title="Delete match"
-                  style={{ 
-                    position: 'absolute', 
+                  style={{
+                    position: 'absolute',
                     top: '16px', 
                     right: '56px',
                     zIndex: 10
@@ -1079,6 +1099,16 @@ export function Dashboard() {
         onClose={handleCloseDetailsModal}
         match={selectedMatch}
         onMatchUpdate={fetchMatches}
+      />
+
+      <DeleteMatchModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDeleteMatch}
+        matchTitle={
+          matchPendingDeletion?.title || matchPendingDeletion?.location
+        }
+        isLoading={isDeletingMatch}
       />
     </div>
   );
