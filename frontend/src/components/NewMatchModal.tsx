@@ -52,9 +52,9 @@ export default function NewMatchModal({
     location: "",
     courtNumber: "",
     date: "",
-    startTime: "16:00",
-    endTime: "20:00",
-    fee: 300000,
+    startTime: "00:00",
+    endTime: "23:59",
+    fee: 0,
     description: "",
   });
 
@@ -69,8 +69,8 @@ export default function NewMatchModal({
         location: editingMatch.location,
         courtNumber: editingMatch.courtNumber,
         date: formattedDate,
-        startTime: startTime || "16:00",
-        endTime: endTime || "20:00",
+        startTime: startTime || "00:00",
+        endTime: endTime || "23:59",
         fee: editingMatch.fee,
         description: editingMatch.description || "",
       });
@@ -81,9 +81,9 @@ export default function NewMatchModal({
         location: "",
         courtNumber: "",
         date: "",
-        startTime: "16:00",
-        endTime: "20:00",
-        fee: 300000,
+        startTime: "00:00",
+        endTime: "23:59",
+        fee: 0,
         description: "",
       });
     }
@@ -112,9 +112,9 @@ export default function NewMatchModal({
       location: "",
       courtNumber: "",
       date: "",
-      startTime: "16:00",
-      endTime: "20:00",
-      fee: 300000,
+      startTime: "00:00",
+      endTime: "23:59",
+      fee: 0,
       description: "",
     });
   };
@@ -168,7 +168,7 @@ export default function NewMatchModal({
                 onChange={handleChange}
                 required
                 className="form-input"
-                placeholder="1"
+                placeholder="Court number..."
               />
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function NewMatchModal({
                 required
                 className="form-input"
                 pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-                placeholder="16:00"
+                placeholder="00:00"
                 title="Enter time in 24-hour format (HH:MM)"
               />
             </div>
@@ -215,7 +215,7 @@ export default function NewMatchModal({
                 required
                 className="form-input"
                 pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-                placeholder="20:00"
+                placeholder="23:59"
                 title="Enter time in 24-hour format (HH:MM)"
               />
             </div>
@@ -223,7 +223,7 @@ export default function NewMatchModal({
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="fee">Price</label>
+              <label htmlFor="fee">Court Fee(s)</label>
               <input
                 type="text"
                 id="fee"
@@ -232,7 +232,7 @@ export default function NewMatchModal({
                 onChange={handleChange}
                 required
                 className="form-input"
-                placeholder="300000"
+                placeholder="Court fee..."
                 pattern="[0-9]+"
                 title="Enter price amount (numbers only)"
               />
