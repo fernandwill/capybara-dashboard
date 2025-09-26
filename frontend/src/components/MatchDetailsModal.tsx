@@ -482,7 +482,7 @@ export default function MatchDetailsModal({
             </div>
             <div className="match-details-grid">
               <div className="detail-item">
-                <span className="detail-label">Court:</span>
+                <span className="detail-label">Court No:</span>
                 <span className="detail-value">{match.courtNumber}</span>
               </div>
               <div className="detail-item">
@@ -490,7 +490,7 @@ export default function MatchDetailsModal({
                 <span className="detail-value">{formatTimeWithDuration(match.time)}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Fee:</span>
+                <span className="detail-label">Court Fee:</span>
                 <span className="detail-value fee-value">
                   {formatCurrency(match.fee)}
                 </span>
