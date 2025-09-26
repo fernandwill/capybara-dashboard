@@ -1302,6 +1302,8 @@ body {
   max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   animation: modalSlideIn 0.3s ease-out;
   display: flex;
   flex-direction: column;
