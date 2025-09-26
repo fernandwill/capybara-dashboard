@@ -926,7 +926,7 @@ export function Dashboard() {
                   </span>
                 </div>
                 <button
-                  className="delete-match-btn"
+                  className="delete-btn"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDeleteMatch(match);
