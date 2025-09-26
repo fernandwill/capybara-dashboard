@@ -201,6 +201,19 @@ export default function MatchDetailsModal({
   const handleAddPlayer = async (playerId: string) => {
     if (!match) return;
     try {
+
+      const resetResponse = await fetch(`/api/players/${playerId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: 'ACTIVE', paymentStatus: 'BELUM_SETOR' }),
+      });
+
+      if (!resetResponse.ok) {
+        console.error("Failed to reset player status.");
+      }
+
       const response = await fetch(
         `/api/matches/${match.id}/players`,
         {
