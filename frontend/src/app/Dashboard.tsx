@@ -883,13 +883,23 @@ export function Dashboard() {
         <div className="tabs">
           <div
             className={`tab ${activeTab === "upcoming" ? "active" : ""}`}
-            onClick={() => setActiveTab("upcoming")}
+            onClick={() => {
+              if (sortBy !== "date-earliest") {
+                setSortBy ("date-earliest");
+              }
+              setActiveTab("upcoming");
+            }}
           >
             Upcoming Matches
           </div>
           <div
             className={`tab ${activeTab === "past" ? "active" : ""}`}
-            onClick={() => setActiveTab("past")}
+            onClick={() => {
+              if (sortBy !== "date-latest") {
+                setSortBy ("date-earliest");
+              }
+              setActiveTab("past");
+            }}
           >
             Past Matches
           </div>
