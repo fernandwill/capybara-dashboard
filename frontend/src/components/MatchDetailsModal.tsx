@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, X } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
+import ErrorModal from "./ErrorModal";
 
 interface Player {
   id: string;
@@ -143,6 +144,11 @@ export default function MatchDetailsModal({
   const [newPlayerName, setNewPlayerName] = useState("");
   const [playerToRemove, setPlayerToRemove] = useState<{ id: string; name: string } | null>(null);
   const [isRemovingPlayer, setIsRemovingPlayer] = useState(false);
+  const [errorModal, setErrorModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
 
   const matchId = match?.id;
 
@@ -320,14 +326,30 @@ export default function MatchDetailsModal({
         }),
       });
 
-      if (createResponse.ok) {
+      if (createResponse.status === 409) {
+        setErrorModal({
+          isOpen: true,
+          title: "Error!",
+          message: "Player with this name already exists.",
+        });
+        return;
+      }
+
+      if (!createResponse.ok) {
+        throw new Error(`Failed to create player. Status : ${createResponse.status}`);
+      }
+
         const newPlayer = await createResponse.json();
         await handleAddPlayer(newPlayer.id);
         setNewPlayerName("");
         setShowAddPlayer(false);
-      }
     } catch (error) {
       console.error("Error creating player:", error);
+      setErrorModal({
+        isOpen: true,
+        title: "Unable to create player",
+        message: "Please try again.",
+      });
     }
   };
 
@@ -659,6 +681,12 @@ export default function MatchDetailsModal({
         actionsClassName="delete-modal-actions"
         cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
         confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
+      />
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}
+        title={errorModal.title}
+        message={errorModal.message}
       />
     </>
   );
