@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
+import { getTimeRangeEnd } from '@/lib/time';
 
 export async function GET(
   request: Request,
@@ -51,28 +52,17 @@ export async function PUT(
     // Determine the correct status based on date and time
     let finalStatus = status;
     if (status === "UPCOMING" && date && time) {
-      try {
-        const now = new Date();
-        const matchDate = new Date(date);
-        
-        // Parse the time string (e.g., "18:00-20:00")
-        const timeParts = time.split('-');
-        if (timeParts.length === 2) {
-          const endTime = timeParts[1].trim(); // Get the end time
-          const [endHour, endMin] = endTime.split(':').map(Number);
-          
-          // Create a date object for the match end time
-          const matchEndDate = new Date(matchDate);
-          matchEndDate.setHours(endHour, endMin, 0, 0);
-          
-          // If the match end time has passed, mark it as completed
-          if (matchEndDate < now) {
-            finalStatus = "COMPLETED";
-          }
+      const now = new Date();
+      const matchDate = new Date(date);
+      const endTime = getTimeRangeEnd(time);
+
+      if (endTime) {
+        const matchEndDate = new Date(matchDate);
+        matchEndDate.setHours(endTime.hours, endTime.minutes, 0, 0);
+
+        if (matchEndDate < now) {
+          finalStatus = "COMPLETED";
         }
-      } catch (parseError) {
-        console.warn('Error parsing time for status determination:', parseError);
-        // Keep the original status if parsing fails
       }
     }
 
@@ -147,21 +137,15 @@ async function updateMatchStatuses() {
     
     for (const match of upcomingMatches) {
       try {
-        // Parse the time string (e.g., "18:00-20:00")
-        const timeParts = match.time.split('-');
-        if (timeParts.length !== 2) {
+        const endTime = getTimeRangeEnd(match.time);
+        if (!endTime) {
           console.warn(`Invalid time format for match ${match.id}: ${match.time}`);
           continue;
         }
-        
-        const endTime = timeParts[1]; // Get the end time (e.g., "20:00")
-        const [endHour, endMin] = endTime.split(':').map(Number);
-        
-        // Create a date object for the match end time
+
         const matchEndDate = new Date(match.date);
-        matchEndDate.setHours(endHour, endMin, 0, 0);
-        
-        // If the match end time has passed, mark it as completed
+        matchEndDate.setHours(endTime.hours, endTime.minutes, 0, 0);
+
         if (matchEndDate < now) {
           await prisma.match.update({
             where: { id: match.id },
