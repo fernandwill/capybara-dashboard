@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, X } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
-import { formatTimeWithDuration } from "@/lib/time";
 
 interface Player {
   id: string;
@@ -55,6 +54,46 @@ const formatDate = (dateString: string) => {
 };
 
 const formatCurrency = (amount: number) => IDR_FORMATTER.format(amount);
+
+const formatTimeWithDuration = (timeString: string) => {
+  if (!timeString || !timeString.includes("-")) {
+    return timeString;
+  }
+
+  try {
+    const [startTime, endTime] = timeString.split("-").map((time) => time.trim());
+    const [startHours, startMinutes] = startTime.split(":").map(Number);
+    const [endHours, endMinutes] = endTime.split(":").map(Number);
+
+    if (
+      Number.isNaN(startHours) ||
+      Number.isNaN(startMinutes) ||
+      Number.isNaN(endHours) ||
+      Number.isNaN(endMinutes)
+    ) {
+      return timeString;
+    }
+
+    const startDate = new Date();
+    startDate.setHours(startHours, startMinutes, 0, 0);
+
+    const endDate = new Date();
+    endDate.setHours(endHours, endMinutes, 0, 0);
+
+    let durationMillis = endDate.getTime() - startDate.getTime();
+    if (durationMillis < 0) {
+      durationMillis += 24 * 60 * 60 * 1000;
+    }
+
+    const durationHours = durationMillis / (1000 * 60 * 60);
+    const roundedDuration = Math.round(durationHours * 10) / 10;
+
+    return `${startTime}-${endTime} (${roundedDuration} hrs)`;
+  } catch (error) {
+    console.error("Error formatting time with duration:", error);
+    return timeString;
+  }
+};
 
 const deduplicatePlayers = (playersList: Player[]): Player[] => {
   const seenIds = new Set<string>();

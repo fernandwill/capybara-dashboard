@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
-import { getTimeRangeEnd } from '@/lib/time';
 
 export async function POST() {
   try {
@@ -40,15 +39,21 @@ async function updateMatchStatuses() {
     
     for (const match of upcomingMatches) {
       try {
-        const endTime = getTimeRangeEnd(match.time);
-        if (!endTime) {
+        // Parse the time string (e.g., "18:00-20:00")
+        const timeParts = match.time.split('-');
+        if (timeParts.length !== 2) {
           console.warn(`Invalid time format for match ${match.id}: ${match.time}`);
           continue;
         }
-
+        
+        const endTime = timeParts[1]; // Get the end time (e.g., "20:00")
+        const [endHour, endMin] = endTime.split(':').map(Number);
+        
+        // Create a date object for the match end time
         const matchEndDate = new Date(match.date);
-        matchEndDate.setHours(endTime.hours, endTime.minutes, 0, 0);
-
+        matchEndDate.setHours(endHour, endMin, 0, 0);
+        
+        // If the match end time has passed, mark it as completed
         if (matchEndDate < now) {
           await prisma.match.update({
             where: { id: match.id },
