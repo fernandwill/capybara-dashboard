@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStats = exports.getPlayersFromPastMatches = exports.removePlayerFromMatch = exports.addPlayerToMatch = exports.deleteMatch = exports.updateMatch = exports.createMatch = exports.getMatchById = exports.getAllMatches = void 0;
 const database_1 = __importDefault(require("../utils/database"));
-const server_1 = require("../server");
-const server_2 = require("../server");
+const matchStatus_1 = require("../utils/matchStatus");
+const socket_1 = require("../utils/socket");
 const getAllMatches = async (req, res) => {
     try {
         const matches = await database_1.default.match.findMany({
@@ -108,8 +108,10 @@ const updateMatch = async (req, res) => {
                 payments: true,
             },
         });
-        await (0, server_1.updateStatus)();
-        server_2.io.emit('matchUpdated');
+        await (0, matchStatus_1.updateMatchStatuses)();
+        if ((0, socket_1.hasSocketInstance)()) {
+            (0, socket_1.getIO)().emit('matchUpdated');
+        }
         res.json(match);
     }
     catch (error) {
@@ -227,14 +229,14 @@ const getPlayersFromPastMatches = async (req, res) => {
         });
         // Extract unique players from past matches
         const playerMap = new Map();
-        pastMatches.forEach(match => {
-            match.players.forEach(playerMatch => {
+        for (const match of pastMatches) {
+            for (const playerMatch of match.players) {
                 // Only add if not already in the map (to ensure uniqueness)
                 if (!playerMap.has(playerMatch.player.id)) {
                     playerMap.set(playerMatch.player.id, playerMatch.player);
                 }
-            });
-        });
+            }
+        }
         // Convert map values to array
         const uniquePlayers = Array.from(playerMap.values());
         res.json(uniquePlayers);
@@ -268,7 +270,7 @@ const getStats = async (req, res) => {
             },
         });
         let totalHours = 0;
-        completedMatchesWithTime.forEach((match) => {
+        for (const match of completedMatchesWithTime) {
             // Assuming time format is "HH:MM-HH:MM" like "16:00-20:00"
             if (match.time && match.time.includes("-")) {
                 const [startTime, endTime] = match.time.split("-");
@@ -279,7 +281,7 @@ const getStats = async (req, res) => {
                 const durationMinutes = endMinutes - startMinutes;
                 totalHours += durationMinutes / 60;
             }
-        });
+        }
         res.json({
             totalMatches,
             upcomingMatches,

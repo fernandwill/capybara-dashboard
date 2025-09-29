@@ -1,5 +1,5 @@
 import prisma from '../utils/database'
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
 
 export const getPayment = async (req: Request, res: Response) => {
     try {

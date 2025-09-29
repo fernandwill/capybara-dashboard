@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 export declare const getAllMatches: (req: Request, res: Response) => Promise<void>;
 export declare const getMatchById: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 export declare const createMatch: (req: Request, res: Response) => Promise<void>;

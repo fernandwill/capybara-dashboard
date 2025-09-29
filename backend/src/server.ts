@@ -1,62 +1,23 @@
-import express from 'express'
+import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
 import prisma from './utils/database'
-
-import {createServer} from 'http'
-import {Server} from 'socket.io'
-
+import { createServer } from 'http'
+import type { Socket } from 'socket.io'
 import playerRoutes from './routes/players'
 import matchRoutes from './routes/matches'
 import paymentRoutes from './routes/payments'
+import { initSocket } from './utils/socket'
+import { updateMatchStatuses } from './utils/matchStatus'
+import { getStats } from './controllers/MatchController'
 
 dotenv.config()
 
 const app = express();
 const server = createServer(app)
-const io = new Server(server, {
-    cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:3000",
-        methods: ["GET", "POST"]
-    }
-})
-
-const updateStatus = async () => {
-    try {
-        const now = new Date();
-        console.log('Current time: ', now);
-
-        const upcomingMatches = await prisma.match.findMany({
-            where: {status: 'UPCOMING'},
-            select: {id: true, date: true, time: true}
-        });
-
-        console.log('Found upcoming matches: ', upcomingMatches.length);
-
-        for (const match of upcomingMatches) {
-            const matchDate = new Date(match.date);
-            const [, endTime] = match.time.split('-');
-            const [endHour, endMin] = endTime.split(':').map(Number);
-
-            matchDate.setHours(endHour, endMin, 0, 0);
-
-            console.log(`Match ${match.id}: ends at ${matchDate}, now is ${now}`);
-            console.log(`Should complete? ${matchDate < now}`);
-
-            if (matchDate < now) {
-                await prisma.match.update({
-                    where: {id: match.id},
-                    data: {status: 'COMPLETED'}
-                });
-                console.log(`Completed match: ${match.id}`);
-                }
-            }
-        } catch (error) {
-            console.error('Error updating match status: ', error);
-    }
-};
+const io = initSocket(server)
 
 const PORT = process.env.PORT || 8000;
 
@@ -73,11 +34,11 @@ app.use('/api/players', playerRoutes)
 app.use('/api/matches', matchRoutes)
 app.use('/api/payments', paymentRoutes)
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (req: Request, res: Response) => {
     res.json({status: 'OK', message: 'API is running.'})
 })
 
-app.get('/api/stats/monthly', async (req, res) => {
+app.get('/api/stats/monthly', async (req: Request, res: Response) => {
     try {
         const matches = await prisma.match.findMany({
             where: {status: 'COMPLETED'},
@@ -87,15 +48,17 @@ app.get('/api/stats/monthly', async (req, res) => {
             }
         });
 
-        const monthlyData = matches.reduce((acc: any, match) => {
+        const monthlyData: Record<string, {count: number; totalHours: number}> = {};
+
+        for (const match of matches) {
             const date = new Date(match.date);
             const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
-            if (!acc[monthKey]) {
-                acc[monthKey] = {count: 0, totalHours: 0};
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = {count: 0, totalHours: 0};
             }
 
-            acc[monthKey].count += 1;
+            monthlyData[monthKey].count += 1;
             const [startTime, endTime] = match.time.split('-');
             const [startHour, startMin] = startTime.split(':').map(Number);
             const [endHour, endMin] = endTime.split(':').map(Number);
@@ -104,10 +67,8 @@ app.get('/api/stats/monthly', async (req, res) => {
             const endMinutes = endHour * 60 + endMin;
             const durationHours = (endMinutes - startMinutes) / 60;
 
-            acc[monthKey].totalHours += durationHours;
-
-            return acc;
-        }, {});
+            monthlyData[monthKey].totalHours += durationHours;
+        }
 
         res.json(monthlyData);
     } catch (error) {
@@ -116,19 +77,24 @@ app.get('/api/stats/monthly', async (req, res) => {
     }
 });
 
-app.get('/api/debug/update-statuses', async (req, res) => {
-    await updateStatus();
-    res.json({message: 'Status update completed'});
+app.get('/api/debug/update-statuses', async (req: Request, res: Response) => {
+    try {
+        const updatedCount = await updateMatchStatuses();
+        res.json({message: 'Status update completed', updatedCount});
+    } catch (error) {
+        console.error('Error updating match statuses via debug route:', error)
+        res.status(500).json({error: 'Failed to update match statuses'});
+    }
 });
 
-app.get('/api/debug/all-matches', async (req, res) => {
+app.get('/api/debug/all-matches', async (req: Request, res: Response) => {
     const matches = await prisma.match.findMany({
         select: { id: true, date: true, time: true, status: true, title: true }
     });
     res.json(matches);
 });
 
-app.put('/api/debug/complete/:id', async (req, res) => {
+app.put('/api/debug/complete/:id', async (req: Request, res: Response) => {
     try {
         const {id} = req.params;
         const matchStatus = await prisma.match.update({
@@ -141,12 +107,9 @@ app.put('/api/debug/complete/:id', async (req, res) => {
     }
 });
 
-// Import the stats function directly for the /api/stats route
-import { getStats, updateMatch } from './controllers/MatchController'
-import { dmmfToRuntimeDataModel } from '@prisma/client/runtime/library'
 app.get('/api/stats', getStats)
 
-io.on('connection', (socket) => {
+io.on('connection', (socket: Socket) => {
     console.log('Client connected: ', socket.id)
 
     socket.on('disconnect', () => {
@@ -158,8 +121,10 @@ server.listen(PORT, () => {
     console.log(`Server on port ${PORT}`)
     console.log('Socket.io server active.')
 
-    setInterval(updateStatus, 24 * 60 * 60 * 1000);
+    setInterval(() => {
+        updateMatchStatuses().catch((error) =>
+            console.error('Error updating match statuses via interval:', error)
+        )
+    }, 24 * 60 * 60 * 1000);
 })
-
 export {io}
-export {updateStatus}

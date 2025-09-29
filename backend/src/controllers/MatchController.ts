@@ -1,7 +1,7 @@
 import prisma from "../utils/database";
-import { Request, Response } from "express";
-import { updateStatus } from "../server";
-import {io} from '../server';
+import type { Request, Response } from "express";
+import { updateMatchStatuses } from "../utils/matchStatus";
+import { getIO, hasSocketInstance } from "../utils/socket";
 
 export const getAllMatches = async (req: Request, res: Response) => {
   try {
@@ -125,8 +125,11 @@ export const updateMatch = async (req: Request, res: Response) => {
       },
     });
 
-    await updateStatus();
-    io.emit('matchUpdated');
+    await updateMatchStatuses();
+
+    if (hasSocketInstance()) {
+      getIO().emit('matchUpdated');
+    }
 
     res.json(match);
   } catch (error) {
@@ -252,15 +255,19 @@ export const getPlayersFromPastMatches = async (req: Request, res: Response) => 
     });
 
     // Extract unique players from past matches
-    const playerMap = new Map();
-    pastMatches.forEach(match => {
-      match.players.forEach(playerMatch => {
+    const playerMap = new Map<
+      string,
+      (typeof pastMatches[number])["players"][number]["player"]
+    >();
+
+    for (const match of pastMatches) {
+      for (const playerMatch of match.players) {
         // Only add if not already in the map (to ensure uniqueness)
         if (!playerMap.has(playerMatch.player.id)) {
           playerMap.set(playerMatch.player.id, playerMatch.player);
         }
-      });
-    });
+      }
+    }
 
     // Convert map values to array
     const uniquePlayers = Array.from(playerMap.values());
@@ -299,7 +306,7 @@ export const getStats = async (req: Request, res: Response) => {
     });
 
     let totalHours = 0;
-    completedMatchesWithTime.forEach((match) => {
+    for (const match of completedMatchesWithTime) {
       // Assuming time format is "HH:MM-HH:MM" like "16:00-20:00"
       if (match.time && match.time.includes("-")) {
         const [startTime, endTime] = match.time.split("-");
@@ -312,7 +319,7 @@ export const getStats = async (req: Request, res: Response) => {
 
         totalHours += durationMinutes / 60;
       }
-    });
+    }
 
     res.json({
       totalMatches,
