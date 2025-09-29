@@ -896,7 +896,7 @@ export function Dashboard() {
             className={`tab ${activeTab === "past" ? "active" : ""}`}
             onClick={() => {
               if (sortBy !== "date-latest") {
-                setSortBy ("date-earliest");
+                setSortBy("date-latest");
               }
               setActiveTab("past");
             }}
