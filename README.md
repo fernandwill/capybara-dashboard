@@ -1,5 +1,5 @@
 
-<img width="800" height="600" alt="capybara-dashboard" src="https://github.com/user-attachments/assets/c5afadbd-b799-41c7-8461-1dc0a48322f6" />
+<img width="1000" height="1000" alt="capybara-dashboard" src="https://github.com/user-attachments/assets/c5afadbd-b799-41c7-8461-1dc0a48322f6" />
 
 ## Project Overview
 Capybara Dashboard is a badminton match management platform delivered entirely through the `/frontend` Next.js application. The production build runs on Vercel and can be used for organizing matches, tracking player participation, monitoring payments, and visualizing activity. The Express server found in `/backend` is optional—available for bespoke local experiments—but it is not required for deploying, operating, or extending the production experience.
@@ -28,15 +28,15 @@ These variables are consumed by the Supabase client in `src/lib/supabaseClient.t
 
 ## Database Models & Relationships
 
-<img width="800" height="600" alt="capybara-dashboard-flow-diagram" src="https://github.com/user-attachments/assets/73aaca67-7258-40b4-9765-409a64e35321" />
+<img width="1000" height="1000" alt="capybara-dashboard-flow-diagram" src="https://github.com/user-attachments/assets/73aaca67-7258-40b4-9765-409a64e35321" />
 
 Prisma models map directly to Supabase tables:
 
-- **Admin** – Represents dashboard administrators; used primarily for demo authentication (`authenticateAdmin`/`createAdmin`).
-- **Player** – Stores roster details, lifecycle status (`ACTIVE`, etc.), and payment status flags (`BELUM_SETOR` or `SUDAH_SETOR`).
-- **Match** – Core event entity containing schedule, fee, status (`UPCOMING`/`COMPLETED`), and descriptive metadata.
-- **MatchPlayer** – Join table tying players to matches while enforcing uniqueness per combination.
-- **Payment** – Tracks monetary transactions for players, optionally linked to matches.
+- **users** – Represents dashboard user. 
+- **players** – Stores roster details, lifecycle status (`ACTIVE`, etc.), and payment status flags (`BELUM_SETOR` or `SUDAH_SETOR`).
+- **matches** – Core event entity containing schedule, fee, status (`UPCOMING`/`COMPLETED`), and descriptive metadata.
+- **match_players** – Join table tying players to matches while enforcing uniqueness per combination.
+- **payments** – Tracks monetary transactions for players, optionally linked to matches.
 
 These relationships allow Prisma to eagerly load players and payments alongside match data, which powers the dashboard's rich context cards and payment health indicators.
 
