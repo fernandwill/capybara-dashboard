@@ -149,20 +149,6 @@ export default function NewMatchModal({
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label htmlFor="title">Match Title</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              className="form-input"
-              placeholder="Friendly doubles night"
-            />
-          </div>
-
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="location">Location</label>
@@ -174,7 +160,7 @@ export default function NewMatchModal({
                 onChange={handleChange}
                 required
                 className="form-input"
-                placeholder="Court location"
+                placeholder="Court location..."
               />
             </div>
             <div className="form-group">
