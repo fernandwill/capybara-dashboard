@@ -329,7 +329,7 @@ export default function MatchDetailsModal({
       if (createResponse.status === 409) {
         setErrorModal({
           isOpen: true,
-          title: "Error!",
+          title: "Oops!",
           message: "Player with this name already exists.",
         });
         return;
