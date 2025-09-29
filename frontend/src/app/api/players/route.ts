@@ -19,10 +19,21 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { name, email, phone, status = "ACTIVE", paymentStatus = "BELUM_SETOR" } = body;
+    const trimmedName = typeof name === "string" ? name.trim() : "";
+
+    const existingPlayer = await prisma.player.findFirst({
+      where: {
+        name: trimmedName,
+      },
+    });
+
+    if (existingPlayer) {
+      return NextResponse.json({error: "Player already exists."}, {status: 409});
+    }
 
     const player = await prisma.player.create({
       data: {
-        name,
+        name: trimmedName,
         email,
         phone,
         status,
