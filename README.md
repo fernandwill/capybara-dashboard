@@ -1,266 +1,307 @@
-# Capybara's Dashboard
+# Capybara Dashboard Documentation
 
-A badminton match tracker and management system built with Next.js, Express.js, TypeScript, and PostgreSQL. This application provides a complete solution for organizing internal badminton matches, managing players, tracking payments, and analyzing match statistics.
+## Project Overview
+Capybara Dashboard is a badminton match management platform delivered entirely through the `/frontend` Next.js application. The production build runs on Vercel and can be used for organizing matches, tracking player participation, monitoring payments, and visualizing activity. The Express server found in `/backend` is optional—available for bespoke local experiments—but it is not required for deploying, operating, or extending the production experience.
 
-## Features
+## Architecture
+The production architecture revolves around Next.js 14 running in the App Router paradigm:
 
-### Match Management
-- Create, edit, and delete badminton matches
-- Track match details including location, court number, date, time, and fees
-- Automatic match status updates (upcoming/completed based on date)
-- Match search and filtering capabilities
-- Detailed match view with player management
+- **React UI & Client Components** – Pages such as `src/app/page.tsx` render the login form and hydrate the dashboard once a Supabase session is detected. Client components manage stateful experiences such as modals, charts, and match filtering.
+- **Shared Layout & Context** – `src/app/layout.tsx` bootstraps fonts and wraps every route with `AuthProvider` so authentication state is globally available. `src/contexts/AuthContext.tsx` listens to Supabase's auth events and exposes `{ user, loading, setUser }` via React context hooks.
+- **Server Actions & API Routes** – HTTP requests are handled by route handlers under `src/app/api/**`. Each handler runs inside Vercel's serverless functions, instantiates Prisma through `src/lib/database.ts`, and executes database queries directly against Supabase PostgreSQL.
+- **Data Layer** – Prisma models defined in `prisma/schema.prisma` describe admins, players, matches, match-player join tables, and payments. `src/lib/database.ts` configures a singleton `PrismaClient` so the API handlers reuse connections across invocations when running locally.
+- **Authentication & Authorization** – `src/lib/supabaseClient.ts` creates the Supabase JavaScript client with Vercel-managed environment variables. `src/lib/authService.ts` wraps Supabase auth helpers for signing in, signing up, signing out, and fetching the current user. Additional admin-only helpers in `src/lib/auth.ts` provide bcrypt-secured fallbacks for demo environments.
 
-### Player Management
-- Add players to matches with contact information
-- Toggle player status between Active and Tentative
-- Two-column layout separating confirmed and tentative players
-- Payment status tracking (Belum Setor/Sudah Setor)
-- Player removal from matches
+The dashboard is delivered through the Next.js App Router in `frontend/src/app`, where `AuthProvider` from the authentication context wraps the layout so every page can resolve the Supabase session before rendering protected content. The primary screen logic lives in `frontend/src/app/Dashboard.tsx`, which orchestrates data fetching, user interactions, and modal workflows. It issues fetches to the colocated API routes under `frontend/src/app/api/**` for matches, players, and aggregate statistics, while delegating Supabase sign-out to the shared auth service. Each route handler is implemented with Prisma, using the singleton client in `frontend/src/lib/database.ts` to query and mutate the Supabase-hosted Postgres schema that stores matches, players, match-player relationships, and derived stats.
 
-### Statistics & Analytics
-- Monthly statistics dashboard with interactive charts
-- Total matches, upcoming matches, and completed matches counters
-- Hours played tracking and visualization
-- Responsive chart display showing match count and hours by month
+The optional `/backend` Express server may be used in development when developers want to experiment with long-running background jobs or custom integrations. It does not participate in the deployed architecture.
 
-### User Interface
-- Dark/Light theme toggle with system preference detection
-- Fully responsive design for desktop, tablet, and mobile
-- Modern modal-based interactions
-- Professional error and success notifications
-- Intuitive navigation and user experience
+## Deployment & Environment
+Production deployments are orchestrated through Vercel with `/frontend` configured as the project root. Continuous deployment typically mirrors the main branch and produces immutable builds. The Prisma schema targets a Supabase-hosted PostgreSQL instance, and the following environment variables must be supplied in Vercel (and in local development):
 
-## Recent Improvements
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `DATABASE_URL`
 
-### Data Fetching Optimization
-- Implemented fresh data fetching every time the match details modal is opened
-- Added proper data cleanup when the modal is closed to prevent cached data issues
-- Added loading states for better user experience during data fetching
-- Improved player data refresh after all player operations (add, remove, status updates)
+These variables are consumed by the Supabase client in `src/lib/supabaseClient.ts` and by Prisma's connection logic in `src/lib/database.ts`, ensuring both browser-side and server-side data access operate inside Vercel's serverless environment.
 
-### Mobile Responsiveness
-- Enhanced mobile layout for the "Add Player" section
-- Improved form styling for better touch interaction on mobile devices
-- Adjusted responsive breakpoints for various screen sizes
+## Database Models & Relationships
+Prisma models map directly to Supabase tables:
 
-## Technology Stack
+- **Admin** – Represents dashboard administrators; used primarily for demo authentication (`authenticateAdmin`/`createAdmin`).
+- **Player** – Stores roster details, lifecycle status (`ACTIVE`, etc.), and payment status flags (`BELUM_SETOR` or `SUDAH_SETOR`).
+- **Match** – Core event entity containing schedule, fee, status (`UPCOMING`/`COMPLETED`), and descriptive metadata.
+- **MatchPlayer** – Join table tying players to matches while enforcing uniqueness per combination.
+- **Payment** – Tracks monetary transactions for players, optionally linked to matches.
 
-### Frontend
-- **Next.js 15.4.6** - React framework with App Router
-- **React 19.1.0** - UI library
-- **TypeScript 5** - Type safety and developer experience
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **Radix UI** - Accessible component primitives
-- **Recharts 3.1.2** - Data visualization library
-- **Lucide React** - Icon library
+These relationships allow Prisma to eagerly load players and payments alongside match data, which powers the dashboard's rich context cards and payment health indicators.
 
-### Backend
-- **Express.js** - REST API server
-- **Prisma 6.14.0** - Database ORM and migration tool
-- **PostgreSQL** - Primary database (Supabase compatible)
-- **Socket.IO** - Real-time communication
+## Frontend Application Modules
+### Routing & Layout
+- `src/app/layout.tsx` defines HTML scaffolding, metadata, and wraps children with `AuthProvider`.
+- `src/app/page.tsx` renders the login surface; if `AuthContext` exposes a user, it hydrates the `Dashboard` component instead of the login form.
+- `src/app/login/page.tsx` and `src/app/signup/page.tsx` provide dedicated routes for traditional navigation flows; both reuse the shared login CSS located in `src/app/login/login.css`.
+- `src/app/dashboard/page.tsx` renders the same `Dashboard` experience when accessed via `/dashboard`, while `src/app/dashboard/layout.tsx` guards access by redirecting unauthenticated visitors to `/login`.
 
-### Development Tools
-- **ESLint** - Code linting and formatting
-- **PostCSS** - CSS processing
-- **Concurrently** - Run multiple commands simultaneously
+### Authentication Flow
+`AuthProvider` in `src/contexts/AuthContext.tsx` initializes Supabase, fetches the current session with `getCurrentUser`, and subscribes to `supabase.auth.onAuthStateChange` so UI state updates whenever a session starts or ends. The helper functions exported from `src/lib/authService.ts` are consumed by forms to sign in (`signInWithEmail`), sign up (`signUpWithEmail`), sign out (`signOut`), and query the authenticated user (`getCurrentUser`). Admin-only forms can additionally leverage `authenticateAdmin` and `createAdmin` from `src/lib/auth.ts` when demo credentials are needed.
 
-## Project Structure
+```ts title="frontend/src/lib/authService.ts"
+export async function signInWithEmail(
+  email: string,
+  password: string
+): Promise<{ success: boolean; data?: AuthResponse['data']; error?: string }> {
+  try {
+    const { data, error }: AuthResponse = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-```
-capybara-dashboard/
-├── backend/                       # Backend API server
-│   ├── src/
-│   │   ├── server.ts             # Express server entry point
-│   │   ├── routes/               # API route definitions
-│   │   ├── controllers/          # Request handlers
-│   │   ├── middleware/           # Custom middleware
-│   │   └── utils/                # Utility functions
-│   ├── prisma/                   # Prisma schema and migrations
-│   └── package.json              # Backend dependencies
-├── frontend/                      # Next.js frontend application
-│   ├── src/
-│   │   ├── app/                  # App router pages and API routes
-│   │   │   ├── api/              # Frontend API routes
-│   │   │   │   ├── matches/      # Match CRUD operations
-│   │   │   │   ├── players/      # Player management
-│   │   │   │   └── stats/        # Statistics endpoints
-│   │   │   ├── globals.css       # Global styles and theme variables
-│   │   │   ├── layout.tsx        # Root layout with metadata
-│   │   │   └── page.tsx          # Main dashboard page
-│   │   ├── components/           # React components
-│   │   │   ├── ui/               # Reusable UI components
-│   │   │   ├── ErrorModal.tsx    # Error notification modal
-│   │   │   ├── MatchDetailsModal.tsx  # Match details and player management
-│   │   │   ├── NewMatchModal.tsx # Match creation/editing form
-│   │   │   ├── StatsChart.tsx    # Monthly statistics chart
-│   │   │   └── SuccessModal.tsx  # Success notification modal
-│   │   └── lib/                  # Library functions
-│   │       └── database.ts       # Database connection utilities
-│   ├── prisma/                   # Prisma client generation
-│   ├── public/                   # Static assets
-│   │   └── icons/                # Application icons and favicon
-│   ├── package.json              # Frontend dependencies
-│   └── README.md                 # Frontend documentation
-├── package.json                  # Root monorepo configuration
-└── README.md                     # Project documentation
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data }
+  } catch (error: unknown) {
+    console.error('Error signing in:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
+
+export async function getCurrentUser(): Promise<{
+  success: boolean
+  data?: UserResponse['data']['user']
+  error?: string
+}> {
+  try {
+    const { data, error }: UserResponse = await supabase.auth.getUser()
+
+    if (error) {
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, data: data.user }
+  } catch (error: unknown) {
+    console.error('Error getting current user:', error)
+    return { success: false, error: 'An unexpected error occurred' }
+  }
+}
 ```
 
-## Database Schema
+### Dashboard Experience
+`src/app/Dashboard.tsx` orchestrates the core interface once a user is authenticated:
 
-### Players Table
-- **id**: Unique identifier (CUID)
-- **name**: Player name (required)
-- **email**: Email address (optional, unique)
-- **phone**: Phone number (optional)
-- **status**: ACTIVE or TENTATIVE (default: ACTIVE)
-- **paymentStatus**: BELUM_SETOR or SUDAH_SETOR (default: BELUM_SETOR)
-- **createdAt/updatedAt**: Timestamps
+- Initializes local state for stats, match filters, modal visibility, theme, and destructive actions.
+- Fetches aggregate stats from `/api/stats` and match collections from `/api/matches`, caching responses in component state.
+- Triggers `/api/matches/auto-update` on mount so stale `UPCOMING` matches automatically transition to `COMPLETED` if their end time has passed.
+- Provides handlers for creating and updating matches (`handleSubmitMatch`), deleting matches (`handleConfirmDeleteMatch`), and logging out (`handleLogout`).
+- Computes derived values such as the closest upcoming match, countdown timers, formatted currency, and payment completion status.
+- Filters and sorts match cards using helper functions (`sortMatches`, `formatDate`, `formatTimeWithDuration`, `areAllPlayersPaid`, etc.).
 
-### Matches Table
-- **id**: Unique identifier (CUID)
-- **title**: Match title (required)
-- **location**: Venue location (required)
-- **courtNumber**: Court identifier (optional)
-- **date**: Match date (required)
-- **time**: Match time (required)
-- **fee**: Match fee amount (required)
-- **status**: Match status (UPCOMING/COMPLETED)
-- **description**: Additional notes (optional)
-- **createdAt/updatedAt**: Timestamps
+### System Flow Diagram
 
-### MatchPlayer Table (Junction)
-- **id**: Unique identifier (CUID)
-- **matchId**: Reference to match
-- **playerId**: Reference to player
-- **joinedAt**: When player joined the match
+At runtime, `AuthProvider` performs a `getCurrentUser()` call so the UI knows whether a Supabase user session exists. Once authenticated, the dashboard triggers fetches such as `GET /api/matches`, `GET /api/players`, and `GET /api/stats` for read paths, while user actions lead to mutations including `POST /api/matches`, `PUT /api/matches/:id`, and `POST /api/matches/:id/players`. Each request lands in the corresponding `src/app/api/**` handler, where the Supabase client performs `select`, `insert`, or `update` operations against the `matches`, `players`, `match_players`, and `payments` tables (joined to `users` when user-specific data is required). Responses flow back up the stack so the UI can refresh state and modals with the latest data.
 
-## Installation
+```tsx title="frontend/src/app/Dashboard.tsx"
+const handleSubmitMatch = async (matchData: {
+  title: string
+  location: string
+  courtNumber: string
+  date: string
+  time: string
+  fee: number
+  status: string
+  description?: string
+}) => {
+  try {
+    const isEditing = editingMatch !== null
+    const url = isEditing ? `/api/matches/${editingMatch.id}` : "/api/matches"
+    const method = isEditing ? "PUT" : "POST"
 
-### Prerequisites
-- Node.js 18+ 
-- PostgreSQL database (local or Supabase)
-- npm or yarn package manager
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(matchData),
+    })
 
-### Setup Steps
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd capybara-dashboard
-   ```
+    const result = await response.json()
+    console.log(
+      `Match ${isEditing ? "updated" : "created"} successfully:`,
+      result
+    )
 
-2. **Install dependencies for both frontend and backend**
-   ```bash
-   npm install
-   ```
+    setIsModalOpen(false)
+    setEditingMatch(null)
+    fetchStats()
+    fetchMatches()
+    setSuccessModal({
+      isOpen: true,
+      title: "Success!",
+      message: `Match ${isEditing ? "updated" : "created"} successfully!`,
+    })
+  } catch (error) {
+    console.error(`Error ${editingMatch ? "updating" : "creating"} match:`, error)
+    setErrorModal({
+      isOpen: true,
+      title: "Error!",
+      message: `Failed to ${editingMatch ? "update" : "create"} match. Please try again.`,
+    })
+  }
+}
+```
 
-3. **Environment Configuration**
-   Create a `.env` file in the backend directory:
-   ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/badminton_db"
-   PORT=3001
-   JWT_SECRET="your-jwt-secret-key"
-   ```
+The dashboard renders auxiliary components:
 
-4. **Database Setup**
-   ```bash
-   # Generate Prisma client
-   npm run db:generate --workspace=backend
-   
-   # Push schema to database
-   npm run db:push --workspace=backend
-   
-   # Optional: Open Prisma Studio
-   npm run db:studio --workspace=backend
-   ```
+- **`StatsChart` (`src/components/StatsChart.tsx`)** – Fetches `/api/stats/monthly`, transforms results into 12-month chart data, and renders a responsive bar chart with Recharts while handling loading and empty states.
+- **Modals** – `NewMatchModal`, `MatchDetailsModal`, `DeleteMatchModal`, `SuccessModal`, and `ErrorModal` control CRUD workflows. `NewMatchModal` assembles match payloads with start/end time parsing, `MatchDetailsModal` visualizes players and payments per match, `DeleteMatchModal` confirms destructive actions, and the success/error modals deliver consistent feedback messaging.
+- **UI Utilities** – Components leverage a custom `Select` control and Tailwind utility helpers (`cn` in `src/lib/utils.ts`) for styling consistency.
 
-5. **Start Development Servers**
-   ```bash
-   # Start both frontend and backend servers simultaneously
-   npm run dev
-   ```
+### Styling & Theming
+Dashboard components toggle dark/light themes by mutating the `dark` class on `<html>`. CSS modules in `src/app/login/login.css` and component-level styles deliver the branded experience and modal layout.
 
-   The frontend application will be available at `http://localhost:3000`
-   The backend API will be available at `http://localhost:3001`
+## API Surface & Business Logic
+All HTTP endpoints live under `src/app/api` and run inside Vercel's serverless context:
 
-## Available Scripts
+- **Players (`api/players`)**
+  - `GET /api/players` returns all players sorted alphabetically.
+  - `POST /api/players` creates players with default status values.
+  - `GET /api/players/:id`, `PUT /api/players/:id`, and `DELETE /api/players/:id` support record retrieval, updates (including payment status changes), and deletion.
+- **Matches (`api/matches`)**
+  - `GET /api/matches` fetches matches with related players and payments, sorted by date.
+  - `POST /api/matches` creates matches, normalizes schedule metadata, and auto-derives completion state when the end time has elapsed.
+  - `GET /api/matches/:id`, `PUT /api/matches/:id`, and `DELETE /api/matches/:id` manage match-specific retrieval, edits (with automatic status recalculation), and deletion. Each update invokes `updateMatchStatuses` to ensure downstream records stay consistent.
+  - `POST /api/matches/auto-update` is a maintenance endpoint invoked by the dashboard to mark overdue matches as `COMPLETED` without manual intervention.
+- **Statistics (`api/stats`)**
+  - `GET /api/stats` returns total match counts, segmented upcoming/completed figures, and aggregated hours played by parsing stored time ranges.
+  - `GET /api/stats/monthly` groups completed matches by year-month and returns both match counts and cumulative hours for charting.
+- **Authentication (`api/auth`)**
+  - `POST /api/auth/login` validates credentials via `authenticateAdmin` and returns admin metadata on success.
+  - `POST /api/auth/register` provisions admins via `createAdmin`, intended for tightly controlled scenarios.
 
-### Monorepo Scripts (Root)
-- **`npm run dev`** - Start both frontend and backend development servers
-- **`npm run dev:frontend`** - Start frontend development server only
-- **`npm run dev:backend`** - Start backend development server only
-- **`npm run build`** - Build both frontend and backend applications
-- **`npm run build:frontend`** - Build frontend application only
-- **`npm run build:backend`** - Build backend application only
-- **`npm run start`** - Start both frontend and backend production servers
-- **`npm run start:frontend`** - Start frontend production server only
-- **`npm run start:backend`** - Start backend production server only
+Each route wraps Prisma operations in try/catch blocks, logging unexpected errors and returning descriptive HTTP status codes for the dashboard to interpret.
 
-### Frontend Scripts
-- **`npm run dev --workspace=frontend`** - Start frontend development server
-- **`npm run build --workspace=frontend`** - Build production frontend application
-- **`npm run start --workspace=frontend`** - Start production frontend server
-- **`npm run lint --workspace=frontend`** - Run ESLint code analysis
+```ts title="frontend/src/app/api/matches/[id]/route.ts"
+async function updateMatchStatuses() {
+  try {
+    const now = new Date()
+    let updatedCount = 0
 
-### Backend Scripts
-- **`npm run dev --workspace=backend`** - Start backend development server with nodemon
-- **`npm run build --workspace=backend`** - Compile TypeScript to JavaScript
-- **`npm run start --workspace=backend`** - Start production backend server
-- **`npm run db:studio --workspace=backend`** - Open database management interface
-- **`npm run db:push --workspace=backend`** - Push schema changes to database
-- **`npm run db:migrate --workspace=backend`** - Create and apply migrations
+    const upcomingMatches = await prisma.match.findMany({
+      where: {
+        status: 'UPCOMING',
+        date: {
+          lte: now,
+        },
+      },
+      select: {
+        id: true,
+        date: true,
+        time: true,
+        title: true,
+      },
+    })
 
-## API Endpoints
+    for (const match of upcomingMatches) {
+      try {
+        const timeParts = match.time.split('-')
+        if (timeParts.length !== 2) {
+          console.warn(`Invalid time format for match ${match.id}: ${match.time}`)
+          continue
+        }
 
-### Matches
-- `GET /api/matches` - Retrieve all matches
-- `POST /api/matches` - Create new match
-- `GET /api/matches/:id` - Get specific match
-- `PUT /api/matches/:id` - Update match
-- `DELETE /api/matches/:id` - Delete match
-- `POST /api/matches/:id/players` - Add player to match
-- `DELETE /api/matches/:id/players/:playerId` - Remove player from match
+        const endTime = timeParts[1]
+        const [endHour, endMin] = endTime.split(':').map(Number)
 
-### Players
-- `GET /api/players` - Retrieve all players
-- `POST /api/players` - Create new player
-- `GET /api/players/:id` - Get specific player
-- `PUT /api/players/:id` - Update player
-- `DELETE /api/players/:id` - Delete player
+        const matchEndDate = new Date(match.date)
+        matchEndDate.setHours(endHour, endMin, 0, 0)
 
-### Statistics
-- `GET /api/stats` - Get dashboard statistics
-- `GET /api/stats/monthly` - Get monthly match statistics
+        if (matchEndDate < now) {
+          await prisma.match.update({
+            where: { id: match.id },
+            data: { status: 'COMPLETED' },
+          })
 
-## Deployment
+          console.log(`Auto-completed match: ${match.title} (${match.id})`)
+          updatedCount++
+        }
+      } catch (parseError) {
+        console.error(`Error parsing time for match ${match.id}:`, parseError)
+        continue
+      }
+    }
 
-### Vercel Deployment (Frontend)
-1. Connect your repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on git push
+    return updatedCount
+  } catch (error) {
+    console.error('Error updating match statuses:', error)
+  }
+}
+```
 
-### Manual Deployment
-1. Build both frontend and backend applications
-2. Start both servers in production mode
-3. Configure reverse proxy (nginx/Apache) if needed
+```ts title="frontend/src/app/api/stats/route.ts"
+export async function GET() {
+  try {
+    const totalMatches = await prisma.match.count()
 
-## Configuration
+    const upcomingMatches = await prisma.match.count({
+      where: { status: 'UPCOMING' },
+    })
 
-### Theme System
-The application supports automatic dark/light theme switching based on system preferences. Theme variables are defined in `globals.css` and can be customized.
+    const completedMatches = await prisma.match.count({
+      where: { status: 'COMPLETED' },
+    })
 
-### Database Configuration
-- Supports PostgreSQL databases
-- Compatible with Supabase for cloud deployment
-- Uses Prisma for type-safe database operations
+    const completedMatchesWithTime = await prisma.match.findMany({
+      where: { status: 'COMPLETED' },
+      select: { time: true },
+    })
 
-### Environment Variables
-- `DATABASE_URL`: PostgreSQL connection string
-- `JWT_SECRET`: Secret key for authentication (future use)
-- `PORT`: Backend server port (default: 3001)
+    let totalHours = 0
+    completedMatchesWithTime.forEach((match: MatchWithTime) => {
+      if (match.time && match.time.includes('-')) {
+        const [startTime, endTime] = match.time.split('-')
+        const [startHour, startMin] = startTime.split(':').map(Number)
+        const [endHour, endMin] = endTime.split(':').map(Number)
 
-## License
+        const startMinutes = startHour * 60 + startMin
+        const endMinutes = endHour * 60 + endMin
+        const durationMinutes = endMinutes - startMinutes
 
-This project is private and proprietary. All rights reserved.
+        totalHours += durationMinutes / 60
+      }
+    })
+
+    return NextResponse.json({
+      totalMatches,
+      upcomingMatches,
+      completedMatches,
+      hoursPlayed: totalHours.toFixed(1),
+    })
+  } catch (error) {
+    console.error('Error fetching stats:', error)
+    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 })
+  }
+}
+```
+
+## Data & Automation Fundamentals
+- **State Management** – React hooks drive UI state, while context provides cross-route access to Supabase sessions.
+- **Serverless Execution** – Next.js route handlers replace the traditional Express backend and run close to the database within Vercel's infrastructure, reducing latency and operational overhead.
+- **Time-Based Automation** – Both match creation and update flows parse `time` strings (e.g., `18:00-20:00`) to automatically update statuses and compute durations for statistics.
+- **Data Visualization** – Recharts integrates seamlessly with responsive containers to deliver monthly overviews without server-side rendering requirements.
+- **Error Handling** – Components and API routes centralize error handling via consistent modals and JSON payloads, aiding both developer debugging and user experience.
+
+## Optional Express Backend
+The `/backend` directory contains an Express server that mirrors parts of the API surface for local experimentation. It can be launched when developers need custom routes, long-running background tasks, or when testing Prisma logic outside of Vercel's edge functions. Production deployments ignore this service; all stable functionality should be implemented within Next.js routes to maintain parity with the live environment.
+
+## Development Workflow
+1. Install dependencies within `/frontend` (`npm install`).
+2. Configure environment variables in `.env.local` matching the Supabase project credentials and Prisma connection string.
+3. Run the development server with `npm run dev` (from `/frontend`), which starts the Next.js app at `http://localhost:3000`.
+4. Apply database migrations via `npx prisma migrate dev` when schema changes occur.
+5. Use Supabase Studio or Prisma Studio (`npx prisma studio`) to inspect data during development.
