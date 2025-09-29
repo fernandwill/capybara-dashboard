@@ -12,6 +12,11 @@ import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
 import { Loader2, LogOut, Trash2 } from "lucide-react";
+import {
+  formatTimeWithDuration,
+  getTimeRangeStart,
+  getTimeRangeStartMinutes,
+} from "@/lib/time";
 
 type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 
@@ -337,48 +342,34 @@ export function Dashboard() {
           // First sort by date
           const dateDiff = parseDate(a.date) - parseDate(b.date);
           if (dateDiff !== 0) return dateDiff;
-          
-          // If same date, sort by time (start time)
-          try {
-            const timeA = a.time.split('-')[0].trim(); // Get start time
-            const timeB = b.time.split('-')[0].trim(); // Get start time
-            
-            const [hoursA, minutesA] = timeA.split(':').map(Number);
-            const [hoursB, minutesB] = timeB.split(':').map(Number);
-            
-            if (hoursA !== hoursB) {
-              return hoursA - hoursB;
-            }
-            
-            return minutesA - minutesB;
-          } catch (error) {
-            // Fallback to original date sorting if time parsing fails
-            console.error("Error parsing time for sorting:", error);
-            return dateDiff;
+
+          const startMinutesA = getTimeRangeStartMinutes(a.time);
+          const startMinutesB = getTimeRangeStartMinutes(b.time);
+
+          if (startMinutesA !== null && startMinutesB !== null) {
+            return startMinutesA - startMinutesB;
           }
+
+          if (startMinutesA !== null) return -1;
+          if (startMinutesB !== null) return 1;
+
+          return dateDiff;
         case "date-latest":
           // First sort by date (reverse)
           const dateDiffLatest = parseDate(b.date) - parseDate(a.date);
           if (dateDiffLatest !== 0) return dateDiffLatest;
-          
-          // If same date, sort by time (start time) in reverse
-          try {
-            const timeA = a.time.split('-')[0].trim(); // Get start time
-            const timeB = b.time.split('-')[0].trim(); // Get start time
-            
-            const [hoursA, minutesA] = timeA.split(':').map(Number);
-            const [hoursB, minutesB] = timeB.split(':').map(Number);
-            
-            if (hoursA !== hoursB) {
-              return hoursB - hoursA; // Reverse order
-            }
-            
-            return minutesB - minutesA; // Reverse order
-          } catch (error) {
-            // Fallback to original date sorting if time parsing fails
-            console.error("Error parsing time for sorting:", error);
-            return dateDiffLatest;
+
+          const latestStartMinutesA = getTimeRangeStartMinutes(a.time);
+          const latestStartMinutesB = getTimeRangeStartMinutes(b.time);
+
+          if (latestStartMinutesA !== null && latestStartMinutesB !== null) {
+            return latestStartMinutesB - latestStartMinutesA;
           }
+
+          if (latestStartMinutesA !== null) return -1;
+          if (latestStartMinutesB !== null) return 1;
+
+          return dateDiffLatest;
         case "fee-low":
           return a.fee - b.fee;
         case "fee-high":
@@ -387,25 +378,18 @@ export function Dashboard() {
           // First sort by date
           const defaultDateDiff = parseDate(a.date) - parseDate(b.date);
           if (defaultDateDiff !== 0) return defaultDateDiff;
-          
-          // If same date, sort by time (start time)
-          try {
-            const timeA = a.time.split('-')[0].trim(); // Get start time
-            const timeB = b.time.split('-')[0].trim(); // Get start time
-            
-            const [hoursA, minutesA] = timeA.split(':').map(Number);
-            const [hoursB, minutesB] = timeB.split(':').map(Number);
-            
-            if (hoursA !== hoursB) {
-              return hoursA - hoursB;
-            }
-            
-            return minutesA - minutesB;
-          } catch (error) {
-            // Fallback to original date sorting if time parsing fails
-            console.error("Error parsing time for sorting:", error);
-            return defaultDateDiff;
+
+          const defaultStartMinutesA = getTimeRangeStartMinutes(a.time);
+          const defaultStartMinutesB = getTimeRangeStartMinutes(b.time);
+
+          if (defaultStartMinutesA !== null && defaultStartMinutesB !== null) {
+            return defaultStartMinutesA - defaultStartMinutesB;
           }
+
+          if (defaultStartMinutesA !== null) return -1;
+          if (defaultStartMinutesB !== null) return 1;
+
+          return defaultDateDiff;
       }
     });
   };
@@ -454,43 +438,6 @@ export function Dashboard() {
     }).format(amount);
   };
 
-  const formatTimeWithDuration = (timeString: string) => {
-    if (!timeString || !timeString.includes('-')) {
-      return timeString;
-    }
-    try {
-      const [startTime, endTime] = timeString.split('-').map(t => t.trim());
-      const [startHours, startMinutes] = startTime.split(':').map(Number);
-      const [endHours, endMinutes] = endTime.split(':').map(Number);
-
-      if (isNaN(startHours) || isNaN(startMinutes) || isNaN(endHours) || isNaN(endMinutes)) {
-        return timeString;
-      }
-
-      const startDate = new Date();
-      startDate.setHours(startHours, startMinutes, 0, 0);
-
-      const endDate = new Date();
-      endDate.setHours(endHours, endMinutes, 0, 0);
-
-      let durationMillis = endDate.getTime() - startDate.getTime();
-      if (durationMillis < 0) {
-        // Handle overnight case
-        const dayInMillis = 24 * 60 * 60 * 1000;
-        durationMillis += dayInMillis;
-      }
-      
-      const durationHours = durationMillis / (1000 * 60 * 60);
-      // round to 1 decimal place
-      const roundedDuration = Math.round(durationHours * 10) / 10;
-
-      return `${timeString} (${roundedDuration} hrs)`;
-    } catch (error) {
-      console.error("Error formatting time with duration:", error);
-      return timeString;
-    }
-  };
-
   // Check if all players have paid (status is "SUDAH_SETOR")
   const areAllPlayersPaid = (match: Match): boolean => {
     if (!match.players || match.players.length === 0) {
@@ -523,25 +470,18 @@ export function Dashboard() {
         if (dateA !== dateB) {
           return dateA - dateB;
         }
-        
-        // If same date, sort by time (start time)
-        try {
-          const timeA = a.time.split('-')[0].trim(); // Get start time
-          const timeB = b.time.split('-')[0].trim(); // Get start time
-          
-          const [hoursA, minutesA] = timeA.split(':').map(Number);
-          const [hoursB, minutesB] = timeB.split(':').map(Number);
-          
-          if (hoursA !== hoursB) {
-            return hoursA - hoursB;
-          }
-          
-          return minutesA - minutesB;
-        } catch (error) {
-          // Fallback to original date sorting if time parsing fails
-          console.error("Error parsing time for sorting:", error);
-          return dateA - dateB;
+
+        const startMinutesA = getTimeRangeStartMinutes(a.time);
+        const startMinutesB = getTimeRangeStartMinutes(b.time);
+
+        if (startMinutesA !== null && startMinutesB !== null) {
+          return startMinutesA - startMinutesB;
         }
+
+        if (startMinutesA !== null) return -1;
+        if (startMinutesB !== null) return 1;
+
+        return dateA - dateB;
       });
     
     return upcomingMatches.length > 0 ? upcomingMatches[0] : null;
@@ -559,12 +499,15 @@ export function Dashboard() {
       try {
         // Parse the date and time more carefully
         const matchDate = new Date(closestMatch.date);
-        const timeString = closestMatch.time.split('-')[0].trim(); // Get start time
-        const [hours, minutes] = timeString.split(':').map(Number);
-        
+        const startTime = getTimeRangeStart(closestMatch.time);
+        if (!startTime) {
+          setCountdown("Time pending");
+          return;
+        }
+
         // Create the full match datetime
         const matchDateTime = new Date(matchDate);
-        matchDateTime.setHours(hours, minutes, 0, 0);
+        matchDateTime.setHours(startTime.hours, startTime.minutes, 0, 0);
         
         const now = new Date();
         const timeDiff = matchDateTime.getTime() - now.getTime();

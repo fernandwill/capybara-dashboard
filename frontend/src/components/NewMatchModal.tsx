@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  formatTimeParts,
+  formatTimeTo24Hour,
+  getTimeRangeEnd,
+  getTimeRangeStart,
+} from "@/lib/time";
 
 interface Match {
   id: string;
@@ -63,12 +69,28 @@ const INITIAL_FORM_STATE: MatchFormState = {
   description: "",
 };
 
-const parseTimeRange = (timeRange: string) => {
-  const [start, end] = timeRange.split("-").map((value) => value.trim());
+const parseTimeRangeForForm = (timeRange: string) => {
+  const startParts = getTimeRangeStart(timeRange);
+  const endParts = getTimeRangeEnd(timeRange);
+
+  const parts = timeRange.split("-");
+  const rawStart = parts[0]?.trim() ?? "";
+  const rawEnd = parts[parts.length - 1]?.trim() ?? "";
+
+  const startTimeCandidate = startParts
+    ? formatTimeParts(startParts)
+    : formatTimeTo24Hour(rawStart);
+  const endTimeCandidate = endParts ? formatTimeParts(endParts) : formatTimeTo24Hour(rawEnd);
 
   return {
-    startTime: start || "00:00",
-    endTime: end || "23:59",
+    startTime:
+      startTimeCandidate && startTimeCandidate.includes(":")
+        ? startTimeCandidate
+        : INITIAL_FORM_STATE.startTime,
+    endTime:
+      endTimeCandidate && endTimeCandidate.includes(":")
+        ? endTimeCandidate
+        : INITIAL_FORM_STATE.endTime,
   };
 };
 
@@ -82,7 +104,7 @@ export default function NewMatchModal({
 
   useEffect(() => {
     if (editingMatch) {
-      const { startTime, endTime } = parseTimeRange(editingMatch.time);
+      const { startTime, endTime } = parseTimeRangeForForm(editingMatch.time);
       const formattedDate = editingMatch.date
         ? new Date(editingMatch.date).toISOString().split("T")[0]
         : "";
