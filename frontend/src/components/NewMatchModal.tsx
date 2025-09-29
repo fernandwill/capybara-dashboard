@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface Match {
   id: string;
@@ -41,93 +41,98 @@ interface NewMatchModalProps {
   editingMatch?: Match | null;
 }
 
+interface MatchFormState {
+  title: string;
+  location: string;
+  courtNumber: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  fee: string;
+  description: string;
+}
+
+const INITIAL_FORM_STATE: MatchFormState = {
+  title: "",
+  location: "",
+  courtNumber: "",
+  date: "",
+  startTime: "00:00",
+  endTime: "23:59",
+  fee: "",
+  description: "",
+};
+
+const parseTimeRange = (timeRange: string) => {
+  const [start, end] = timeRange.split("-").map((value) => value.trim());
+
+  return {
+    startTime: start || "00:00",
+    endTime: end || "23:59",
+  };
+};
+
 export default function NewMatchModal({
   isOpen,
   onClose,
   onSubmit,
   editingMatch,
 }: NewMatchModalProps) {
-  const [formData, setFormData] = useState({
-    title: "",
-    location: "",
-    courtNumber: "",
-    date: "",
-    startTime: "00:00",
-    endTime: "23:59",
-    fee: 0,
-    description: "",
-  });
+  const [formData, setFormData] = useState<MatchFormState>(INITIAL_FORM_STATE);
 
-  // Populate form when editing
   useEffect(() => {
     if (editingMatch) {
-      const [startTime, endTime] = editingMatch.time.split('-');
-      const formattedDate = new Date(editingMatch.date).toISOString().split('T')[0];
-      
+      const { startTime, endTime } = parseTimeRange(editingMatch.time);
+      const formattedDate = editingMatch.date
+        ? new Date(editingMatch.date).toISOString().split("T")[0]
+        : "";
+
       setFormData({
         title: editingMatch.title,
         location: editingMatch.location,
         courtNumber: editingMatch.courtNumber,
         date: formattedDate,
-        startTime: startTime || "00:00",
-        endTime: endTime || "23:59",
-        fee: editingMatch.fee,
-        description: editingMatch.description || "",
+        startTime,
+        endTime,
+        fee: editingMatch.fee ? String(editingMatch.fee) : "",
+        description: editingMatch.description ?? "",
       });
     } else {
-      // Reset form for new match
-      setFormData({
-        title: "",
-        location: "",
-        courtNumber: "",
-        date: "",
-        startTime: "00:00",
-        endTime: "23:59",
-        fee: 0,
-        description: "",
-      });
+      setFormData(INITIAL_FORM_STATE);
     }
   }, [editingMatch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    // Combine date and time for the API
-    const matchData = {
-      title: formData.location, // Use location as title for backward compatibility
-      location: formData.location,
-      courtNumber: formData.courtNumber,
+    const trimmedTitle = formData.title.trim();
+    const trimmedLocation = formData.location.trim();
+    const trimmedCourtNumber = formData.courtNumber.trim();
+    const trimmedDescription = formData.description.trim();
+    const feeValue = Number.parseInt(formData.fee, 10);
+
+    const matchData: MatchData = {
+      title: trimmedTitle,
+      location: trimmedLocation,
+      courtNumber: trimmedCourtNumber,
       date: formData.date,
       time: `${formData.startTime}-${formData.endTime}`,
-      fee: formData.fee,
-      status: "UPCOMING",
-      description: formData.description,
+      fee: Number.isNaN(feeValue) ? 0 : feeValue,
+      status: editingMatch?.status ?? "UPCOMING",
+      description: trimmedDescription,
     };
 
     onSubmit(matchData);
-
-    // Reset form
-    setFormData({
-      title: "",
-      location: "",
-      courtNumber: "",
-      date: "",
-      startTime: "00:00",
-      endTime: "23:59",
-      fee: 0,
-      description: "",
-    });
+    setFormData(INITIAL_FORM_STATE);
   };
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "fee" ? Number(value) : value,
+    const { name, value } = event.target;
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
     }));
   };
 
@@ -137,13 +142,27 @@ export default function NewMatchModal({
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2>{editingMatch ? 'Edit Match' : 'Create New Match'}</h2>
-          <button className="modal-close" onClick={onClose}>
+          <h2>{editingMatch ? "Edit Match" : "Create New Match"}</h2>
+          <button className="modal-close" onClick={onClose} aria-label="Close match form">
             ×
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-group">
+            <label htmlFor="title">Match Title</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="form-input"
+              placeholder="Friendly doubles night"
+            />
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="location">Location</label>
@@ -192,31 +211,25 @@ export default function NewMatchModal({
             <div className="form-group">
               <label htmlFor="startTime">Start Time</label>
               <input
-                type="text"
+                type="time"
                 id="startTime"
                 name="startTime"
                 value={formData.startTime}
                 onChange={handleChange}
                 required
                 className="form-input"
-                pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-                placeholder="00:00"
-                title="Enter time in 24-hour format (HH:MM)"
               />
             </div>
             <div className="form-group">
               <label htmlFor="endTime">End Time</label>
               <input
-                type="text"
+                type="time"
                 id="endTime"
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
                 required
                 className="form-input"
-                pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-                placeholder="23:59"
-                title="Enter time in 24-hour format (HH:MM)"
               />
             </div>
           </div>
@@ -225,7 +238,7 @@ export default function NewMatchModal({
             <div className="form-group">
               <label htmlFor="fee">Court Fee(s)</label>
               <input
-                type="text"
+                type="number"
                 id="fee"
                 name="fee"
                 value={formData.fee}
@@ -233,8 +246,8 @@ export default function NewMatchModal({
                 required
                 className="form-input"
                 placeholder="Court fee..."
-                pattern="[0-9]+"
-                title="Enter price amount (numbers only)"
+                min="0"
+                step="1000"
               />
             </div>
           </div>
@@ -257,7 +270,7 @@ export default function NewMatchModal({
               Cancel
             </button>
             <button type="submit" className="btn-create">
-              {editingMatch ? 'Update' : 'Create'}
+              {editingMatch ? "Update" : "Create"}
             </button>
           </div>
         </form>
