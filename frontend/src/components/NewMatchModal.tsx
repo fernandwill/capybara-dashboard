@@ -1,12 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  formatTimeParts,
-  formatTimeTo24Hour,
-  getTimeRangeEnd,
-  getTimeRangeStart,
-} from "@/lib/time";
 
 interface Match {
   id: string;
@@ -58,6 +52,9 @@ interface MatchFormState {
   description: string;
 }
 
+const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const TIME_PATTERN_INPUT = "([01]\\d|2[0-3]):([0-5]\\d)";
+
 const INITIAL_FORM_STATE: MatchFormState = {
   title: "",
   location: "",
@@ -69,29 +66,17 @@ const INITIAL_FORM_STATE: MatchFormState = {
   description: "",
 };
 
-const parseTimeRangeForForm = (timeRange: string) => {
-  const startParts = getTimeRangeStart(timeRange);
-  const endParts = getTimeRangeEnd(timeRange);
-
-  const parts = timeRange.split("-");
-  const rawStart = parts[0]?.trim() ?? "";
-  const rawEnd = parts[parts.length - 1]?.trim() ?? "";
-
-  const startTimeCandidate = startParts
-    ? formatTimeParts(startParts)
-    : formatTimeTo24Hour(rawStart);
-  const endTimeCandidate = endParts ? formatTimeParts(endParts) : formatTimeTo24Hour(rawEnd);
+const parseTimeRange = (timeRange: string) => {
+  const [start, end] = timeRange.split("-").map((value) => value.trim());
 
   return {
-    startTime:
-      startTimeCandidate && startTimeCandidate.includes(":")
-        ? startTimeCandidate
-        : INITIAL_FORM_STATE.startTime,
-    endTime:
-      endTimeCandidate && endTimeCandidate.includes(":")
-        ? endTimeCandidate
-        : INITIAL_FORM_STATE.endTime,
+    startTime: start && TIME_PATTERN.test(start) ? start : "00:00",
+    endTime: end && TIME_PATTERN.test(end) ? end : "23:59",
   };
+};
+
+const sanitizeTimeInput = (value: string) => {
+  return value.replace(/[^0-9:]/g, "").slice(0, 5);
 };
 
 export default function NewMatchModal({
@@ -104,7 +89,7 @@ export default function NewMatchModal({
 
   useEffect(() => {
     if (editingMatch) {
-      const { startTime, endTime } = parseTimeRangeForForm(editingMatch.time);
+      const { startTime, endTime } = parseTimeRange(editingMatch.time);
       const formattedDate = editingMatch.date
         ? new Date(editingMatch.date).toISOString().split("T")[0]
         : "";
@@ -131,6 +116,14 @@ export default function NewMatchModal({
     const trimmedLocation = formData.location.trim();
     const trimmedCourtNumber = formData.courtNumber.trim();
     const trimmedDescription = formData.description.trim();
+    const sanitizedStartTime = formData.startTime.trim();
+    const sanitizedEndTime = formData.endTime.trim();
+
+    if (!TIME_PATTERN.test(sanitizedStartTime) || !TIME_PATTERN.test(sanitizedEndTime)) {
+      alert("Please enter start and end times using the 24-hour format HH:MM (00:00 - 23:59).");
+      return;
+    }
+
     const feeValue = Number.parseInt(formData.fee, 10);
 
     const matchData: MatchData = {
@@ -138,7 +131,7 @@ export default function NewMatchModal({
       location: trimmedLocation,
       courtNumber: trimmedCourtNumber,
       date: formData.date,
-      time: `${formData.startTime}-${formData.endTime}`,
+      time: `${sanitizedStartTime}-${sanitizedEndTime}`,
       fee: Number.isNaN(feeValue) ? 0 : feeValue,
       status: editingMatch?.status ?? "UPCOMING",
       description: trimmedDescription,
@@ -152,6 +145,15 @@ export default function NewMatchModal({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = event.target;
+    if (name === "startTime" || name === "endTime") {
+      const sanitizedValue = sanitizeTimeInput(value);
+      setFormData((previous) => ({
+        ...previous,
+        [name]: sanitizedValue,
+      }));
+      return;
+    }
+
     setFormData((previous) => ({
       ...previous,
       [name]: value,
@@ -219,25 +221,35 @@ export default function NewMatchModal({
             <div className="form-group">
               <label htmlFor="startTime">Start Time</label>
               <input
-                type="time"
+                type="text"
                 id="startTime"
                 name="startTime"
                 value={formData.startTime}
                 onChange={handleChange}
                 required
                 className="form-input"
+                placeholder="HH:MM"
+                inputMode="numeric"
+                pattern={TIME_PATTERN_INPUT}
+                title="Enter time in 24-hour format HH:MM"
+                maxLength={5}
               />
             </div>
             <div className="form-group">
               <label htmlFor="endTime">End Time</label>
               <input
-                type="time"
+                type="text"
                 id="endTime"
                 name="endTime"
                 value={formData.endTime}
                 onChange={handleChange}
                 required
                 className="form-input"
+                placeholder="HH:MM"
+                inputMode="numeric"
+                pattern={TIME_PATTERN_INPUT}
+                title="Enter time in 24-hour format HH:MM"
+                maxLength={5}
               />
             </div>
           </div>
