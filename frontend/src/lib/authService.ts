@@ -19,29 +19,6 @@ export async function signInWithEmail(email: string, password: string): Promise<
   }
 }
 
-export async function signUpWithEmail(email: string, password: string, name: string): Promise<{ success: boolean; data?: AuthResponse['data']; error?: string }> {
-  try {
-    const { data, error }: AuthResponse = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-        },
-      },
-    })
-
-    if (error) {
-      return { success: false, error: error.message }
-    }
-
-    return { success: true, data }
-  } catch (error: unknown) {
-    console.error('Error signing up:', error);
-    return { success: false, error: 'An unexpected error occurred' }
-  }
-}
-
 export async function signOut(): Promise<{ success: boolean; error?: string }> {
   try {
     const { error }: { error: AuthError | null } = await supabase.auth.signOut()
