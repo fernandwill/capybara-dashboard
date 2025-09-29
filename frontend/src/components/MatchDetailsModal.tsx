@@ -55,14 +55,12 @@ export default function MatchDetailsModal({
   const [pastPlayers, setPastPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingPastPlayers, setLoadingPastPlayers] = useState(false);
-  const [deletingMatch, setDeletingMatch] = useState(false);
 
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [playerRemove, setPlayerRemove] = useState<
   {id: string; name: string;} | null>(null);
   const [removePlayer, setRemovePlayer] = useState(false);
-  const [deleteMatch, setDeleteMatch] = useState(false);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -287,41 +285,6 @@ export default function MatchDetailsModal({
     }
   }
 
-  const handleDeleteMatch = async () => {
-    setDeleteMatch(true);
-    };
-
-    const handleCancelDeleteMatch = () => {
-      if (deletingMatch) return;
-        setDeleteMatch(false);
-    };
-
-    const handleConfirmDeleteMatch = async () => {
-    if (!match) return;
-
-    setDeletingMatch(true);
-    try {
-      const response = await fetch(`/api/matches/${match.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        if (onMatchUpdate) {
-          onMatchUpdate();
-        }
-        setDeleteMatch(false);
-        onClose();
-      } else {
-        console.error("Failed to delete match.");
-        window.alert("Failed to delete match. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error deleting match:", error);
-      window.alert("An unexpected error occurred while deleting the match.");
-    } finally {
-      setDeletingMatch(false);
-    }
-  };
   const handleCreateAndAddPlayer = async () => {
     if (!newPlayerName.trim() || !match) return;
 
@@ -461,11 +424,9 @@ export default function MatchDetailsModal({
       setPlayers([]);
       setPastPlayers([]);
       setShowAddPlayer(false);
-      setNewPlayerName("");
-      setDeletingMatch(false);
+      setNewPlayerName("");;
       setPlayerRemove(null);
       setRemovePlayer(false);
-      setDeleteMatch(false);
     }
   }, [isOpen, match]);
 
