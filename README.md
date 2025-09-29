@@ -309,3 +309,18 @@ The `/backend` directory contains an Express server that mirrors parts of the AP
 3. Run the development server with `npm run dev` (from `/frontend`), which starts the Next.js app at `http://localhost:3000`.
 4. Apply database migrations via `npx prisma migrate dev` when schema changes occur.
 5. Use Supabase Studio or Prisma Studio (`npx prisma studio`) to inspect data during development.
+
+## Manual Verification
+
+The `/api/players` route now checks for an existing player with the same trimmed `name` before creating a new record. To verify the behavior manually:
+
+1. Start the frontend development server: `npm run dev:frontend`.
+2. Create a player:
+   - `curl -i -X POST http://localhost:3000/api/players \
+       -H "Content-Type: application/json" \
+       -d '{"name":"Test Player","email":"test@example.com"}'`
+   - Expect a `201 Created` response containing the new player JSON body.
+3. Repeat the same request using the identical `name` value.
+   - Expect a `409 Conflict` response with `{ "error": "Player already exists." }`.
+
+These steps cover both the successful creation and the conflict response introduced in this update.
