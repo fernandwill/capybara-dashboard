@@ -48,7 +48,7 @@ These relationships allow Prisma to eagerly load players and payments alongside 
 - `src/app/dashboard/page.tsx` renders the same `Dashboard` experience when accessed via `/dashboard`, while `src/app/dashboard/layout.tsx` guards access by redirecting unauthenticated visitors to `/login`.
 
 ### Authentication Flow
-`AuthProvider` in `src/contexts/AuthContext.tsx` initializes Supabase, fetches the current session with `getCurrentUser`, and subscribes to `supabase.auth.onAuthStateChange` so UI state updates whenever a session starts or ends. The helper functions exported from `src/lib/authService.ts` are consumed by forms to sign in (`signInWithEmail`), sign up (`signUpWithEmail`), sign out (`signOut`), and query the authenticated user (`getCurrentUser`). Admin-only forms can additionally leverage `authenticateAdmin` and `createAdmin` from `src/lib/auth.ts` when demo credentials are needed.
+`AuthProvider` in `src/contexts/AuthContext.tsx` initializes Supabase, fetches the current session with `getCurrentUser`, and subscribes to `supabase.auth.onAuthStateChange` so UI state updates whenever a session starts or ends. The helper functions exported from `src/lib/authService.ts` are consumed by forms to sign in (`signInWithEmail`) and sign out (`signOut`), and query the authenticated user (`getCurrentUser`). 
 
 ```ts title="frontend/src/lib/authService.ts"
 export async function signInWithEmail(
