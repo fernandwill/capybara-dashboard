@@ -53,15 +53,14 @@ export const getPlayerById = async (req: Request, res: Response) => {
 
 export const createPlayer = async (req: Request, res: Response) => {
     try {
-        const {name, email, phone, status = 'ACTIVE', paymentStatus = 'BELUM_SETOR'} = req.body
+        const {name, email, phone, status = 'ACTIVE'} = req.body
 
         const player = await prisma.player.create({
             data: {
-                name, 
+                name,
                 email,
                 phone,
                 status,
-                paymentStatus,
             },
             include: {
                 matchPlayers: {
@@ -82,16 +81,15 @@ export const createPlayer = async (req: Request, res: Response) => {
 export const updatePlayer = async (req: Request, res: Response) => {
     try {
         const {id} = req.params
-        const {name, email, phone, status, paymentStatus} = req.body
+        const {name, email, phone, status} = req.body
 
         const player = await prisma.player.update({
             where: {id},
             data: {
-                name,
-                email, 
-                phone,
-                status,
-                paymentStatus
+                ...(name !== undefined ? {name} : {}),
+                ...(email !== undefined ? {email} : {}),
+                ...(phone !== undefined ? {phone} : {}),
+                ...(status !== undefined ? {status} : {}),
             },
             include: {
                 matchPlayers: {

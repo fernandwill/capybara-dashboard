@@ -18,7 +18,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, status = "ACTIVE", paymentStatus = "BELUM_SETOR" } = body;
+    const { name, email, phone, status = "ACTIVE" } = body;
     const trimmedName = typeof name === "string" ? name.trim() : "";
 
     const existingPlayer = await prisma.player.findFirst({
@@ -37,7 +37,6 @@ export async function POST(request: Request) {
         email,
         phone,
         status,
-        paymentStatus,
       },
     });
 
