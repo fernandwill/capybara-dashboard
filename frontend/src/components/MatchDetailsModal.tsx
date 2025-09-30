@@ -143,6 +143,7 @@ export default function MatchDetailsModal({
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [playerToRemove, setPlayerToRemove] = useState<{ id: string; name: string } | null>(null);
+  const [existingPlayerSearch, setExistingPlayerSearch] = useState("");
   const [isRemovingPlayer, setIsRemovingPlayer] = useState(false);
   const [errorModal, setErrorModal] = useState({
     isOpen: false,
@@ -233,8 +234,15 @@ export default function MatchDetailsModal({
       setNewPlayerName("");
       setPlayerToRemove(null);
       setIsRemovingPlayer(false);
+      setExistingPlayerSearch("");
     }
   }, [isOpen, matchId, fetchCurrentPlayers, fetchPastPlayers]);
+
+  useEffect(() => {
+    if (!showAddPlayer) {
+      setExistingPlayerSearch("");
+    }
+  }, [showAddPlayer]);
 
   const handleAddPlayer = async (playerId: string) => {
     if (!matchId) return;
@@ -395,6 +403,18 @@ export default function MatchDetailsModal({
     [pastPlayers, players],
   );
 
+  const filteredExistingPlayers = useMemo(() => {
+    const searchTerm = existingPlayerSearch.trim().toLowerCase();
+
+    if (!searchTerm) {
+      return availablePastPlayers;
+    }
+
+    return availablePastPlayers.filter((player) =>
+      player.name.toLowerCase().includes(searchTerm),
+    );
+  }, [availablePastPlayers, existingPlayerSearch]);
+
   const activePlayers = useMemo(
     () => players.filter((player) => player.status === "ACTIVE"),
     [players],
@@ -461,25 +481,39 @@ export default function MatchDetailsModal({
               {showAddPlayer && (
                 <div className="add-player-section">
                   <div className="add-player-options">
-                    <h4>Players from Past Matches</h4>
+                    <h4>Existing Player</h4>
                     {isLoadingPastPlayers ? (
                       <div className="loading-past-players">
                         <p>Loading players from past matches...</p>
                       </div>
                     ) : availablePastPlayers.length > 0 ? (
-                      <div className="existing-players-list">
-                        {availablePastPlayers.map((player) => (
-                          <div key={player.id} className="existing-player-item">
-                            <span>{player.name}</span>
-                            <button
-                              onClick={() => handleAddPlayer(player.id)}
-                              className="add-player-btn-small"
-                            >
-                              Add
-                            </button>
+                      <>
+                        <input
+                          type="text"
+                          placeholder="Search existing players..."
+                          value={existingPlayerSearch}
+                          onChange={(event) => setExistingPlayerSearch(event.target.value)}
+                          className="form-input"
+                          aria-label="Search existing players"
+                        />
+                        {filteredExistingPlayers.length > 0 ? (
+                          <div className="existing-players-list">
+                            {filteredExistingPlayers.map((player) => (
+                              <div key={player.id} className="existing-player-item">
+                                <span>{player.name}</span>
+                                <button
+                                  onClick={() => handleAddPlayer(player.id)}
+                                  className="add-player-btn-small"
+                                >
+                                  Add
+                                </button>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        ) : (
+                          <p className="no-players">No matching players found.</p>
+                        )}
+                      </>
                     ) : (
                       <p className="no-players">No players found in recent matches.</p>
                     )}
