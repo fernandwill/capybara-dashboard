@@ -557,7 +557,7 @@ export default function MatchDetailsModal({
                           </div>
                         )
                       ) : availablePastPlayers.length > 0 ? (
-                        <p className="existing-player-hint">Start typing to search players</p>
+                        <p className="existing-player-hint">If player exists in the match, click on the player to add them to the match.</p>
                       ) : (
                         <p className="no-players">No players found.</p>
                       )}
