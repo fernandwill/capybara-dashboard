@@ -18,8 +18,8 @@ interface Match {
       id: string;
       name: string;
       status: string;
-      paymentStatus: string;
     };
+    paymentStatus: "BELUM_SETOR" | "SUDAH_SETOR";
   }[];
 }
 

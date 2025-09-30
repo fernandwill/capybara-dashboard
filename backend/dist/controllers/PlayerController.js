@@ -57,14 +57,13 @@ const getPlayerById = async (req, res) => {
 exports.getPlayerById = getPlayerById;
 const createPlayer = async (req, res) => {
     try {
-        const { name, email, phone, status = 'ACTIVE', paymentStatus = 'BELUM_SETOR' } = req.body;
+        const { name, email, phone, status = 'ACTIVE' } = req.body;
         const player = await database_1.default.player.create({
             data: {
                 name,
                 email,
                 phone,
                 status,
-                paymentStatus,
             },
             include: {
                 matchPlayers: {
@@ -85,15 +84,14 @@ exports.createPlayer = createPlayer;
 const updatePlayer = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, phone, status, paymentStatus } = req.body;
+        const { name, email, phone, status } = req.body;
         const player = await database_1.default.player.update({
             where: { id },
             data: {
-                name,
-                email,
-                phone,
-                status,
-                paymentStatus
+                ...(name !== undefined ? { name } : {}),
+                ...(email !== undefined ? { email } : {}),
+                ...(phone !== undefined ? { phone } : {}),
+                ...(status !== undefined ? { status } : {}),
             },
             include: {
                 matchPlayers: {
