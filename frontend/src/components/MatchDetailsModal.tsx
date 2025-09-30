@@ -182,13 +182,13 @@ export default function MatchDetailsModal({
     try {
       const response = await fetch(`/api/matches/${matchId}/players/past`);
       if (!response.ok) {
-        throw new Error("Failed to fetch past players.");
+        throw new Error("Failed to fetch players.");
       }
 
       const data = (await response.json()) as Player[];
       setPastPlayers(deduplicatePlayers(data));
     } catch (error) {
-      console.error("Error fetching past players:", error);
+      console.error("Error fetching players:", error);
       setPastPlayers([]);
     } finally {
       setIsLoadingPastPlayers(false);
@@ -499,7 +499,7 @@ export default function MatchDetailsModal({
                     <h4>Existing Player</h4>
                     {isLoadingPastPlayers ? (
                       <div className="loading-past-players">
-                        <p>Loading players from past matches...</p>
+                        <p>Loading players...</p>
                       </div>
                     ) : availablePastPlayers.length > 0 ? (
                       <>
@@ -531,9 +531,9 @@ export default function MatchDetailsModal({
                           )
                         ) : null}
                       </>
-                    ) : (
-                      <p className="no-players">No players found in recent matches.</p>
-                    )}
+                      ) : (
+                        <p className="no-players">No players found.</p>
+                      )}
                   </div>
                   <div className="or-divider">OR</div>
                   <div className="new-player">
