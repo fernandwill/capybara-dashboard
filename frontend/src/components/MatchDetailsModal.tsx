@@ -272,6 +272,7 @@ export default function MatchDetailsModal({
         await fetchCurrentPlayers();
         await fetchPastPlayers();
         onMatchUpdate?.();
+        setExistingPlayerSearch("");
       }
     } catch (error) {
       console.error("Error adding player:", error);
@@ -430,6 +431,16 @@ export default function MatchDetailsModal({
     });
   }, [availablePastPlayers, existingPlayerSearch]);
 
+  const isPlayerAlreadyInMatch = useMemo(() => {
+    const searchTerm = existingPlayerSearch.trim().toLowerCase();
+
+    if (!searchTerm) {
+      return false;
+    }
+
+    return players.some((player) => player.name.toLowerCase().includes(searchTerm));
+  }, [existingPlayerSearch, players]);
+
   const activePlayers = useMemo(
     () => players.filter((player) => player.status === "ACTIVE"),
     [players],
@@ -526,6 +537,8 @@ export default function MatchDetailsModal({
                                 </button>
                               ))}
                             </div>
+                          ) : isPlayerAlreadyInMatch ? (
+                            <p className="no-players">Player is in the match.</p>
                           ) : (
                             <p className="no-players">No matching players found.</p>
                           )
