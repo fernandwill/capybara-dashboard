@@ -496,23 +496,7 @@ export default function MatchDetailsModal({
                           className="form-input"
                           aria-label="Search existing players"
                         />
-                        {filteredExistingPlayers.length > 0 ? (
-                          <div className="existing-players-list">
-                            {filteredExistingPlayers.map((player) => (
-                              <div key={player.id} className="existing-player-item">
-                                <span>{player.name}</span>
-                                <button
-                                  onClick={() => handleAddPlayer(player.id)}
-                                  className="add-player-btn-small"
-                                >
-                                  Add
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="no-players">No matching players found.</p>
-                        )}
+                        {/* Existing player list temporarily hidden until search improvements are implemented */}
                       </>
                     ) : (
                       <p className="no-players">No players found in recent matches.</p>
