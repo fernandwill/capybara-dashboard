@@ -1564,12 +1564,64 @@ body {
   font-weight: 600;
 }
 
-.existing-players-list {
+.existing-player-search {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 150px;
+}
+
+.existing-player-dropdown {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--card-bg);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.existing-player-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
   overflow-y: auto;
+}
+
+.existing-player-option {
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.existing-player-option:hover,
+.existing-player-option:focus-visible {
+  background-color: rgba(34, 197, 94, 0.16);
+  color: #bbf7d0;
+  outline: none;
+}
+
+.existing-player-loading,
+.existing-player-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.existing-player-empty {
+  justify-content: center;
+}
+
+.existing-player-hint {
+  font-size: 13px;
+  color: var(--muted-foreground);
 }
 
 .no-players {
@@ -1578,7 +1630,6 @@ body {
   font-style: italic;
 }
 
-.existing-player-btn,
 .create-player-btn {
   background: linear-gradient(135deg, #22c55e, #16a34a);
   color: #ffffff;
@@ -1591,17 +1642,10 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.existing-player-btn:hover,
 .create-player-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #16a34a, #15803d);
   box-shadow: 0 8px 16px rgba(34, 197, 94, 0.25);
   transform: translateY(-1px);
-}
-
-.existing-player-btn {
-  display: block;
-  text-align: left;
-  width: 100%;
 }
 
 .new-player-form {
