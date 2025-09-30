@@ -410,9 +410,24 @@ export default function MatchDetailsModal({
       return availablePastPlayers;
     }
 
-    return availablePastPlayers.filter((player) =>
+    const filtered = availablePastPlayers.filter((player) =>
       player.name.toLowerCase().includes(searchTerm),
     );
+
+    return filtered.sort((playerA, playerB) => {
+      const nameA = playerA.name.toLowerCase();
+      const nameB = playerB.name.toLowerCase();
+
+      if (nameA === searchTerm && nameB !== searchTerm) return -1;
+      if (nameB === searchTerm && nameA !== searchTerm) return 1;
+
+      const aStartsWith = nameA.startsWith(searchTerm);
+      const bStartsWith = nameB.startsWith(searchTerm);
+      if (aStartsWith && !bStartsWith) return -1;
+      if (bStartsWith && !aStartsWith) return 1;
+
+      return nameA.localeCompare(nameB);
+    });
   }, [availablePastPlayers, existingPlayerSearch]);
 
   const activePlayers = useMemo(
@@ -496,7 +511,25 @@ export default function MatchDetailsModal({
                           className="form-input"
                           aria-label="Search existing players"
                         />
-                        {/* Existing player list temporarily hidden until search improvements are implemented */}
+                        {existingPlayerSearch.trim() ? (
+                          filteredExistingPlayers.length > 0 ? (
+                            <div className="existing-players-list" role="listbox">
+                              {filteredExistingPlayers.map((player) => (
+                                <button
+                                  key={player.id}
+                                  type="button"
+                                  className="existing-player-btn"
+                                  onClick={() => handleAddPlayer(player.id)}
+                                  aria-label={`Add ${player.name} to this match`}
+                                >
+                                  {player.name}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="no-players">No matching players found.</p>
+                          )
+                        ) : null}
                       </>
                     ) : (
                       <p className="no-players">No players found in recent matches.</p>
