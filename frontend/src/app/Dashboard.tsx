@@ -15,6 +15,8 @@ import { Loader2, LogOut, Trash2 } from "lucide-react";
 
 type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 
+type PaymentStatus = "BELUM_SETOR" | "SUDAH_SETOR";
+
 interface Stats {
   totalMatches: number;
   upcomingMatches: number;
@@ -38,8 +40,8 @@ interface Match {
       id: string;
       name: string;
       status: string;
-      paymentStatus: string;
     };
+    paymentStatus: PaymentStatus;
   }[];
 }
 
@@ -496,8 +498,8 @@ export function Dashboard() {
     if (!match.players || match.players.length === 0) {
       return false; // No players means not fully paid
     }
-    return match.players.every(playerMatch => 
-      playerMatch.player.paymentStatus === "SUDAH_SETOR"
+    return match.players.every(playerMatch =>
+      playerMatch.paymentStatus === "SUDAH_SETOR"
     );
   };
 
@@ -506,8 +508,8 @@ export function Dashboard() {
     if (!match.players || match.players.length === 0) {
       return 0;
     }
-    return match.players.filter(playerMatch => 
-      playerMatch.player.paymentStatus === "BELUM_SETOR"
+    return match.players.filter(playerMatch =>
+      playerMatch.paymentStatus === "BELUM_SETOR"
     ).length;
   };
 

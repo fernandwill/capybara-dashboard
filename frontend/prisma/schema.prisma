@@ -19,16 +19,15 @@ model Admin {
 }
 
 model Player {
-  id            String        @id @default(cuid())
-  name          String
-  email         String?       @unique
-  phone         String?
-  status        String        @default("ACTIVE")
-  paymentStatus String        @default("BELUM_SETOR")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  matchPlayers  MatchPlayer[]
-  payments      Payment[]
+  id           String        @id @default(cuid())
+  name         String
+  email        String?       @unique
+  phone        String?
+  status       String        @default("ACTIVE")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  matchPlayers MatchPlayer[]
+  payments     Payment[]
 
   @@map("players")
 }
@@ -52,12 +51,13 @@ model Match {
 }
 
 model MatchPlayer {
-  id       String   @id @default(cuid())
-  matchId  String
-  playerId String
-  joinedAt DateTime @default(now())
-  match    Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  player   Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  matchId       String
+  playerId      String
+  paymentStatus String   @default("BELUM_SETOR")
+  joinedAt      DateTime @default(now())
+  match         Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player        Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@unique([matchId, playerId])
   @@map("match_players")
