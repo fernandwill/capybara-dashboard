@@ -183,6 +183,7 @@ export default function MatchDetailsModal({
     if (!matchId) return;
 
     setIsLoadingPastPlayers(true);
+    setPastPlayers([]);
     try {
       const response = await fetch(`/api/matches/${matchId}/players/past`);
       if (!response.ok) {
@@ -513,45 +514,54 @@ export default function MatchDetailsModal({
                 <div className="add-player-section">
                   <div className="add-player-options">
                     <h4>Existing Player</h4>
-                    {isLoadingPastPlayers ? (
-                      <div className="loading-past-players">
-                        <p>Loading players...</p>
-                      </div>
-                    ) : availablePastPlayers.length > 0 ? (
-                      <>
-                        <input
-                          type="text"
-                          placeholder="Search existing players..."
-                          value={existingPlayerSearch}
-                          onChange={(event) => setExistingPlayerSearch(event.target.value)}
-                          className="form-input"
-                          aria-label="Search existing players"
-                        />
-                        {existingPlayerSearch.trim() ? (
-                          filteredExistingPlayers.length > 0 ? (
-                            <div className="existing-players-list" role="listbox">
+                    <div className="existing-player-search">
+                      <input
+                        type="text"
+                        placeholder="Search existing players..."
+                        value={existingPlayerSearch}
+                        onChange={(event) => setExistingPlayerSearch(event.target.value)}
+                        className="form-input"
+                        aria-label="Search existing players"
+                      />
+
+                      {isLoadingPastPlayers ? (
+                        <div className="existing-player-dropdown" role="status">
+                          <div className="existing-player-loading">
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                            <span>Loading players...</span>
+                          </div>
+                        </div>
+                      ) : existingPlayerSearch.trim() ? (
+                        filteredExistingPlayers.length > 0 ? (
+                          <div className="existing-player-dropdown" role="listbox">
+                            <ul className="existing-player-options">
                               {filteredExistingPlayers.map((player) => (
-                                <button
-                                  key={player.id}
-                                  type="button"
-                                  className="existing-player-btn"
-                                  onClick={() => handleAddPlayer(player.id)}
-                                  aria-label={`Add ${player.name} to this match`}
-                                >
-                                  {player.name}
-                                </button>
+                                <li key={player.id}>
+                                  <button
+                                    type="button"
+                                    className="existing-player-option"
+                                    onClick={() => handleAddPlayer(player.id)}
+                                    aria-label={`Add ${player.name} to this match`}
+                                  >
+                                    {player.name}
+                                  </button>
+                                </li>
                               ))}
-                            </div>
-                          ) : isPlayerAlreadyInMatch ? (
-                            <p className="no-players">Player is in the match.</p>
-                          ) : (
-                            <p className="no-players">No matching players found.</p>
-                          )
-                        ) : null}
-                      </>
+                            </ul>
+                          </div>
+                        ) : (
+                          <div className="existing-player-dropdown existing-player-empty">
+                            <p className="no-players">
+                              {isPlayerAlreadyInMatch ? "Player is in the match." : "No matching players found."}
+                            </p>
+                          </div>
+                        )
+                      ) : availablePastPlayers.length > 0 ? (
+                        <p className="existing-player-hint">Start typing to search players</p>
                       ) : (
                         <p className="no-players">No players found.</p>
                       )}
+                    </div>
                   </div>
                   <div className="or-divider">OR</div>
                   <div className="new-player">
