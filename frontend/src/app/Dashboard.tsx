@@ -259,6 +259,13 @@ export function Dashboard() {
     fetchStats();
     fetchMatches();
     autoUpdateMatches(); // Run auto-update when dashboard loads
+
+    const intervalId = window.setInterval(() => {
+      autoUpdateMatches();
+    }, 1 * 60 * 1000); // Auto-update every minute
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [fetchStats, fetchMatches, autoUpdateMatches]);
 
   const handleSubmitMatch = async (matchData: {
