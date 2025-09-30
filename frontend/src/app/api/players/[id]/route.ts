@@ -29,17 +29,17 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, email, phone, status, paymentStatus } = body;
+    const { name, email, phone, status } = body;
+
+    const data: Record<string, unknown> = {};
+    if (name !== undefined) data.name = name;
+    if (email !== undefined) data.email = email;
+    if (phone !== undefined) data.phone = phone;
+    if (status !== undefined) data.status = status;
 
     const player = await prisma.player.update({
       where: { id },
-      data: {
-        name,
-        email,
-        phone,
-        status,
-        paymentStatus,
-      },
+      data,
     });
 
     return NextResponse.json(player);

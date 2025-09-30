@@ -5,11 +5,12 @@ import { Loader2, X } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
 
+type PaymentStatus = "BELUM_SETOR" | "SUDAH_SETOR";
+
 interface Player {
   id: string;
   name: string;
   status: string;
-  paymentStatus: string;
   matchPlayers?: {
     match: {
       id: string;
@@ -17,6 +18,10 @@ interface Player {
     };
   }[];
 }
+
+type PlayerInMatch = Player & {
+  paymentStatus: PaymentStatus;
+};
 
 interface Match {
   id: string;
@@ -30,12 +35,8 @@ interface Match {
   description?: string;
   createdAt: string;
   players?: {
-    player: {
-      id: string;
-      name: string;
-      status: string;
-      paymentStatus: string;
-    };
+    player: Player;
+    paymentStatus: PaymentStatus;
   }[];
 }
 
@@ -96,10 +97,10 @@ const formatTimeWithDuration = (timeString: string) => {
   }
 };
 
-const deduplicatePlayers = (playersList: Player[]): Player[] => {
+const deduplicatePlayers = <T extends Player>(playersList: T[]): T[] => {
   const seenIds = new Set<string>();
   const seenNames = new Set<string>();
-  const deduplicatedPlayers: Player[] = [];
+  const deduplicatedPlayers: T[] = [];
 
   for (const player of playersList) {
     const trimmedName = player.name.trim();
@@ -115,7 +116,7 @@ const deduplicatePlayers = (playersList: Player[]): Player[] => {
   return deduplicatedPlayers;
 };
 
-const sortPlayersByPaymentStatus = (players: Player[]) => {
+const sortPlayersByPaymentStatus = (players: PlayerInMatch[]) => {
   return [...players].sort((a, b) => {
     if (a.paymentStatus === "SUDAH_SETOR" && b.paymentStatus === "BELUM_SETOR") return -1;
     if (a.paymentStatus === "BELUM_SETOR" && b.paymentStatus === "SUDAH_SETOR") return 1;
@@ -136,7 +137,7 @@ export default function MatchDetailsModal({
   match,
   onMatchUpdate,
 }: MatchDetailsModalProps) {
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [players, setPlayers] = useState<PlayerInMatch[]>([]);
   const [pastPlayers, setPastPlayers] = useState<Player[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
   const [isLoadingPastPlayers, setIsLoadingPastPlayers] = useState(false);
@@ -165,7 +166,10 @@ export default function MatchDetailsModal({
 
       const matchData = await response.json();
       const matchPlayers =
-        matchData.players?.map((matchPlayer: { player: Player }) => matchPlayer.player) ?? [];
+        matchData.players?.map((matchPlayer: { player: Player; paymentStatus: PaymentStatus }) => ({
+          ...matchPlayer.player,
+          paymentStatus: matchPlayer.paymentStatus,
+        })) ?? [];
       setPlayers(matchPlayers);
     } catch (error) {
       console.error("Error fetching match players:", error);
@@ -253,7 +257,7 @@ export default function MatchDetailsModal({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: "ACTIVE", paymentStatus: "BELUM_SETOR" }),
+        body: JSON.stringify({ status: "ACTIVE" }),
       });
 
       if (!resetResponse.ok) {
@@ -331,7 +335,6 @@ export default function MatchDetailsModal({
         body: JSON.stringify({
           name: newPlayerName.trim(),
           status: "ACTIVE",
-          paymentStatus: "BELUM_SETOR",
         }),
       });
 
@@ -348,10 +351,10 @@ export default function MatchDetailsModal({
         throw new Error(`Failed to create player. Status : ${createResponse.status}`);
       }
 
-        const newPlayer = await createResponse.json();
-        await handleAddPlayer(newPlayer.id);
-        setNewPlayerName("");
-        setShowAddPlayer(false);
+      const newPlayer = await createResponse.json();
+      await handleAddPlayer(newPlayer.id);
+      setNewPlayerName("");
+      setShowAddPlayer(false);
     } catch (error) {
       console.error("Error creating player:", error);
       setErrorModal({
@@ -380,10 +383,12 @@ export default function MatchDetailsModal({
     }
   };
 
-  const handleSetPaymentStatus = async (playerId: string, newPaymentStatus: string) => {
+  const handleSetPaymentStatus = async (playerId: string, newPaymentStatus: PaymentStatus) => {
     try {
-      const response = await fetch(`/api/players/${playerId}`, {
-        method: "PUT",
+      if (!matchId) return;
+
+      const response = await fetch(`/api/matches/${matchId}/players/${playerId}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
