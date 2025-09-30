@@ -158,7 +158,8 @@ server.listen(PORT, () => {
     console.log(`Server on port ${PORT}`)
     console.log('Socket.io server active.')
 
-    setInterval(updateStatus, 24 * 60 * 60 * 1000);
+    updateStatus();
+    setInterval(updateStatus, 1000 * 60 * 60)
 })
 
 export {io}
