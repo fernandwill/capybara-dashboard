@@ -47,26 +47,23 @@ body {
 
 /* Upcoming Match Banner */
 .upcoming-match-banner {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-radius: 16px;
-  padding: 24px;
+  background: linear-gradient(135deg, #1f2937 0%, #0f172a 100%);
+  border-radius: 20px;
+  padding: 28px;
   margin-bottom: 32px;
-  color: white;
+  color: #ffffff;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(71, 85, 105, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.35);
 }
 
 .upcoming-match-banner::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.25), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.2), transparent 45%);
   pointer-events: none;
 }
 
@@ -78,171 +75,163 @@ body {
 .upcoming-match-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 .upcoming-match-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(226, 232, 240, 0.9);
+}
+
+.upcoming-match-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
 }
 
 .upcoming-match-date {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(226, 232, 240, 0.85);
+  white-space: nowrap;
 }
 
-.upcoming-match-details {
+.match-countdown {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: flex-end;
+  gap: 6px;
+  text-align: right;
 }
 
-.upcoming-match-info {
-  flex: 1;
+.countdown-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(203, 213, 225, 0.75);
+  font-weight: 600;
+}
+
+.countdown-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  background: linear-gradient(135deg, #facc15, #f97316);
+  padding: 8px 18px;
+  border-radius: 9999px;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(250, 204, 21, 0.35);
+}
+
+.upcoming-match-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .match-name {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
-  color: white;
-  margin-bottom: 12px;
   line-height: 1.2;
+  color: #ffffff;
+}
+
+.match-location {
+  font-size: 15px;
+  color: rgba(226, 232, 240, 0.75);
 }
 
 .match-meta {
   display: flex;
-  gap: 20px;
   flex-wrap: wrap;
+  gap: 18px;
 }
 
-.match-time,
-.match-location,
-.match-court {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+.match-meta-item {
   display: flex;
   align-items: center;
-  font-weight: 500;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  backdrop-filter: blur(6px);
+  font-size: 14px;
+  color: rgba(226, 232, 240, 0.9);
 }
 
-.upcoming-match-countdown {
-  text-align: right;
-}
-
-.countdown-display {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.countdown-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-}
-
-.countdown-timer {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
-  padding: 8px 16px;
+.meta-icon {
+  width: 28px;
+  height: 28px;
   border-radius: 8px;
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  min-width: 120px;
-  text-align: center;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8fafc;
+}
+
+.meta-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* Responsive design for upcoming match banner */
 @media (max-width: 768px) {
   .upcoming-match-banner {
-    padding: 16px;
+    padding: 20px;
     margin-bottom: 24px;
   }
-  
+
   .upcoming-match-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
-    margin-bottom: 12px;
-  }
-  
-  .upcoming-match-title {
-    font-size: 12px;
-  }
-  
-  .upcoming-match-date {
-    font-size: 13px;
-  }
-  
-  .upcoming-match-details {
-    flex-direction: column;
     gap: 12px;
-    align-items: stretch;
+    margin-bottom: 20px;
   }
-  
+
+  .upcoming-match-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .match-countdown {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .countdown-value {
+    min-width: auto;
+  }
+
   .match-name {
-    font-size: 18px;
-    margin-bottom: 8px;
+    font-size: 22px;
   }
-  
+
   .match-meta {
     gap: 12px;
-    margin-bottom: 8px;
-  }
-  
-  .match-time,
-  .match-location,
-  .match-court {
-    font-size: 13px;
-  }
-  
-  .upcoming-match-countdown {
-    text-align: center;
-    width: 100%;
-  }
-  
-  .countdown-display {
-    align-items: center;
-    gap: 2px;
-  }
-  
-  .countdown-label {
-    font-size: 11px;
-  }
-  
-  .countdown-timer {
-    font-size: 16px;
-    min-width: auto;
-    width: 100%;
-    padding: 6px 12px;
   }
 }
 
 @media (max-width: 480px) {
   .upcoming-match-banner {
-    padding: 14px;
+    padding: 18px;
   }
-  
-  .match-meta {
-    flex-direction: column;
-    gap: 6px;
-  }
-  
+
   .match-name {
-    font-size: 16px;
+    font-size: 20px;
   }
-  
-  .countdown-timer {
-    font-size: 15px;
+
+  .match-meta-item {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
