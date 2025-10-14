@@ -16,7 +16,13 @@ export const UpcomingMatchBanner = ({ match, countdown }: UpcomingMatchBannerPro
       <div className="upcoming-match-content">
         <div className="upcoming-match-header">
           <h2 className="upcoming-match-title">UPCOMING MATCH</h2>
-          <span className="upcoming-match-date">{formatDate(closestMatch.date)}</span>
+          <div className="upcoming-match-date-wrapper">
+            <span className="upcoming-match-date">{formatDate(closestMatch.date)}</span>
+            <div className="match-countdown">
+              <span className="countdown-label">TIME UNTIL MATCH</span>
+              <span className="countdown-value">{countdown}</span>
+            </div>
+          </div>
         </div>
         <div className="upcoming-match-details">
           <div className="upcoming-match-info">
@@ -61,12 +67,6 @@ export const UpcomingMatchBanner = ({ match, countdown }: UpcomingMatchBannerPro
                 </svg>
                 Players: {closestMatch.players?.length || 0}
               </span>
-            </div>
-          </div>
-          <div className="upcoming-match-countdown">
-            <div className="countdown-display">
-              <span className="countdown-label">Time Until Match</span>
-              <span className="countdown-timer">{countdown}</span>
             </div>
           </div>
         </div>
