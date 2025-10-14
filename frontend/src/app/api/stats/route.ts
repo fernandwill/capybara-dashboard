@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
+import { calculateDurationHours } from '@/lib/time';
 
 // Add interface for match type
 interface MatchWithTime {
@@ -26,16 +27,9 @@ export async function GET() {
 
     let totalHours = 0;
     completedMatchesWithTime.forEach((match: MatchWithTime) => {
-      if (match.time && match.time.includes("-")) {
-        const [startTime, endTime] = match.time.split("-");
-        const [startHour, startMin] = startTime.split(":").map(Number);
-        const [endHour, endMin] = endTime.split(":").map(Number);
-
-        const startMinutes = startHour * 60 + startMin;
-        const endMinutes = endHour * 60 + endMin;
-        const durationMinutes = endMinutes - startMinutes;
-
-        totalHours += durationMinutes / 60;
+      const durationHours = calculateDurationHours(match.time);
+      if (durationHours !== null) {
+        totalHours += durationHours;
       }
     });
 

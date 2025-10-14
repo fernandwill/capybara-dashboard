@@ -15,6 +15,7 @@ const socket_io_1 = require("socket.io");
 const players_1 = __importDefault(require("./routes/players"));
 const matches_1 = __importDefault(require("./routes/matches"));
 const payments_1 = __importDefault(require("./routes/payments"));
+const time_1 = require("./utils/time");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
@@ -36,12 +37,14 @@ const updateStatus = async () => {
         console.log('Found upcoming matches: ', upcomingMatches.length);
         for (const match of upcomingMatches) {
             const matchDate = new Date(match.date);
-            const [, endTime] = match.time.split('-');
-            const [endHour, endMin] = endTime.split(':').map(Number);
-            matchDate.setHours(endHour, endMin, 0, 0);
-            console.log(`Match ${match.id}: ends at ${matchDate}, now is ${now}`);
-            console.log(`Should complete? ${matchDate < now}`);
-            if (matchDate < now) {
+            const matchEndDate = (0, time_1.getMatchEndDate)(matchDate, match.time);
+            if (!matchEndDate) {
+                console.warn(`Skipping match ${match.id} due to invalid time range: ${match.time}`);
+                continue;
+            }
+            console.log(`Match ${match.id}: ends at ${matchEndDate}, now is ${now}`);
+            console.log(`Should complete? ${matchEndDate < now}`);
+            if (matchEndDate < now) {
                 await database_1.default.match.update({
                     where: { id: match.id },
                     data: { status: 'COMPLETED' }
@@ -86,13 +89,10 @@ app.get('/api/stats/monthly', async (req, res) => {
                 acc[monthKey] = { count: 0, totalHours: 0 };
             }
             acc[monthKey].count += 1;
-            const [startTime, endTime] = match.time.split('-');
-            const [startHour, startMin] = startTime.split(':').map(Number);
-            const [endHour, endMin] = endTime.split(':').map(Number);
-            const startMinutes = startHour * 60 + startMin;
-            const endMinutes = endHour * 60 + endMin;
-            const durationHours = (endMinutes - startMinutes) / 60;
-            acc[monthKey].totalHours += durationHours;
+            const durationHours = (0, time_1.calculateDurationHours)(match.time);
+            if (durationHours !== null) {
+                acc[monthKey].totalHours += durationHours;
+            }
             return acc;
         }, {});
         res.json(monthlyData);
@@ -137,6 +137,7 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
     console.log(`Server on port ${PORT}`);
     console.log('Socket.io server active.');
-    setInterval(updateStatus, 24 * 60 * 60 * 1000);
+    updateStatus();
+    setInterval(updateStatus, 1 * 60 * 1000); // Update status every minute
 });
 //# sourceMappingURL=server.js.map

@@ -11,6 +11,7 @@ import {Server} from 'socket.io'
 import playerRoutes from './routes/players'
 import matchRoutes from './routes/matches'
 import paymentRoutes from './routes/payments'
+import { calculateDurationHours, getMatchEndDate } from './utils/time'
 
 dotenv.config()
 
@@ -37,15 +38,17 @@ const updateStatus = async () => {
 
         for (const match of upcomingMatches) {
             const matchDate = new Date(match.date);
-            const [, endTime] = match.time.split('-');
-            const [endHour, endMin] = endTime.split(':').map(Number);
+            const matchEndDate = getMatchEndDate(matchDate, match.time);
 
-            matchDate.setHours(endHour, endMin, 0, 0);
+            if (!matchEndDate) {
+                console.warn(`Skipping match ${match.id} due to invalid time range: ${match.time}`);
+                continue;
+            }
 
-            console.log(`Match ${match.id}: ends at ${matchDate}, now is ${now}`);
-            console.log(`Should complete? ${matchDate < now}`);
+            console.log(`Match ${match.id}: ends at ${matchEndDate}, now is ${now}`);
+            console.log(`Should complete? ${matchEndDate < now}`);
 
-            if (matchDate < now) {
+            if (matchEndDate < now) {
                 await prisma.match.update({
                     where: {id: match.id},
                     data: {status: 'COMPLETED'}
@@ -96,15 +99,10 @@ app.get('/api/stats/monthly', async (req, res) => {
             }
 
             acc[monthKey].count += 1;
-            const [startTime, endTime] = match.time.split('-');
-            const [startHour, startMin] = startTime.split(':').map(Number);
-            const [endHour, endMin] = endTime.split(':').map(Number);
-
-            const startMinutes = startHour * 60 + startMin;
-            const endMinutes = endHour * 60 + endMin;
-            const durationHours = (endMinutes - startMinutes) / 60;
-
-            acc[monthKey].totalHours += durationHours;
+            const durationHours = calculateDurationHours(match.time);
+            if (durationHours !== null) {
+                acc[monthKey].totalHours += durationHours;
+            }
 
             return acc;
         }, {});

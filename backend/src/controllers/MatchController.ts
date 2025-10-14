@@ -1,6 +1,7 @@
 import prisma from "../utils/database";
 import { Request, Response } from "express";
 import { updateStatus } from "../server";
+import { calculateDurationHours } from "../utils/time";
 import {io} from '../server';
 
 export const getAllMatches = async (req: Request, res: Response) => {
@@ -300,17 +301,9 @@ export const getStats = async (req: Request, res: Response) => {
 
     let totalHours = 0;
     completedMatchesWithTime.forEach((match) => {
-      // Assuming time format is "HH:MM-HH:MM" like "16:00-20:00"
-      if (match.time && match.time.includes("-")) {
-        const [startTime, endTime] = match.time.split("-");
-        const [startHour, startMin] = startTime.split(":").map(Number);
-        const [endHour, endMin] = endTime.split(":").map(Number);
-
-        const startMinutes = startHour * 60 + startMin;
-        const endMinutes = endHour * 60 + endMin;
-        const durationMinutes = endMinutes - startMinutes;
-
-        totalHours += durationMinutes / 60;
+      const durationHours = calculateDurationHours(match.time);
+      if (durationHours !== null) {
+        totalHours += durationHours;
       }
     });
 

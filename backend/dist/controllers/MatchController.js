@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStats = exports.getPlayersFromPastMatches = exports.removePlayerFromMatch = exports.addPlayerToMatch = exports.deleteMatch = exports.updateMatch = exports.createMatch = exports.getMatchById = exports.getAllMatches = void 0;
 const database_1 = __importDefault(require("../utils/database"));
 const server_1 = require("../server");
+const time_1 = require("../utils/time");
 const server_2 = require("../server");
 const getAllMatches = async (req, res) => {
     try {
@@ -269,15 +270,9 @@ const getStats = async (req, res) => {
         });
         let totalHours = 0;
         completedMatchesWithTime.forEach((match) => {
-            // Assuming time format is "HH:MM-HH:MM" like "16:00-20:00"
-            if (match.time && match.time.includes("-")) {
-                const [startTime, endTime] = match.time.split("-");
-                const [startHour, startMin] = startTime.split(":").map(Number);
-                const [endHour, endMin] = endTime.split(":").map(Number);
-                const startMinutes = startHour * 60 + startMin;
-                const endMinutes = endHour * 60 + endMin;
-                const durationMinutes = endMinutes - startMinutes;
-                totalHours += durationMinutes / 60;
+            const durationHours = (0, time_1.calculateDurationHours)(match.time);
+            if (durationHours !== null) {
+                totalHours += durationHours;
             }
         });
         res.json({
