@@ -9,6 +9,9 @@ if (!ADMIN_EMAIL || !ADMIN_PASSWORD_HASH) {
   throw new Error("Unknown error.")
 }
 
+const adminEmail: string = ADMIN_EMAIL;
+const adminPasswordHash: string = ADMIN_PASSWORD_HASH;
+
 export async function authenticateAdmin(email: string, password: string) {
   try {
     // In a real application, you would:
@@ -16,10 +19,10 @@ export async function authenticateAdmin(email: string, password: string) {
     // 2. Compare the provided password with the stored hash
     
     // For demo purposes, we're using environment variables or fallback values
-    if (email === ADMIN_EMAIL && await bcrypt.compare(password, ADMIN_PASSWORD_HASH)) {
+    if (email === adminEmail && await bcrypt.compare(password, adminPasswordHash)) {
       return {
         id: 'admin-1',
-        email: ADMIN_EMAIL,
+        email: adminEmail,
         name: 'Capybara Admin',
       };
     }

@@ -30,7 +30,7 @@ export async function GET(
     });
 
     return NextResponse.json(
-      players.map((player) => ({
+      players.map((player: {id: string; name: string; email: string | null; phone: string | null; status: string; createdAt: Date; updatedAt: Date}) => ({
         ...player,
         name: player.name.trim(),
       })),
