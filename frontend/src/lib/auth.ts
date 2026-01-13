@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { logger } from './logger';
 
 // Environment variables - validated at runtime, not at module load
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
@@ -37,7 +38,7 @@ export async function createAdmin(email: string, password: string, name: string)
       throw new Error('Only the main admin can be created in this demo');
     }
 
-    console.log('Admin creation requested for:', email);
+    logger.info('Admin creation requested', { email });
 
     return {
       id: 'admin-1',
@@ -45,7 +46,7 @@ export async function createAdmin(email: string, password: string, name: string)
       name,
     };
   } catch (error) {
-    console.error('Admin creation error:', error);
+    logger.error('Admin creation error', error);
     throw error;
   }
 }
