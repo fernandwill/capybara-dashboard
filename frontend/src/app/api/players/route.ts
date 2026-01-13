@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
+import { validate, validationErrorResponse, schemas } from '@/lib/validation';
+import { handleApiError, ApiErrors } from '@/lib/apiError';
 
 export async function GET(request: Request) {
   const user = await getAuthenticatedUser(request);
@@ -16,8 +18,7 @@ export async function GET(request: Request) {
     });
     return NextResponse.json(players);
   } catch (error) {
-    console.error('Error fetching players:', error);
-    return NextResponse.json({ error: "Failed to find players." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('fetch players'));
   }
 }
 
@@ -29,9 +30,17 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { name, email, phone, status = "ACTIVE" } = body;
-    const trimmedName = typeof name === "string" ? name.trim() : "";
 
+    // Validate input
+    const validation = validate(body, schemas.createPlayer);
+    if (!validation.success) {
+      return validationErrorResponse(validation.errors!);
+    }
+
+    const { name, email, phone, status = "ACTIVE" } = body;
+    const trimmedName = name.trim();
+
+    // Check for existing player
     const existingPlayer = await prisma.player.findFirst({
       where: {
         name: trimmedName,
@@ -39,21 +48,20 @@ export async function POST(request: Request) {
     });
 
     if (existingPlayer) {
-      return NextResponse.json({error: "Player already exists."}, {status: 409});
+      return NextResponse.json({ error: "Player already exists." }, { status: 409 });
     }
 
     const player = await prisma.player.create({
       data: {
         name: trimmedName,
-        email,
-        phone,
+        email: email || null,
+        phone: phone || null,
         status,
       },
     });
 
     return NextResponse.json(player, { status: 201 });
   } catch (error) {
-    console.error('Error creating player:', error);
-    return NextResponse.json({ error: "Failed to create player." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('create player'));
   }
 }

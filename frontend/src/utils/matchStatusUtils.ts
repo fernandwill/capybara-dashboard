@@ -2,6 +2,7 @@
 // Consolidates duplicated status update logic from multiple route files
 
 import prisma from "@/lib/database";
+import { logger } from "@/lib/logger";
 
 type MatchStatus = "UPCOMING" | "COMPLETED";
 
@@ -57,7 +58,7 @@ export function determineMatchStatus(
 
         return "UPCOMING";
     } catch (error) {
-        console.warn("Error determining match status:", error);
+        logger.warn("Error determining match status", error);
         return currentStatus as MatchStatus;
     }
 }
@@ -91,7 +92,7 @@ export async function updateMatchStatuses(): Promise<number> {
             const endTimeParts = parseEndTime(match.time);
 
             if (!endTimeParts) {
-                console.warn(`Invalid time format for match ${match.id}: ${match.time}`);
+                logger.warn(`Invalid time format for match ${match.id}: ${match.time}`);
                 continue;
             }
 
@@ -105,14 +106,14 @@ export async function updateMatchStatuses(): Promise<number> {
                     data: { status: "COMPLETED" },
                 });
 
-                console.log(`Auto-completed match: ${match.title} (${match.id})`);
+                logger.info(`Auto-completed match: ${match.title} (${match.id})`);
                 updatedCount++;
             }
         }
 
         return updatedCount;
     } catch (error) {
-        console.error("Error updating match statuses:", error);
+        logger.error("Error updating match statuses", error);
         throw error;
     }
 }

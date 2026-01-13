@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 import { determineMatchStatus } from '@/utils/matchStatusUtils';
+import { validate, validationErrorResponse, schemas } from '@/lib/validation';
+import { handleApiError, ApiErrors } from '@/lib/apiError';
 
 export async function GET(request: NextRequest) {
   const user = await getAuthenticatedUser(request);
@@ -25,8 +27,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(matches);
   } catch (error) {
-    console.error('Error fetching matches:', error);
-    return NextResponse.json({ error: "Failed to find matches." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('fetch matches'));
   }
 }
 
@@ -38,6 +39,13 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    // Validate input
+    const validation = validate(body, schemas.createMatch);
+    if (!validation.success) {
+      return validationErrorResponse(validation.errors!);
+    }
+
     const {
       title,
       location,
@@ -54,14 +62,14 @@ export async function POST(request: NextRequest) {
 
     const match = await prisma.match.create({
       data: {
-        title,
-        location,
-        courtNumber,
+        title: title.trim(),
+        location: location.trim(),
+        courtNumber: courtNumber?.trim() || null,
         date: new Date(date),
         time,
         fee,
         status: finalStatus,
-        description,
+        description: description?.trim() || null,
       },
       include: {
         players: {
@@ -75,7 +83,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(match, { status: 201 });
   } catch (error) {
-    console.error('Error creating match:', error);
-    return NextResponse.json({ error: "Failed to create match." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('create match'));
   }
 }
