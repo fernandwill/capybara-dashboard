@@ -208,6 +208,7 @@ export function Dashboard() {
     fee: number;
     status: string;
     description?: string;
+    playerIds?: string[];
   }) => {
     try {
       const isEditing = editingMatch !== null;

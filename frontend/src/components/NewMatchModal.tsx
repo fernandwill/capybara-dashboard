@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {Match} from "@/types/types";
+import { Match } from "@/types/types";
 
 interface MatchData {
   title: string;
@@ -12,6 +12,7 @@ interface MatchData {
   fee: number;
   status: string;
   description?: string;
+  playerIds?: string[];
 }
 
 interface NewMatchModalProps {
@@ -30,6 +31,7 @@ interface MatchFormState {
   endTime: string;
   fee: string;
   description: string;
+  playerIds: string[];
 }
 
 const INITIAL_FORM_STATE: MatchFormState = {
@@ -41,6 +43,7 @@ const INITIAL_FORM_STATE: MatchFormState = {
   endTime: "23:59",
   fee: "",
   description: "",
+  playerIds: [],
 };
 
 const parseTimeRange = (timeRange: string) => {
@@ -59,6 +62,29 @@ export default function NewMatchModal({
   editingMatch,
 }: NewMatchModalProps) {
   const [formData, setFormData] = useState<MatchFormState>(INITIAL_FORM_STATE);
+  const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
+  const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchPlayers = async () => {
+        setIsLoadingPlayers(true);
+        try {
+          const { authFetch } = await import("@/lib/authFetch");
+          const response = await authFetch("/api/players");
+          if (response.ok) {
+            const data = await response.json();
+            setAvailablePlayers(data);
+          }
+        } catch (error) {
+          console.error("Error fetching players:", error);
+        } finally {
+          setIsLoadingPlayers(false);
+        }
+      };
+      fetchPlayers();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (editingMatch) {
@@ -76,6 +102,7 @@ export default function NewMatchModal({
         endTime,
         fee: editingMatch.fee ? String(editingMatch.fee) : "",
         description: editingMatch.description ?? "",
+        playerIds: editingMatch.players?.map((p) => p.player.id) ?? [],
       });
     } else {
       setFormData(INITIAL_FORM_STATE);
@@ -100,6 +127,7 @@ export default function NewMatchModal({
       fee: Number.isNaN(feeValue) ? 0 : feeValue,
       status: editingMatch?.status ?? "UPCOMING",
       description: trimmedDescription,
+      playerIds: formData.playerIds,
     };
 
     onSubmit(matchData);
@@ -114,6 +142,18 @@ export default function NewMatchModal({
       ...previous,
       [name]: value,
     }));
+  };
+
+  const handlePlayerToggle = (playerId: string) => {
+    setFormData((prev) => {
+      const isSelected = prev.playerIds.includes(playerId);
+      return {
+        ...prev,
+        playerIds: isSelected
+          ? prev.playerIds.filter((id) => id !== playerId)
+          : [...prev.playerIds, playerId],
+      };
+    });
   };
 
   if (!isOpen) return null;
@@ -229,6 +269,28 @@ export default function NewMatchModal({
               placeholder="Optional description..."
               rows={3}
             />
+          </div>
+
+          <div className="form-group">
+            <label>Initial Players</label>
+            <div className="players-selection-grid">
+              {isLoadingPlayers ? (
+                <div className="loading-players">Loading players...</div>
+              ) : availablePlayers.length === 0 ? (
+                <div className="no-players">No players found.</div>
+              ) : (
+                availablePlayers.map((player) => (
+                  <label key={player.id} className="player-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.playerIds.includes(player.id)}
+                      onChange={() => handlePlayerToggle(player.id)}
+                    />
+                    <span>{player.name}</span>
+                  </label>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="modal-actions">
