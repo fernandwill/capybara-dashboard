@@ -1,144 +1,452 @@
 # Capybara Dashboard Frontend
 
-This is the frontend application for the Capybara Dashboard, a badminton match tracker and management system built with Next.js, TypeScript, and Tailwind CSS.
+<img width="1000" height="1000" alt="capybara-dashboard" src="https://github.com/user-attachments/assets/c5afadbd-b799-41c7-8461-1dc0a48322f6" />
+
+A modern badminton match tracker and management system built with Next.js 16, React 19, and TypeScript.
+
+![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)
+![React](https://img.shields.io/badge/React-19.2.3-61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [API Reference](#api-reference)
+- [Testing](#testing)
+- [Code Quality](#code-quality)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+
+---
 
 ## Features
 
 ### Match Management
-
 - Create, edit, and delete badminton matches
-- Track match details including location, court number, date, time, and fees
-- Automatic match status updates (upcoming/completed based on date)
-- Match search and filtering capabilities
-- Detailed match view with player management
+- Track location, court number, date, time, and fees
+- Automatic status updates (UPCOMING → COMPLETED) based on match end time
+- Search and filter matches by title
+- Sort by date or fee
 
 ### Player Management
-
-- Add players to matches with contact information
-- Toggle player status between Active and Tentative
-- Two-column layout separating confirmed and tentative players
+- Add/remove players from matches
+- Track player status (Active/Tentative)
 - Payment status tracking (Belum Setor/Sudah Setor)
-- Player removal from matches
+- Two-column layout separating confirmed and tentative players
 
 ### Statistics & Analytics
+- Dashboard with key metrics (total, upcoming, completed matches)
+- Hours played tracking
+- Monthly statistics with interactive bar charts
+- Real-time countdown to next match
 
-- Monthly statistics dashboard with interactive charts
-- Total matches, upcoming matches, and completed matches counters
-- Hours played tracking and visualization
-- Responsive chart display showing match count and hours by month
+### Security
+- Supabase JWT authentication on all API routes
+- Input validation with schema-based validators
+- Environment-based credential management
+- No hardcoded secrets
 
-### User Interface
+### User Experience
+- Dark/Light theme with system preference detection
+- Fully responsive (desktop, tablet, mobile)
+- Loading states and error handling
+- Professional modal-based interactions
 
-- Dark/Light theme toggle with system preference detection
-- Fully responsive design for desktop, tablet, and mobile
-- Modern modal-based interactions
-- Professional error and success notifications
-- Intuitive navigation and user experience
+---
 
-## Recent Improvements
+## Tech Stack
 
-### Data Fetching Optimization
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 16.1.1 (App Router) |
+| UI Library | React 19.2.3 |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS 4 |
+| Database | PostgreSQL via Prisma |
+| Auth | Supabase |
+| Components | Radix UI |
+| Charts | Recharts |
+| Icons | Lucide React |
+| Testing | Vitest |
 
-- Implemented fresh data fetching every time the match details modal is opened
-- Added proper data cleanup when the modal is closed to prevent cached data issues
-- Added loading states for better user experience during data fetching
-- Improved player data refresh after all player operations (add, remove, status updates)
+---
 
-### Mobile Responsiveness
+## Architecture
 
-- Enhanced mobile layout for the "Add Player" section
-- Improved form styling for better touch interaction on mobile devices
-- Adjusted responsive breakpoints for various screen sizes
+### Design Principles
 
-## Technology Stack
+1. **Modular CSS**: Styles split into 7 focused files instead of one large file
+2. **Custom Hooks**: Data fetching logic extracted into reusable hooks
+3. **Centralized Utilities**: Shared validation, logging, and error handling
+4. **Type Safety**: Shared TypeScript types across components
 
-- **Next.js 15.4.6** - React framework with App Router
-- **React 19.1.0** - UI library
-- **TypeScript 5** - Type safety and developer experience
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **Radix UI** - Accessible component primitives
-- **Recharts 3.1.2** - Data visualization library
-- **Lucide React** - Icon library
+### Data Flow
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     Components                          │
+│  (Dashboard, MatchDetailsModal, NewMatchModal, etc.)    │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                   Custom Hooks                          │
+│        (useStats, useMatches, useCountdown)             │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                    authFetch                            │
+│        (Adds Bearer token to all requests)              │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                   API Routes                            │
+│          (/api/matches, /api/players, etc.)             │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                     Prisma                              │
+│               (Database Operations)                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Authentication Flow
+
+```
+1. User logs in via /api/auth/login
+2. Supabase returns JWT token
+3. Token stored in localStorage
+4. authFetch adds "Authorization: Bearer <token>" to requests
+5. API routes validate token via getAuthenticatedUser()
+6. Unauthorized requests return 401
+```
+
+---
 
 ## Project Structure
 
 ```
 frontend/
 ├── src/
-│   ├── app/                  # App router pages and API routes
-│   │   ├── api/              # Frontend API routes
-│   │   │   ├── matches/      # Match CRUD operations
-│   │   │   ├── players/      # Player management
-│   │   │   └── stats/        # Statistics endpoints
-│   │   ├── globals.css       # Global styles and theme variables
-│   │   ├── layout.tsx        # Root layout with metadata
-│   │   └── page.tsx          # Main dashboard page
-│   ├── components/           # React components
-│   │   ├── ui/               # Reusable UI components
-│   │   ├── ErrorModal.tsx    # Error notification modal
-│   │   ├── MatchDetailsModal.tsx  # Match details and player management
-│   │   ├── NewMatchModal.tsx # Match creation/editing form
-│   │   ├── StatsChart.tsx    # Monthly statistics chart
-│   │   └── SuccessModal.tsx  # Success notification modal
-│   └── lib/                  # Library functions
-│       └── database.ts       # Database connection utilities
-├── prisma/                   # Prisma client generation
-├── public/                   # Static assets
-│   └── icons/                # Application icons and favicon
-└── package.json              # Dependencies and scripts
+│   ├── app/                        # Next.js App Router
+│   │   ├── api/                    # API route handlers
+│   │   │   ├── auth/               # Authentication
+│   │   │   ├── matches/            # Match CRUD + players
+│   │   │   ├── players/            # Player CRUD
+│   │   │   └── stats/              # Statistics
+│   │   ├── globals.css             # CSS imports
+│   │   ├── layout.tsx              # Root layout
+│   │   ├── page.tsx                # Main page
+│   │   └── Dashboard.tsx           # Dashboard component
+│   │
+│   ├── components/                 # React components
+│   │   ├── ui/                     # Shadcn UI primitives
+│   │   ├── ConfirmModal.tsx
+│   │   ├── ErrorModal.tsx
+│   │   ├── MatchDetailsModal.tsx
+│   │   ├── NewMatchModal.tsx
+│   │   ├── StatsChart.tsx
+│   │   └── SuccessModal.tsx
+│   │
+│   ├── hooks/                      # Custom React hooks
+│   │   ├── useCountdown.ts         # Match countdown timer
+│   │   ├── useMatches.ts           # Match data fetching
+│   │   └── useStats.ts             # Stats data fetching
+│   │
+│   ├── lib/                        # Core utilities
+│   │   ├── apiAuth.ts              # Supabase auth helper
+│   │   ├── apiError.ts             # Error handling
+│   │   ├── auth.ts                 # Admin authentication
+│   │   ├── authFetch.ts            # Authenticated fetch
+│   │   ├── database.ts             # Prisma client
+│   │   ├── logger.ts               # Logging utility
+│   │   ├── supabaseClient.ts       # Supabase client
+│   │   └── validation.ts           # Input validation
+│   │
+│   ├── styles/                     # Modular CSS
+│   │   ├── base.css                # Variables, reset
+│   │   ├── dashboard.css           # Layout, header
+│   │   ├── matches.css             # Match cards
+│   │   ├── modals.css              # All modals
+│   │   ├── players.css             # Player cards
+│   │   ├── charts.css              # Stats chart
+│   │   └── responsive.css          # Media queries
+│   │
+│   ├── types/                      # TypeScript types
+│   │   └── types.ts                # Shared interfaces
+│   │
+│   └── utils/                      # Utility functions
+│       ├── formatters.ts           # Date, currency
+│       ├── matchUtils.ts           # Sort, filter
+│       └── matchStatusUtils.ts     # Status logic
+│
+├── prisma/                         # Database schema
+├── vitest.config.ts                # Test config
+└── package.json
 ```
+
+---
 
 ## Getting Started
 
-First, make sure you're in the frontend directory:
+### Prerequisites
+
+- Node.js 18+
+- PostgreSQL database
+- Supabase project (for auth)
+
+### Installation
 
 ```bash
-cd frontend
-```
+# Clone the repository
+git clone https://github.com/fernandwill/capybara-dashboard.git
 
-Install dependencies:
+# Navigate to frontend
+cd capybara-dashboard/frontend
 
-```bash
+# Install dependencies
 npm install
-```
 
-Environment Configuration:
-Create a `.env` file in the frontend directory:
+# Generate Prisma client
+npx prisma generate
 
-```env
-NEXT_PUBLIC_API_URL="http://localhost:3001"
-```
+# Run database migrations
+npx prisma migrate dev
 
-Start the development server:
-
-```bash
+# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment Variables
 
-## Available Scripts
+Create `.env.local` in the frontend directory:
 
-- **`npm run dev`** - Start development server
-- **`npm run build`** - Build production application
-- **`npm run start`** - Start production server
-- **`npm run lint`** - Run ESLint code analysis
+```env
+# Database (Required)
+DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 
-## Learn More
+# Supabase (Required)
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 
-To learn more about Next.js, take a look at the following resources:
+# Admin Credentials (Required)
+ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD_HASH="$2a$12$..."  # bcrypt hash
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Optional
+NODE_ENV="development"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Generating Password Hash
 
-## Deploy on Vercel
+```bash
+node -e "const bcrypt = require('bcryptjs'); bcrypt.hash('yourpassword', 12).then(console.log)"
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Reference
+
+### Authentication
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/login` | POST | Admin login, returns JWT |
+
+### Matches
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/matches` | GET | List all matches |
+| `/api/matches` | POST | Create match |
+| `/api/matches/[id]` | GET | Get match by ID |
+| `/api/matches/[id]` | PUT | Update match |
+| `/api/matches/[id]` | DELETE | Delete match |
+| `/api/matches/[id]/players` | GET | List match players |
+| `/api/matches/[id]/players` | POST | Add player to match |
+| `/api/matches/[id]/players/[playerId]` | PUT | Update player status |
+| `/api/matches/[id]/players/[playerId]` | DELETE | Remove player |
+| `/api/matches/auto-update` | POST | Auto-complete past matches |
+
+### Players
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/players` | GET | List all players |
+| `/api/players` | POST | Create player |
+| `/api/players/[id]` | GET | Get player by ID |
+| `/api/players/[id]` | PUT | Update player |
+| `/api/players/[id]` | DELETE | Delete player |
+
+### Statistics
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/stats` | GET | Dashboard stats |
+| `/api/stats/monthly` | GET | Monthly chart data |
+
+### Request/Response Examples
+
+**Create Match (POST /api/matches)**
+```json
+// Request
+{
+  "title": "Weekend Badminton",
+  "location": "Sports Center",
+  "courtNumber": "Court 1",
+  "date": "2024-01-20",
+  "time": "18:00-20:00",
+  "fee": 50000,
+  "description": "Weekly match"
+}
+
+// Response (201)
+{
+  "id": "abc123",
+  "title": "Weekend Badminton",
+  "status": "UPCOMING",
+  ...
+}
+```
+
+**Validation Error (400)**
+```json
+{
+  "error": "Validation failed",
+  "details": [
+    "title is required",
+    "time must be in format HH:MM-HH:MM"
+  ]
+}
+```
+
+---
+
+## Testing
+
+### Run Tests
+
+```bash
+# Watch mode
+npm run test
+
+# Single run
+npm run test:run
+```
+
+### Test Coverage
+
+Tests are located alongside source files with `.test.ts` suffix:
+- `src/utils/formatters.test.ts`
+- `src/utils/matchUtils.test.ts`
+
+### Writing Tests
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { formatCurrency } from './formatters';
+
+describe('formatCurrency', () => {
+  it('formats Indonesian Rupiah correctly', () => {
+    expect(formatCurrency(50000)).toBe('Rp50.000');
+  });
+});
+```
+
+---
+
+## Code Quality
+
+### Utilities Overview
+
+| Utility | Purpose |
+|---------|---------|
+| `logger.ts` | Dev-only logging; silent in production |
+| `apiError.ts` | Consistent error responses |
+| `validation.ts` | Schema-based input validation |
+
+### Logger Usage
+
+```typescript
+import { logger } from '@/lib/logger';
+
+logger.debug('Debug info');    // Dev only
+logger.info('Info message');   // Dev only
+logger.warn('Warning');        // Dev + Prod
+logger.error('Error', error);  // Dev + Prod
+```
+
+### Validation Usage
+
+```typescript
+import { validate, validationErrorResponse, schemas } from '@/lib/validation';
+
+const result = validate(body, schemas.createMatch);
+if (!result.success) {
+  return validationErrorResponse(result.errors!);
+}
+```
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
+
+### Environment Variables for Production
+
+Set these in Vercel:
+- `DATABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD_HASH`
+
+---
+
+## Scripts Reference
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server (port 3000) |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | ESLint analysis |
+| `npm run test` | Vitest watch mode |
+| `npm run test:run` | Vitest single run |
+
+---
+
+## Contributing
+
+1. Create a feature branch
+2. Make changes following existing patterns
+3. Add tests for new functionality
+4. Run `npm run lint` and `npm run test:run`
+5. Submit a pull request
+
+---
+
+## License
+
+MIT
