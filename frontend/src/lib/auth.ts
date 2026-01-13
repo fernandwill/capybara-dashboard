@@ -1,28 +1,21 @@
 import bcrypt from 'bcryptjs';
 
-// In a production environment, these values should come from environment variables
-// and never be committed to version control
+// Environment variables - validated at runtime, not at module load
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 
-if (!ADMIN_EMAIL || !ADMIN_PASSWORD_HASH) {
-  throw new Error("Unknown error.")
-}
-
-const adminEmail: string = ADMIN_EMAIL;
-const adminPasswordHash: string = ADMIN_PASSWORD_HASH;
-
 export async function authenticateAdmin(email: string, password: string) {
   try {
-    // In a real application, you would:
-    // 1. Query your database for the admin user
-    // 2. Compare the provided password with the stored hash
-    
-    // For demo purposes, we're using environment variables or fallback values
-    if (email === adminEmail && await bcrypt.compare(password, adminPasswordHash)) {
+    // Validate environment variables at runtime
+    if (!ADMIN_EMAIL || !ADMIN_PASSWORD_HASH) {
+      console.error('ADMIN_EMAIL or ADMIN_PASSWORD_HASH not configured');
+      return null;
+    }
+
+    if (email === ADMIN_EMAIL && await bcrypt.compare(password, ADMIN_PASSWORD_HASH)) {
       return {
         id: 'admin-1',
-        email: adminEmail,
+        email: ADMIN_EMAIL,
         name: 'Capybara Admin',
       };
     }
@@ -36,20 +29,16 @@ export async function authenticateAdmin(email: string, password: string) {
 
 export async function createAdmin(email: string, password: string, name: string) {
   try {
-    // In a real application, you would:
-    // 1. Check if admin already exists
-    // 2. Hash the password
-    // 3. Store in database
-    
-    // For demo purposes, we're just validating against our environment variable
+    if (!ADMIN_EMAIL) {
+      throw new Error('ADMIN_EMAIL not configured');
+    }
+
     if (email !== ADMIN_EMAIL) {
       throw new Error('Only the main admin can be created in this demo');
     }
 
-    // In a real application, you would hash and store the password
-    // For demo, we're just validating
     console.log('Admin creation requested for:', email);
-    
+
     return {
       id: 'admin-1',
       email,

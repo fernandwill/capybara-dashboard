@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
-
-type PaymentStatus = "BELUM_SETOR" | "SUDAH_SETOR";
+import {PaymentStatus} from "@/types/types";
 
 export async function PATCH(
   request: Request,
