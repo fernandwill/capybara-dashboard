@@ -58,6 +58,7 @@ export async function PUT(
       fee,
       status,
       description,
+      playerIds,
     } = body;
 
     // Use shared utility to determine correct status
@@ -76,6 +77,14 @@ export async function PUT(
         fee,
         status: finalStatus,
         description,
+        players: playerIds ? {
+          deleteMany: {},
+          create: playerIds.map((playerId: string) => ({
+            player: {
+              connect: { id: playerId }
+            }
+          }))
+        } : undefined
       },
       include: {
         players: {

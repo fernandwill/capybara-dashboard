@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       fee,
       status = "UPCOMING",
       description,
+      playerIds = [],
     } = body;
 
     // Use shared utility to determine correct status
@@ -70,6 +71,13 @@ export async function POST(request: NextRequest) {
         fee,
         status: finalStatus,
         description: description?.trim() || null,
+        players: {
+          create: playerIds.map((playerId: string) => ({
+            player: {
+              connect: { id: playerId }
+            }
+          }))
+        }
       },
       include: {
         players: {
