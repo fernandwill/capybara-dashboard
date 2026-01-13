@@ -1,32 +1,33 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
+import { determineMatchStatus } from '@/utils/matchStatusUtils';
 
 export async function GET(request: NextRequest) {
-    const user = await getAuthenticatedUser(request);
-    if (!user) {
-      return unauthorizedResponse();
-    }
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
 
-    try {
-      const matches = await prisma.match.findMany({
-        include: {
-          players: {
-            include: {
-              player: true,
-            },
+  try {
+    const matches = await prisma.match.findMany({
+      include: {
+        players: {
+          include: {
+            player: true,
           },
-          payments: true,
         },
-        orderBy: {
-          date: "asc",
-        },
-      });
-      return NextResponse.json(matches);
-    } catch (error) {
-      console.error('Error fetching matches:', error);
-      return NextResponse.json({ error: "Failed to find matches." }, { status: 500 });
-    }
+        payments: true,
+      },
+      orderBy: {
+        date: "asc",
+      },
+    });
+    return NextResponse.json(matches);
+  } catch (error) {
+    console.error('Error fetching matches:', error);
+    return NextResponse.json({ error: "Failed to find matches." }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -43,38 +44,13 @@ export async function POST(request: NextRequest) {
       courtNumber,
       date,
       time,
-      fee = 0,
+      fee,
       status = "UPCOMING",
       description,
     } = body;
 
-    // Determine the correct status based on date and time
-    let finalStatus = status;
-    if (status === "UPCOMING") {
-      try {
-        const now = new Date();
-        const matchDate = new Date(date);
-        
-        // Parse the time string (e.g., "18:00-20:00")
-        const timeParts = time.split('-');
-        if (timeParts.length === 2) {
-          const endTime = timeParts[1].trim(); // Get the end time
-          const [endHour, endMin] = endTime.split(':').map(Number);
-          
-          // Create a date object for the match end time
-          const matchEndDate = new Date(matchDate);
-          matchEndDate.setHours(endHour, endMin, 0, 0);
-          
-          // If the match end time has passed, mark it as completed
-          if (matchEndDate < now) {
-            finalStatus = "COMPLETED";
-          }
-        }
-      } catch (parseError) {
-        console.warn('Error parsing time for status determination:', parseError);
-        // Keep the original status if parsing fails
-      }
-    }
+    // Use shared utility to determine correct status
+    const finalStatus = determineMatchStatus(date, time, status);
 
     const match = await prisma.match.create({
       data: {
