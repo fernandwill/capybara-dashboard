@@ -12,6 +12,7 @@ import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
 import { Loader2, LogOut, Trash2 } from "lucide-react";
+import {authFetch} from "@/lib/authFetch";  
 
 type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 
@@ -169,7 +170,7 @@ export function Dashboard() {
     setIsDeletingMatch(true);
 
     try {
-      const response = await fetch(`/api/matches/${matchPendingDeletion.id}`, {
+      const response = await authFetch(`/api/matches/${matchPendingDeletion.id}`, {
         method: "DELETE",
       });
 
@@ -187,8 +188,8 @@ export function Dashboard() {
         handleCloseDetailsModal();
       }
 
-      fetchMatches();
-      fetchStats();
+      authFetchMatches();
+      authFetchStats();
 
       handleCloseDeleteModal();
 
@@ -209,34 +210,34 @@ export function Dashboard() {
     }
   };
 
-  const fetchStats = useCallback(async () => {
+  const authFetchStats = useCallback(async () => {
     try {
-      const response = await fetch("/api/stats");
+      const response = await authFetch("/api/stats");
       const data = await response.json();
       setStats(data);
     } catch (error) {
       // Error handling
-      console.error("Error fetching stats:", error);
+      console.error("Error authFetching stats:", error);
     }
   }, []);
 
-  const fetchMatches = useCallback(async () => {
+  const authFetchMatches = useCallback(async () => {
     try {
-      const response = await fetch("/api/matches");
+      const response = await authFetch("/api/matches");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
       setMatches(data);
     } catch (error) {
-      console.error("Error fetching matches:", error);
+      console.error("Error authFetching matches:", error);
       setMatches([]);
     }
   }, []);
 
   const autoUpdateMatches = useCallback(async () => {
     try {
-      const response = await fetch("/api/matches/auto-update", {
+      const response = await authFetch("/api/matches/auto-update", {
         method: "POST",
       });
       
@@ -248,16 +249,16 @@ export function Dashboard() {
       console.log("Auto-update result:", data);
       
       // Refresh matches and stats after auto-update
-      fetchMatches();
-      fetchStats();
+      authFetchMatches();
+      authFetchStats();
     } catch (error) {
       console.error("Error auto-updating matches:", error);
     }
-  }, [fetchMatches, fetchStats]);
+  }, [authFetchMatches, authFetchStats]);
 
   useEffect(() => {
-    fetchStats();
-    fetchMatches();
+    authFetchStats();
+    authFetchMatches();
     autoUpdateMatches(); // Run auto-update when dashboard loads
 
     const intervalId = window.setInterval(() => {
@@ -266,7 +267,7 @@ export function Dashboard() {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [fetchStats, fetchMatches, autoUpdateMatches]);
+  }, [authFetchStats, authFetchMatches, autoUpdateMatches]);
 
   const handleSubmitMatch = async (matchData: {
     title: string;
@@ -285,7 +286,7 @@ export function Dashboard() {
         : "/api/matches";
       const method = isEditing ? "PUT" : "POST";
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method: method,
         headers: {
           "Content-Type": "application/json",
@@ -308,8 +309,8 @@ export function Dashboard() {
       setEditingMatch(null);
 
       // Refresh stats and matches
-      fetchStats();
-      fetchMatches();
+      authFetchStats();
+      authFetchMatches();
 
       // Show success modal
       setSuccessModal({
@@ -1117,7 +1118,7 @@ export function Dashboard() {
         isOpen={isDetailsModalOpen}
         onClose={handleCloseDetailsModal}
         match={selectedMatch}
-        onMatchUpdate={fetchMatches}
+        onMatchUpdate={authFetchMatches}
       />
 
       <DeleteMatchModal

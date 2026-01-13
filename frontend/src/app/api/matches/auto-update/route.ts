@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
+import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   try {
     const updatedCount = await updateMatchStatuses();
     return NextResponse.json({ 

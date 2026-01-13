@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
+import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 
 type PaymentStatus = "BELUM_SETOR" | "SUDAH_SETOR";
 
@@ -7,6 +8,11 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; playerId: string }> }
 ) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   try {
     const { id: matchId, playerId } = await params;
     const body = await request.json();
@@ -47,6 +53,11 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string; playerId: string }> }
 ) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   try {
     const { id: matchId, playerId } = await params;
 
