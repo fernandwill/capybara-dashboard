@@ -97,6 +97,13 @@ const validators = {
         }
         return null;
     },
+
+    array: (value: unknown, fieldName: string): string | null => {
+        if (value !== undefined && value !== null && !Array.isArray(value)) {
+            return `${fieldName} must be an array`;
+        }
+        return null;
+    },
 };
 
 // Schema definition type
@@ -159,6 +166,7 @@ const schemas = {
         fee: { validators: [validators.required, validators.positiveNumber] },
         status: { validators: [validators.enum(["UPCOMING", "COMPLETED"])] },
         description: { validators: [validators.string] },
+        playerIds: { validators: [validators.array] },
     } as Schema,
 
     updateMatch: {
@@ -170,6 +178,7 @@ const schemas = {
         fee: { validators: [validators.positiveNumber] },
         status: { validators: [validators.enum(["UPCOMING", "COMPLETED"])] },
         description: { validators: [validators.string] },
+        playerIds: { validators: [validators.array] },
     } as Schema,
 
     updatePaymentStatus: {
