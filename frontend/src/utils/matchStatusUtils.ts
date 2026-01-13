@@ -5,13 +5,6 @@ import prisma from "@/lib/database";
 
 type MatchStatus = "UPCOMING" | "COMPLETED";
 
-interface MatchTimeData {
-    id: string;
-    date: Date;
-    time: string;
-    title?: string;
-}
-
 /**
  * Parses end time from a time range string like "18:00-20:00"
  * Returns [hours, minutes] or null if parsing fails

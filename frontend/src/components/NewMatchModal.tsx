@@ -1,27 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-interface Match {
-  id: string;
-  title: string;
-  location: string;
-  courtNumber: string;
-  date: string;
-  time: string;
-  fee: number;
-  status: string;
-  description?: string;
-  createdAt: string;
-  players?: {
-    player: {
-      id: string;
-      name: string;
-      status: string;
-    };
-    paymentStatus: "BELUM_SETOR" | "SUDAH_SETOR";
-  }[];
-}
+import {Match} from "@/types/types";
 
 interface MatchData {
   title: string;

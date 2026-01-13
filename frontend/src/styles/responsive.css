@@ -1,0 +1,404 @@
+/* =============================================================================
+   RESPONSIVE STYLES
+   All media queries grouped by breakpoint
+   ============================================================================= */
+
+/* ===== LARGE TABLETS & SMALL DESKTOPS (max-width: 1024px) ===== */
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .chart-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .chart-legend {
+        align-self: stretch;
+        justify-content: center;
+    }
+}
+
+/* ===== TABLETS (max-width: 768px) ===== */
+@media (max-width: 768px) {
+
+    /* Header */
+    .header-mobile {
+        display: flex;
+    }
+
+    .header-desktop {
+        display: none;
+    }
+
+    .dashboard-title {
+        font-size: 20px;
+    }
+
+    /* Upcoming match banner */
+    .upcoming-match-banner {
+        padding: 16px;
+        margin-bottom: 24px;
+    }
+
+    .upcoming-match-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        margin-bottom: 12px;
+    }
+
+    .upcoming-match-title {
+        font-size: 12px;
+    }
+
+    .upcoming-match-date {
+        font-size: 13px;
+    }
+
+    .upcoming-match-details {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .match-name {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .match-meta {
+        gap: 12px;
+        margin-bottom: 8px;
+    }
+
+    .upcoming-match-banner .match-time,
+    .upcoming-match-banner .match-location,
+    .upcoming-match-banner .match-court {
+        font-size: 13px;
+    }
+
+    .upcoming-match-countdown {
+        text-align: center;
+        width: 100%;
+    }
+
+    .countdown-display {
+        align-items: center;
+        gap: 2px;
+    }
+
+    .countdown-label {
+        font-size: 11px;
+    }
+
+    .countdown-timer {
+        font-size: 16px;
+        min-width: auto;
+        width: 100%;
+        padding: 6px 12px;
+    }
+
+    /* Tabs section */
+    .tabs-section {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+        margin-bottom: 20px;
+    }
+
+    .tabs {
+        justify-content: center;
+        gap: 24px;
+    }
+
+    .tab {
+        font-size: 15px;
+        padding: 10px 0;
+    }
+
+    .new-match-btn {
+        align-self: center;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    /* Matches header */
+    .matches-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .matches-title {
+        font-size: 16px;
+    }
+
+    .sort-section-inline {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .sort-select-inline {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Chart */
+    .monthly-stats-chart {
+        margin: 0 0 24px 0;
+    }
+
+    .chart-header {
+        padding: 20px 16px 12px 16px;
+    }
+
+    .chart-header h3 {
+        font-size: 18px;
+    }
+
+    .chart-container {
+        padding: 16px 12px 20px 12px;
+    }
+
+    .chart-legend {
+        gap: 16px;
+    }
+
+    .legend-item {
+        font-size: 13px;
+    }
+
+    /* Players section */
+    .players-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .add-player-btn {
+        align-self: flex-start;
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+
+    .add-player-section {
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .new-player-form {
+        flex-direction: column;
+    }
+
+    .new-player-form input {
+        margin-bottom: 12px;
+    }
+
+    .create-player-btn {
+        align-self: flex-start;
+        width: 100%;
+    }
+
+    .players-columns {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .players-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .add-player-options {
+        grid-template-columns: 1fr;
+    }
+
+    /* Payment filters */
+    .column-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .payment-filters {
+        align-self: stretch;
+        justify-content: center;
+    }
+}
+
+/* ===== MOBILE PHONES (max-width: 640px) ===== */
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-card-value {
+        font-size: 32px;
+    }
+
+    .stat-card-title {
+        font-size: 13px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-container {
+        margin: 10px;
+        max-width: none;
+    }
+
+    .match-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .match-datetime {
+        align-items: flex-start;
+    }
+
+    .match-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .match-fee {
+        align-self: flex-start;
+    }
+
+    .pending-payment {
+        font-size: 10px;
+        padding: 1px 6px;
+    }
+
+    .match-header-right {
+        gap: 8px;
+    }
+
+    .edit-btn {
+        font-size: 14px;
+        padding: 4px;
+    }
+
+    .header {
+        margin-bottom: 24px;
+    }
+
+    .header-title {
+        font-size: 24px;
+        gap: 10px;
+    }
+
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+}
+
+/* ===== SMALL MOBILE PHONES (max-width: 480px) ===== */
+@media (max-width: 480px) {
+    .upcoming-match-banner {
+        padding: 14px;
+    }
+
+    .match-meta {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .match-name {
+        font-size: 16px;
+    }
+
+    .countdown-timer {
+        font-size: 15px;
+    }
+
+    .tabs-section {
+        gap: 12px;
+    }
+
+    .tabs {
+        gap: 20px;
+    }
+
+    .tab {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+
+    .new-match-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+        gap: 6px;
+    }
+
+    .matches-header {
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+    }
+
+    .matches-title {
+        font-size: 15px;
+    }
+
+    .sort-label {
+        font-size: 12px;
+    }
+
+    .sort-select-inline {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    /* Chart */
+    .chart-header {
+        padding: 16px 12px 8px 12px;
+    }
+
+    .chart-header h3 {
+        font-size: 16px;
+    }
+
+    .chart-container {
+        padding: 12px 8px 16px 8px;
+    }
+
+    .chart-legend {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    /* Players */
+    .players-header {
+        gap: 8px;
+    }
+
+    .add-player-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .add-player-section {
+        padding: 12px;
+    }
+
+    .new-player-form input {
+        margin-bottom: 10px;
+    }
+}

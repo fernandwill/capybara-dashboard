@@ -1,0 +1,327 @@
+/* =============================================================================
+   MATCH CARD STYLES
+   Match list, cards, status badges, and payment indicators
+   ============================================================================= */
+
+.no-matches {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+    padding: 48px 24px;
+}
+
+.matches-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 0;
+}
+
+@media (min-width: 768px) {
+    .matches-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .matches-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Match card */
+.match-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s ease;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.match-card:hover {
+    border-color: #555;
+    transform: translateY(-1px);
+}
+
+.match-status-top {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 12px;
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.match-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.match-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Match details */
+.match-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.match-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.match-location,
+.match-court,
+.match-players {
+    font-size: 14px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.match-location {
+    font-weight: 600;
+}
+
+.match-players {
+    font-weight: 500;
+}
+
+.match-datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.match-date {
+    font-size: 14px;
+    color: var(--text-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.match-time {
+    font-size: 14px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.match-description {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.5;
+}
+
+/* match-time and match-location in banner context */
+.upcoming-match-banner .match-time,
+.upcoming-match-banner .match-location,
+.upcoming-match-banner .match-court {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+/* Match bottom section */
+.match-bottom {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: auto;
+}
+
+.match-price {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.fee-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.match-status-price {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Fee badges */
+.match-fee {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4ade80;
+    background-color: rgba(74, 222, 128, 0.1);
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+
+.match-fee.fee-paid {
+    color: #22c55e;
+    background-color: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.match-fee.fee-unpaid {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.pending-payment {
+    font-size: 12px;
+    color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    font-weight: 500;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 3px 6px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-badge.upcoming {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-badge.completed {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* Delete and edit buttons */
+.delete-btn,
+.edit-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.delete-btn {
+    color: red;
+}
+
+.match-card:hover .delete-btn,
+.match-card:hover .edit-btn {
+    opacity: 0.7;
+    visibility: visible;
+}
+
+.delete-btn:hover,
+.edit-btn:hover {
+    background-color: var(--card-bg);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.delete-btn:active,
+.edit-btn:active {
+    transform: scale(0.95);
+}
+
+/* Clickable card styles */
+.clickable-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickable-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    border-color: #555;
+}
+
+.clickable-card:active {
+    transform: translateY(0);
+}
+
+/* Payment filters */
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.payment-filters {
+    display: flex;
+    gap: 8px;
+}
+
+.payment-filter {
+    padding: 4px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: #888;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-filter:hover {
+    background-color: #444;
+    border-color: #555;
+}
+
+.payment-filter.active {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.or-divider {
+    text-align: center;
+    margin: 16px 0;
+    color: #888;
+    font-weight: 600;
+}
