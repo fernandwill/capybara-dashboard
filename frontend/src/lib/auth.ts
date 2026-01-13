@@ -2,8 +2,12 @@ import bcrypt from 'bcryptjs';
 
 // In a production environment, these values should come from environment variables
 // and never be committed to version control
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'capybara389@gmail.com';
-const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2a$12$MrcqahlPcaiCf9mO71kTLeUv/JABy0N41K0IaRWFW4uXqLSg3nmu6';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD_HASH) {
+  throw new Error("Unknown error.")
+}
 
 export async function authenticateAdmin(email: string, password: string) {
   try {

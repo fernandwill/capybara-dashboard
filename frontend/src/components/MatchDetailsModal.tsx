@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, X } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
+import {authFetch} from "@/lib/authFetch";
 
 type PaymentStatus = "BELUM_SETOR" | "SUDAH_SETOR";
 
@@ -159,7 +160,7 @@ export default function MatchDetailsModal({
 
     setIsLoadingPlayers(true);
     try {
-      const response = await fetch(`/api/matches/${matchId}`);
+      const response = await authFetch(`/api/matches/${matchId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch match players.");
       }
@@ -185,7 +186,7 @@ export default function MatchDetailsModal({
     setIsLoadingPastPlayers(true);
     setPastPlayers([]);
     try {
-      const response = await fetch(`/api/matches/${matchId}/players/past`);
+      const response = await authFetch(`/api/matches/${matchId}/players/past`);
       if (!response.ok) {
         throw new Error("Failed to fetch players.");
       }
@@ -253,7 +254,7 @@ export default function MatchDetailsModal({
     if (!matchId) return;
 
     try {
-      const resetResponse = await fetch(`/api/players/${playerId}`, {
+      const resetResponse = await authFetch(`/api/players/${playerId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -265,7 +266,7 @@ export default function MatchDetailsModal({
         console.error("Failed to reset player status.");
       }
 
-      const response = await fetch(`/api/matches/${matchId}/players`, {
+      const response = await authFetch(`/api/matches/${matchId}/players`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -300,7 +301,7 @@ export default function MatchDetailsModal({
 
     setIsRemovingPlayer(true);
     try {
-      const response = await fetch(`/api/matches/${matchId}/players/${playerToRemove.id}`, {
+      const response = await authFetch(`/api/matches/${matchId}/players/${playerToRemove.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -328,7 +329,7 @@ export default function MatchDetailsModal({
     if (!newPlayerName.trim() || !matchId) return;
 
     try {
-      const createResponse = await fetch("/api/players", {
+      const createResponse = await authFetch("/api/players", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -368,7 +369,7 @@ export default function MatchDetailsModal({
 
   const handleSetPlayerStatus = async (playerId: string, newStatus: string) => {
     try {
-      const response = await fetch(`/api/players/${playerId}`, {
+      const response = await authFetch(`/api/players/${playerId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -388,7 +389,7 @@ export default function MatchDetailsModal({
     try {
       if (!matchId) return;
 
-      const response = await fetch(`/api/matches/${matchId}/players/${playerId}`, {
+      const response = await authFetch(`/api/matches/${matchId}/players/${playerId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

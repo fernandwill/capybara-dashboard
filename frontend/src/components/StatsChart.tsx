@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import {authFetch} from "@/lib/authFetch";
 
 interface ChartData {
   month: string;
@@ -20,10 +21,10 @@ export default function StatsChart() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMonthly = async () => {
+    const authFetchMonthly = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/stats/monthly");
+        const response = await authFetch("/api/stats/monthly");
         const monthlyData: Record<
           string,
           { count: number; totalHours: number }
@@ -49,13 +50,13 @@ export default function StatsChart() {
 
         setData(chartData);
       } catch (error) {
-        console.error("Error fetching monthly data: ", error);
+        console.error("Error authFetching monthly data: ", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMonthly();
+    authFetchMonthly();
   }, []);
 
   if (loading) {

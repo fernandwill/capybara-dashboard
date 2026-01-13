@@ -1,29 +1,40 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/database';
+import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 
-export async function GET() {
-  try {
-    const matches = await prisma.match.findMany({
-      include: {
-        players: {
-          include: {
-            player: true,
+export async function GET(request: NextRequest) {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return unauthorizedResponse();
+    }
+
+    try {
+      const matches = await prisma.match.findMany({
+        include: {
+          players: {
+            include: {
+              player: true,
+            },
           },
+          payments: true,
         },
-        payments: true,
-      },
-      orderBy: {
-        date: "asc",
-      },
-    });
-    return NextResponse.json(matches);
-  } catch (error) {
-    console.error('Error fetching matches:', error);
-    return NextResponse.json({ error: "Failed to find matches." }, { status: 500 });
-  }
+        orderBy: {
+          date: "asc",
+        },
+      });
+      return NextResponse.json(matches);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      return NextResponse.json({ error: "Failed to find matches." }, { status: 500 });
+    }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   try {
     const body = await request.json();
     const {

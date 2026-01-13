@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
+import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   try {
     const players = await prisma.player.findMany({
       orderBy: {
@@ -16,6 +22,11 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   try {
     const body = await request.json();
     const { name, email, phone, status = "ACTIVE" } = body;
