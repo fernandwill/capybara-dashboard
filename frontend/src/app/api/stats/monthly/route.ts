@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
+import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 
 // Add interface for match type
 interface MatchData {
@@ -7,7 +8,12 @@ interface MatchData {
   time: string;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const user = await getAuthenticatedUser(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   try {
     const matches = await prisma.match.findMany({
       where: { status: 'COMPLETED' },
