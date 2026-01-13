@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/database';
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 import { updateMatchStatuses } from '@/utils/matchStatusUtils';
 

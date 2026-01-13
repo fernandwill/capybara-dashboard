@@ -213,7 +213,7 @@ export function Dashboard() {
       const isEditing = editingMatch !== null;
 
       // Use the useMatches hook for create/update
-      const { createMatch, updateMatch } = await import("@/hooks/useMatches").then(m => ({
+      const { createMatch, updateMatch } = await import("@/hooks/useMatches").then(() => ({
         createMatch: async (data: typeof matchData) => {
           const { authFetch } = await import("@/lib/authFetch");
           const response = await authFetch("/api/matches", {

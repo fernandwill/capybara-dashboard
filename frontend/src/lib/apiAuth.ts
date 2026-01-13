@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+// Environment variables - validated at runtime, not at module load
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are required.");
-}
-
-const url: string = supabaseUrl;
-const anonKey: string = supabaseAnonKey;
-
 export async function getAuthenticatedUser(request: Request) {
     try {
+        // Validate at runtime
+        if (!supabaseUrl || !supabaseAnonKey) {
+            console.error("Supabase environment variables not configured");
+            return null;
+        }
+
         const authHeader = request.headers.get("authorization");
         const token = authHeader?.replace("Bearer ", "");
 
@@ -20,7 +20,7 @@ export async function getAuthenticatedUser(request: Request) {
             return null;
         }
 
-        const supabase = createClient(url, anonKey);
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
         const { data: { user }, error } = await supabase.auth.getUser(token);
 
         if (error || !user) {

@@ -5,41 +5,11 @@ import { Loader2, X } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
 import {authFetch} from "@/lib/authFetch";
-
-type PaymentStatus = "BELUM_SETOR" | "SUDAH_SETOR";
-
-interface Player {
-  id: string;
-  name: string;
-  status: string;
-  matchPlayers?: {
-    match: {
-      id: string;
-      date: string;
-    };
-  }[];
-}
+import {Match, Player, PaymentStatus} from "@/types/types";
 
 type PlayerInMatch = Player & {
   paymentStatus: PaymentStatus;
 };
-
-interface Match {
-  id: string;
-  title: string;
-  location: string;
-  courtNumber: string;
-  date: string;
-  time: string;
-  fee: number;
-  status: string;
-  description?: string;
-  createdAt: string;
-  players?: {
-    player: Player;
-    paymentStatus: PaymentStatus;
-  }[];
-}
 
 const IDR_FORMATTER = new Intl.NumberFormat("id-ID", {
   style: "currency",
