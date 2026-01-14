@@ -169,6 +169,19 @@ export default function NewMatchModal({
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-group">
+            <label htmlFor="title">Title</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="form-input"
+              placeholder="Match title..."
+            />
+          </div>
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="location">Location</label>
