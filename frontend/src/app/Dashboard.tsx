@@ -11,7 +11,7 @@ import { Select } from "../components/ui/select";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
-import { Loader2, LogOut, Trash2 } from "lucide-react";
+import { Loader2, LogOut, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 
 // Import shared types and utilities
 import { Match, SortOption, ModalState } from "@/types/types";
@@ -44,6 +44,8 @@ export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("date-earliest");
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const MATCHES_PER_PAGE = 6;
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,6 +78,10 @@ export function Dashboard() {
     filterMatches(matches, activeTab === "upcoming" ? "upcoming" : "completed", searchQuery),
     sortBy
   );
+
+  const totalPages = Math.ceil(filteredMatches.length / MATCHES_PER_PAGE);
+  const startIndex = (currentPage - 1) * MATCHES_PER_PAGE;
+  const paginatedMatches = filteredMatches.slice(startIndex, startIndex + MATCHES_PER_PAGE);
 
   // Initial data fetch and auto-update interval
   useEffect(() => {
@@ -197,6 +203,10 @@ export function Dashboard() {
       setIsDeletingMatch(false);
     }
   };
+
+  useEffect (() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery, sortBy]);
 
   // Submit match handler (create/update)
   const handleSubmitMatch = async (matchData: {
@@ -499,7 +509,7 @@ export function Dashboard() {
           </div>
         ) : (
           <div className="matches-list">
-            {filteredMatches.map((match) => (
+            {paginatedMatches.map((match) => (
               <div
                 key={match.id}
                 className="match-card clickable-card"
@@ -583,6 +593,26 @@ export function Dashboard() {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination-container">
+          <button 
+            className="pagination-btn"
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span className="pagination-page">Page {currentPage} of {totalPages}</span>
+          <button 
+            className="pagination-btn"
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      )}
 
       <footer className="footer">
         <div className="footer-txt">© PB Capybara</div>
