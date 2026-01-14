@@ -35,18 +35,27 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 - Automatic status updates (UPCOMING → COMPLETED) based on match end time
 - Search and filter matches by title
 - Sort by date or fee
+- Pagination (6 matches per page) with navigation controls
 
 ### Player Management
 - Add/remove players from matches
 - Track player status (Active/Tentative)
 - Payment status tracking (Belum Setor/Sudah Setor)
 - Two-column layout separating confirmed and tentative players
+- Suggest players from the latest completed match
 
 ### Statistics & Analytics
 - Dashboard with key metrics (total, upcoming, completed matches)
 - Hours played tracking
 - Monthly statistics with interactive bar charts
+- Multi-year support with dynamic year selection
 - Real-time countdown to next match
+
+### PDF Export
+- Export match player lists to PDF
+- Landscape orientation for better printing
+- Standardized format with NO, NAME, and empty tracking columns
+- Automatic filename generation based on match details
 
 ### Security
 - Supabase JWT authentication on all API routes
@@ -75,6 +84,7 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 | Components | Radix UI |
 | Charts | Recharts |
 | Icons | Lucide React |
+| PDF Export | jsPDF & jspdf-autotable |
 | Testing | Vitest |
 
 ---
@@ -189,7 +199,8 @@ frontend/
 │   └── utils/                      # Utility functions
 │       ├── formatters.ts           # Date, currency
 │       ├── matchUtils.ts           # Sort, filter
-│       └── matchStatusUtils.ts     # Status logic
+│       ├── matchStatusUtils.ts     # Status logic
+│       └── playerExport.ts         # PDF generation logic
 │
 ├── prisma/                         # Database schema
 ├── vitest.config.ts                # Test config
@@ -252,12 +263,6 @@ ADMIN_PASSWORD_HASH="$2a$12$..."  # bcrypt hash
 NODE_ENV="development"
 ```
 
-### Generating Password Hash
-
-```bash
-node -e "const bcrypt = require('bcryptjs'); bcrypt.hash('yourpassword', 12).then(console.log)"
-```
-
 ---
 
 ## API Reference
@@ -287,7 +292,7 @@ node -e "const bcrypt = require('bcryptjs'); bcrypt.hash('yourpassword', 12).the
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/players` | GET | List all players |
+| `/api/players` | GET | List all players (supports `?latest=true`) |
 | `/api/players` | POST | Create player |
 | `/api/players/[id]` | GET | Get player by ID |
 | `/api/players/[id]` | PUT | Update player |
@@ -299,41 +304,6 @@ node -e "const bcrypt = require('bcryptjs'); bcrypt.hash('yourpassword', 12).the
 |----------|--------|-------------|
 | `/api/stats` | GET | Dashboard stats |
 | `/api/stats/monthly` | GET | Monthly chart data |
-
-### Request/Response Examples
-
-**Create Match (POST /api/matches)**
-```json
-// Request
-{
-  "title": "Weekend Badminton",
-  "location": "Sports Center",
-  "courtNumber": "Court 1",
-  "date": "2024-01-20",
-  "time": "18:00-20:00",
-  "fee": 50000,
-  "description": "Weekly match"
-}
-
-// Response (201)
-{
-  "id": "abc123",
-  "title": "Weekend Badminton",
-  "status": "UPCOMING",
-  ...
-}
-```
-
-**Validation Error (400)**
-```json
-{
-  "error": "Validation failed",
-  "details": [
-    "title is required",
-    "time must be in format HH:MM-HH:MM"
-  ]
-}
-```
 
 ---
 
@@ -349,25 +319,6 @@ npm run test
 npm run test:run
 ```
 
-### Test Coverage
-
-Tests are located alongside source files with `.test.ts` suffix:
-- `src/utils/formatters.test.ts`
-- `src/utils/matchUtils.test.ts`
-
-### Writing Tests
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { formatCurrency } from './formatters';
-
-describe('formatCurrency', () => {
-  it('formats Indonesian Rupiah correctly', () => {
-    expect(formatCurrency(50000)).toBe('Rp50.000');
-  });
-});
-```
-
 ---
 
 ## Code Quality
@@ -380,28 +331,6 @@ describe('formatCurrency', () => {
 | `apiError.ts` | Consistent error responses |
 | `validation.ts` | Schema-based input validation |
 
-### Logger Usage
-
-```typescript
-import { logger } from '@/lib/logger';
-
-logger.debug('Debug info');    // Dev only
-logger.info('Info message');   // Dev only
-logger.warn('Warning');        // Dev + Prod
-logger.error('Error', error);  // Dev + Prod
-```
-
-### Validation Usage
-
-```typescript
-import { validate, validationErrorResponse, schemas } from '@/lib/validation';
-
-const result = validate(body, schemas.createMatch);
-if (!result.success) {
-  return validationErrorResponse(result.errors!);
-}
-```
-
 ---
 
 ## Deployment
@@ -412,15 +341,6 @@ if (!result.success) {
 2. Import project in Vercel
 3. Add environment variables in Vercel dashboard
 4. Deploy
-
-### Environment Variables for Production
-
-Set these in Vercel:
-- `DATABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD_HASH`
 
 ---
 
