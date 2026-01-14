@@ -486,10 +486,10 @@ export default function MatchDetailsModal({
                     <FileText size={18} />
                     Export Players
                   </button>
+                  <button className="add-player-btn" onClick={() => setShowAddPlayer((value) => !value)}>
+                    + Add Player
+                  </button>
                 </div>
-                <button className="add-player-btn" onClick={() => setShowAddPlayer((value) => !value)}>
-                  + Add Player
-                </button>
               </div>
 
               {showAddPlayer && (
