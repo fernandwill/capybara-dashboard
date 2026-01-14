@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, X } from "lucide-react";
+import { Loader2, X, FileText } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
 import {authFetch} from "@/lib/authFetch";
 import {Match, Player, PaymentStatus} from "@/types/types";
+import {exportPlayerList} from "@/utils/playerExport";
 
 type PlayerInMatch = Player & {
   paymentStatus: PaymentStatus;
@@ -476,6 +477,16 @@ export default function MatchDetailsModal({
             <div className="players-section">
               <div className="players-header">
                 <h3>Players ({players.length})</h3>
+                <div className="flex gap-2">
+                  <button 
+                    className="export-pdf-btn"
+                    onClick={() => exportPlayerList(match, players)}
+                    title="Export Players to PDF"
+                  >
+                    <FileText size={18} />
+                    Export Players
+                  </button>
+                </div>
                 <button className="add-player-btn" onClick={() => setShowAddPlayer((value) => !value)}>
                   + Add Player
                 </button>
