@@ -82,6 +82,8 @@ export function Dashboard() {
   const totalPages = Math.ceil(filteredMatches.length / MATCHES_PER_PAGE);
   const startIndex = (currentPage - 1) * MATCHES_PER_PAGE;
   const paginatedMatches = filteredMatches.slice(startIndex, startIndex + MATCHES_PER_PAGE);
+  const startMatch = filteredMatches.length > 0 ? startIndex + 1 : 0;
+  const endMatch = Math.min(currentPage * MATCHES_PER_PAGE, filteredMatches.length)
 
   // Initial data fetch and auto-update interval
   useEffect(() => {
@@ -609,6 +611,8 @@ export function Dashboard() {
           >
             <ChevronRight size={20} />
           </button>
+          <span className="pagination-range">Showing {startMatch} - {endMatch} of {filteredMatches.length}</span>
+          <span className="pagination-page">Page {currentPage} of {totalPages}</span>
         </div>
       )}
       </div>
