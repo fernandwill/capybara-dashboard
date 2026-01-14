@@ -23,6 +23,15 @@
     align-items: center;
     padding: 24px 24px 16px 24px;
     border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.chart-title-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .chart-header h3 {
@@ -30,6 +39,36 @@
     font-weight: 600;
     color: var(--text-color);
     margin: 0;
+}
+
+.year-selector {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.year-btn {
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #888;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.year-btn:hover {
+    color: var(--text-color);
+}
+
+.year-btn.active {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .chart-legend {
