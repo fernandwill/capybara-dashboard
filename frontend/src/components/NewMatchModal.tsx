@@ -180,6 +180,7 @@ export default function NewMatchModal({
               required
               className="form-input"
               placeholder="Match title..."
+              minLength={3}
             />
           </div>
           <div className="form-row">
@@ -285,8 +286,8 @@ export default function NewMatchModal({
           </div>
 
           <div className="form-group">
-            <label>Initial Players</label>
-            <div className="players-selection-grid">
+            <label htmlFor="players-grid">Initial Players</label>
+            <div id="players-grid" className="players-selection-grid">
               {isLoadingPlayers ? (
                 <div className="loading-players">Loading players...</div>
               ) : availablePlayers.length === 0 ? (
