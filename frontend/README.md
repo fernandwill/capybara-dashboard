@@ -127,7 +127,7 @@ A modern badminton match tracker and management system built with Next.js 16, Re
                            ▼
 ┌─────────────────────────────────────────────────────────┐
 │                     Prisma                              │
-│               (Database Operations)                      │
+│               (Database Operations)                     │
 └─────────────────────────────────────────────────────────┘
 ```
 
