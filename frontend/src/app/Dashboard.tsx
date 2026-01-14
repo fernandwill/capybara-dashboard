@@ -573,7 +573,7 @@ export function Dashboard() {
                     </span>
                   </div>
                 </div>
-                {match.description && <div className="match-description">{match.description}</div>}
+                <div className="match-description">{match.description || ""}</div>
                 <div className="match-bottom">
                   <div className="match-price">
                     <div className="fee-section">
