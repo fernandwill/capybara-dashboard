@@ -603,7 +603,10 @@ export function Dashboard() {
           >
             <ChevronLeft size={20} />
           </button>
-          <span className="pagination-page">Page {currentPage} of {totalPages}</span>
+          <div className="pagination-info">
+            <span className="pagination-page">Page {currentPage} of {totalPages}</span>
+            <span className="pagination-range">Showing {startMatch} - {endMatch} of {filteredMatches.length}</span>
+          </div>
           <button 
             className="pagination-btn"
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
@@ -611,8 +614,6 @@ export function Dashboard() {
           >
             <ChevronRight size={20} />
           </button>
-          <span className="pagination-range">Showing {startMatch} - {endMatch} of {filteredMatches.length}</span>
-          <span className="pagination-page">Page {currentPage} of {totalPages}</span>
         </div>
       )}
       </div>
