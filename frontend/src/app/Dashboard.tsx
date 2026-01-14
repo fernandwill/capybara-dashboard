@@ -592,9 +592,7 @@ export function Dashboard() {
             ))}
           </div>
         )}
-      </div>
-
-      {totalPages > 1 && (
+        {totalPages > 1 && (
         <div className="pagination-container">
           <button 
             className="pagination-btn"
@@ -613,6 +611,7 @@ export function Dashboard() {
           </button>
         </div>
       )}
+      </div>
 
       <footer className="footer">
         <div className="footer-txt">© PB Capybara</div>
