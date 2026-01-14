@@ -8,7 +8,7 @@ import {
 } from "recharts";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import {authFetch} from "@/lib/authFetch";
+import { authFetch } from "@/lib/authFetch";
 
 interface ChartData {
   month: string;
@@ -19,28 +19,33 @@ interface ChartData {
 export default function StatsChart() {
   const [data, setData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   useEffect(() => {
     const authFetchMonthly = async () => {
       try {
         setLoading(true);
         const response = await authFetch("/api/stats/monthly");
-        const monthlyData: Record<
-          string,
-          { count: number; totalHours: number }
-        > = await response.json();
+        const monthlyDate: Record<string, { count: number; totalHours: number }> = await response.json();
 
-        // Create array of all 12 months with abbreviated names for better mobile display
+        const years = Array.from(new Set(Object.keys(monthlyDate).map(key => parseInt(key.split("-")[0])))).sort((a, b) => b - a);
+
+        const currentYear = new Date().getFullYear();
+        if (!years.includes(currentYear)) {
+          years.unshift(currentYear);
+        }
+        setAvailableYears(years);
+
         const monthNames = [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+          "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         ];
 
-        // Transform data to show month names and include all months
         const chartData = monthNames.map((monthName, index) => {
-          const monthKey = `2025-${String(index + 1).padStart(2, '0')}`;
-          const stats = monthlyData[monthKey] || { count: 0, totalHours: 0 };
-          
+          const monthKey = `${selectedYear}-${String(index + 1).padStart(2, "0")}`;
+          const stats = monthlyDate[monthKey] || { count: 0, totalHours: 0 };
+
           return {
             month: monthName,
             count: stats.count,
@@ -50,14 +55,13 @@ export default function StatsChart() {
 
         setData(chartData);
       } catch (error) {
-        console.error("Error authFetching monthly data: ", error);
+        console.error("Error fetching monthly data: ", error);
       } finally {
         setLoading(false);
       }
-    };
-
+    }
     authFetchMonthly();
-  }, []);
+  }, [selectedYear]);
 
   if (loading) {
     return (
@@ -94,7 +98,20 @@ export default function StatsChart() {
   return (
     <div className="monthly-stats-chart">
       <div className="chart-header">
-        <h3>Monthly Statistics</h3>
+        <div className="chart-title-area">
+          <h3>Monthly Statistics</h3>
+          <div className="year-selector">
+            {availableYears.map((year) => (
+              <button
+                key={year}
+                className={`year-btn ${selectedYear === year ? "active" : ""}`}
+                onClick={() => setSelectedYear(year)}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="chart-legend">
           <div className="legend-item">
             <div className="legend-color matches"></div>
@@ -109,27 +126,27 @@ export default function StatsChart() {
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <XAxis 
-              dataKey="month" 
+            <XAxis
+              dataKey="month"
               stroke="var(--text-color)"
               fontSize={12}
             />
-            <YAxis 
+            <YAxis
               stroke="var(--text-color)"
               fontSize={12}
-              label={{ 
-                value: 'Hours Played', 
-                angle: -90, 
-                position: 'insideLeft',
-                style: { textAnchor: 'middle', fill: 'var(--text-color)', fontSize: '12px' }
+              label={{
+                value: "Hours Played",
+                angle: -90,
+                position: "insideLeft",
+                style: { textAnchor: "middle", fill: "var(--text-color)", fontSize: "12px" }
               }}
             />
-            <Tooltip 
+            <Tooltip
               contentStyle={{
-                backgroundColor: 'var(--card-bg)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '8px',
-                color: 'var(--text-color)'
+                backgroundColor: "var(--card-bg)",
+                border: "1px solid var(--border-color)",
+                borderRadius: "8px",
+                color: "var(--text-color)"
               }}
             />
             <Bar dataKey="count" fill="var(--primary-color)" name="Matches" radius={[4, 4, 0, 0]} />
