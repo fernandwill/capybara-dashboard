@@ -59,3 +59,11 @@ export function useAuth() {
   }
   return context
 }
+
+if (typeof window !== "undefined") {
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith("sb-")) {
+      localStorage.removeItem(key)
+    }
+  });
+}
