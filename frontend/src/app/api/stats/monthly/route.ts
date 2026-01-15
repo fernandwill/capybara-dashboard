@@ -8,8 +8,8 @@ interface MatchData {
   time: string;
 }
 
-export async function GET(request: Request) {
-  const user = await getAuthenticatedUser(request);
+export async function GET() {
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }

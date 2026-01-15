@@ -3,10 +3,10 @@ import prisma from '@/lib/database';
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
@@ -32,7 +32,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
@@ -61,10 +61,10 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }

@@ -7,7 +7,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; playerId: string }> }
 ) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
@@ -49,10 +49,10 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string; playerId: string }> }
 ) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
