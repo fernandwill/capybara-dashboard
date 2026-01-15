@@ -1,9 +1,9 @@
-'use client'
+"use client"
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { getCurrentUser } from '@/lib/authService'
-import { supabase } from '@/lib/supabaseClient'
-import { User } from '@supabase/supabase-js'
+import { createContext, useContext, useEffect, useState, ReactNode } from "react"
+import { getCurrentUser } from "@/lib/authService"
+import { supabase } from "@/lib/supabaseClient"
+import { User } from "@supabase/supabase-js"
 
 type AuthContextType = {
   user: User | null
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
 }
