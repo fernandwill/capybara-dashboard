@@ -4,8 +4,8 @@ import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
 
-export async function GET(request: Request) {
-  const user = await getAuthenticatedUser(request);
+export async function GET() {
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }

@@ -6,7 +6,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
