@@ -5,8 +5,8 @@ import { determineMatchStatus } from '@/utils/matchStatusUtils';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
 
-export async function GET(request: NextRequest) {
-  const user = await getAuthenticatedUser(request);
+export async function GET() {
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthenticatedUser(request);
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }

@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
 import { updateMatchStatuses } from '@/utils/matchStatusUtils';
 
-export async function POST(request: Request) {
-  const user = await getAuthenticatedUser(request);
+export async function POST() {
+  const user = await getAuthenticatedUser();
   if (!user) {
     return unauthorizedResponse();
   }
