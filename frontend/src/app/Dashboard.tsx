@@ -481,7 +481,7 @@ export function Dashboard() {
             Past Matches
           </div>
         </div>
-        <Button className="new-match-btn" onClick={handleNewMatch}>
+        <Button variant="primaryGradient" onClick={handleNewMatch}>
           <span>+</span>
           New Match
         </Button>
