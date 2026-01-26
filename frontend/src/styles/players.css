@@ -27,15 +27,10 @@
     border: none;
     padding: 8px 16px;
     border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
 }
 
 .add-player-btn:hover {
     background-color: #2563eb;
-    transform: translateY(-1px);
 }
 
 /* Add player section */
@@ -187,7 +182,6 @@
 .create-player-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #16a34a, #15803d);
     box-shadow: 0 8px 16px rgba(34, 197, 94, 0.25);
-    transform: translateY(-1px);
 }
 
 .create-player-btn:disabled {
