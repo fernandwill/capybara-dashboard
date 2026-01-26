@@ -466,7 +466,7 @@ export default function MatchDetailsModal({
                     Export Players
                   </Button>
                   <Button variant="primary" onClick={() => setShowAddPlayer((value) => !value)}>
-                    <span>+</span>
+                    <span className="text-lg font-bold leading-none">+</span>
                     Add Player
                   </Button>
                 </div>
