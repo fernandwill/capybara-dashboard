@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, X, FileText } from "lucide-react";
+import { Button } from "./ui/button";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
-import {authFetch} from "@/lib/authFetch";
-import {Match, Player, PaymentStatus} from "@/types/types";
-import {exportPlayerList} from "@/utils/playerExport";
+import { authFetch } from "@/lib/authFetch";
+import { Match, Player, PaymentStatus } from "@/types/types";
+import { exportPlayerList } from "@/utils/playerExport";
 
 type PlayerInMatch = Player & {
   paymentStatus: PaymentStatus;
@@ -438,9 +439,9 @@ export default function MatchDetailsModal({
           <div className="modal-header">
             <h2>Match Details</h2>
             <div className="modal-header-actions">
-              <button className="modal-close" onClick={onClose} aria-label="Close match details">
+              <Button variant="ghost" size="icon" className="modal-close" onClick={onClose} aria-label="Close match details">
                 <X />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -478,17 +479,18 @@ export default function MatchDetailsModal({
               <div className="players-header">
                 <h3>Players ({players.length})</h3>
                 <div className="flex gap-2">
-                  <button 
+                  <Button
+                    variant="outline"
                     className="export-pdf-btn"
                     onClick={() => exportPlayerList(match, players)}
                     title="Export Players to PDF"
                   >
                     <FileText size={18} />
                     Export Players
-                  </button>
-                  <button className="add-player-btn" onClick={() => setShowAddPlayer((value) => !value)}>
+                  </Button>
+                  <Button className="add-player-btn" onClick={() => setShowAddPlayer((value) => !value)}>
                     + Add Player
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -519,14 +521,15 @@ export default function MatchDetailsModal({
                             <ul className="existing-player-options">
                               {filteredExistingPlayers.map((player) => (
                                 <li key={player.id}>
-                                  <button
+                                  <Button
                                     type="button"
+                                    variant="ghost"
                                     className="existing-player-option"
                                     onClick={() => handleAddPlayer(player.id)}
                                     aria-label={`Add ${player.name} to this match`}
                                   >
                                     {player.name}
-                                  </button>
+                                  </Button>
                                 </li>
                               ))}
                             </ul>
@@ -556,13 +559,13 @@ export default function MatchDetailsModal({
                         onChange={(event) => setNewPlayerName(event.target.value)}
                         className="form-input"
                       />
-                      <button
+                      <Button
                         className="create-player-btn"
                         onClick={handleCreateAndAddPlayer}
                         disabled={!newPlayerName.trim()}
                       >
                         Create and Add Player
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -586,46 +589,53 @@ export default function MatchDetailsModal({
                           <div key={player.id} className="player-card">
                             <div className="player-header">
                               <h4 className="player-name">{player.name}</h4>
-                              <button
+                              <Button
+                                variant="ghost"
+                                size="icon"
                                 className="remove-player-btn"
                                 onClick={() => handleRemovePlayer(player.id)}
                                 title="Remove player"
                                 aria-label={`Remove ${player.name} from this match`}
                               >
                                 <X />
-                              </button>
+                              </Button>
                             </div>
                             <div className="player-status-controls">
-                              <button
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 className={`status-btn ${player.status === "ACTIVE" ? "active" : "inactive"}`}
                                 onClick={() => handleSetPlayerStatus(player.id, "ACTIVE")}
                               >
                                 ACTIVE
-                              </button>
-                              <button
-                                className={`status-btn ${
-                                  player.status === "TENTATIVE" ? "tentative" : "no-color"
-                                }`}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`status-btn ${player.status === "TENTATIVE" ? "tentative" : "no-color"
+                                  }`}
                                 onClick={() => handleSetPlayerStatus(player.id, "TENTATIVE")}
                               >
                                 SET PLAYER AS TENTATIVE
-                              </button>
-                              <button
-                                className={`payment-btn ${
-                                  player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"
-                                }`}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`payment-btn ${player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"
+                                  }`}
                                 onClick={() => handleSetPaymentStatus(player.id, "BELUM_SETOR")}
                               >
                                 BELUM SETOR
-                              </button>
-                              <button
-                                className={`payment-btn ${
-                                  player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"
-                                }`}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`payment-btn ${player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"
+                                  }`}
                                 onClick={() => handleSetPaymentStatus(player.id, "SUDAH_SETOR")}
                               >
                                 SUDAH SETOR
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         ))
@@ -645,48 +655,54 @@ export default function MatchDetailsModal({
                             <div key={player.id} className="player-card">
                               <div className="player-header">
                                 <h4 className="player-name">{player.name}</h4>
-                                <button
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   className="remove-player-btn"
                                   onClick={() => handleRemovePlayer(player.id)}
                                   title="Remove player"
                                   aria-label={`Remove ${player.name} from this match`}
                                 >
                                   <X />
-                                </button>
+                                </Button>
                               </div>
                               <div className="player-status-controls">
-                                <button
-                                  className={`status-btn ${
-                                    player.status === "ACTIVE" ? "active" : "no-color"
-                                  }`}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={`status-btn ${player.status === "ACTIVE" ? "active" : "no-color"
+                                    }`}
                                   onClick={() => handleSetPlayerStatus(player.id, "ACTIVE")}
                                 >
                                   SET PLAYER AS ACTIVE
-                                </button>
-                                <button
-                                  className={`status-btn ${
-                                    player.status === "TENTATIVE" ? "tentative" : "no-color"
-                                  }`}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={`status-btn ${player.status === "TENTATIVE" ? "tentative" : "no-color"
+                                    }`}
                                   onClick={() => handleSetPlayerStatus(player.id, "TENTATIVE")}
                                 >
                                   TENTATIVE
-                                </button>
-                                <button
-                                  className={`payment-btn ${
-                                    player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"
-                                  }`}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={`payment-btn ${player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"
+                                    }`}
                                   onClick={() => handleSetPaymentStatus(player.id, "BELUM_SETOR")}
                                 >
                                   BELUM SETOR
-                                </button>
-                                <button
-                                  className={`payment-btn ${
-                                    player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"
-                                  }`}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={`payment-btn ${player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"
+                                    }`}
                                   onClick={() => handleSetPaymentStatus(player.id, "SUDAH_SETOR")}
                                 >
                                   SUDAH SETOR
-                                </button>
+                                </Button>
                               </div>
                             </div>
                           ))

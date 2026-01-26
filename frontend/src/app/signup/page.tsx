@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import "../login/login.css";
 
 export default function SignUpPage() {
@@ -27,12 +28,13 @@ export default function SignUpPage() {
       <p className="info-text">
         Account creation is handled by an administrator. Please reach out to your team lead to request access.
       </p>
-      <button
+      <Button
+        variant="info"
         onClick={() => router.push("/login")}
         className="login-btn"
       >
         Go to Login
-      </button>
+      </Button>
     </div>
   );
 }
