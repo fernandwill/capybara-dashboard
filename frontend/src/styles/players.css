@@ -21,18 +21,6 @@
     color: var(--text-color);
 }
 
-.add-player-btn {
-    background-color: #3b82f6;
-    color: #ffffff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-}
-
-.add-player-btn:hover {
-    background-color: #2563eb;
-}
-
 /* Add player section */
 .add-player-section {
     background-color: var(--card-bg);
@@ -133,16 +121,6 @@
     border-bottom: none;
 }
 
-.add-player-btn-small {
-    padding: 4px 8px;
-    font-size: 12px;
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
 .no-players {
     color: #666;
     font-size: 14px;
@@ -164,29 +142,6 @@
 
 .new-player-form input {
     flex: 1;
-}
-
-.create-player-btn {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #ffffff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    font-size: 14px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    white-space: nowrap;
-}
-
-.create-player-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    box-shadow: 0 8px 16px rgba(34, 197, 94, 0.25);
-}
-
-.create-player-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 
 /* Players columns layout */
