@@ -57,27 +57,6 @@
     flex-wrap: wrap;
 }
 
-.modal-close {
-    background: none;
-    border: none;
-    color: #666;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-    background-color: var(--card-bg);
-    color: var(--text-color);
-}
-
 /* Modal form */
 .modal-form {
     padding: 0 24px 24px 24px;
@@ -201,37 +180,6 @@
     border-top: 1px solid var(--border-color);
 }
 
-.btn-cancel {
-    padding: 12px 24px;
-    background-color: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-color);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-cancel:hover {
-    background-color: var(--card-bg);
-}
-
-.btn-create {
-    padding: 12px 24px;
-    background-color: var(--text-color);
-    border: none;
-    border-radius: 8px;
-    color: var(--bg-color);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-create:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-1px);
-}
-
 /* Delete modal */
 .delete-modal {
     position: relative;
@@ -242,17 +190,6 @@
     background-color: var(--bg-color);
     border-radius: 18px;
     box-shadow: 0 18px 45px rgba(22, 24, 35, 0.18);
-}
-
-.delete-modal-close {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-}
-
-.delete-modal-close:hover {
-    background-color: transparent;
-    color: #6b7280;
 }
 
 .delete-modal-content {
@@ -284,51 +221,6 @@
     margin-top: 16px;
     justify-content: center;
     align-items: center;
-}
-
-.delete-modal-button {
-    flex: 1;
-    min-width: 120px;
-    padding: 12px 24px;
-    border-radius: 24px;
-    border: none;
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.delete-modal-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.delete-modal-button-cancel {
-    background-color: transparent;
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.delete-modal-button-cancel:hover:not(:disabled) {
-    background-color: var(--card-bg);
-}
-
-.delete-modal-button-confirm {
-    background-color: #ef4444;
-    color: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.delete-modal-button-confirm:hover:not(:disabled) {
-    background-color: #dc2626;
 }
 
 /* Success modal */
@@ -397,29 +289,6 @@
     color: #888;
     margin: 0;
     line-height: 1.5;
-}
-
-.success-btn {
-    background-color: #22c55e;
-    color: #ffffff;
-    border: none;
-    padding: 12px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    margin-top: 8px;
-    min-width: 80px;
-}
-
-.success-btn:hover {
-    background-color: #16a34a;
-    transform: translateY(-1px);
-}
-
-.success-btn:active {
-    transform: translateY(0);
 }
 
 /* Error modal */
@@ -497,29 +366,6 @@
     color: #888;
     margin: 0;
     line-height: 1.5;
-}
-
-.error-btn {
-    background-color: #ef4444;
-    color: #ffffff;
-    border: none;
-    padding: 12px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    margin-top: 8px;
-    min-width: 80px;
-}
-
-.error-btn:hover {
-    background-color: #dc2626;
-    transform: translateY(-1px);
-}
-
-.error-btn:active {
-    transform: translateY(0);
 }
 
 /* Match details modal */
@@ -627,32 +473,4 @@
     font-size: 14px;
     color: #ccc;
     line-height: 1.5;
-}
-
-.export-pdf-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    color: #475569;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.export-pdf-btn:hover {
-    background-color: #f1f5f9;
-    border-color: #cbd5e1;
-    color: #1e293b;
-}
-
-/* Dark mode adjustment if needed */
-.dark .export-pdf-btn {
-    background-color: #1e293b;
-    border-color: #334155;
-    color: #f1f5f9;
 }

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dashboard } from './Dashboard';
 import { signInWithEmail } from '@/lib/authService';
+import { Button } from '@/components/ui/button';
 import './login/login.css';
 
 export default function Home() {
@@ -20,7 +21,7 @@ export default function Home() {
     e.preventDefault();
     setLoginLoading(true);
     setError('');
-    
+
     try {
       const { success, error: errorMsg } = await signInWithEmail(email, password);
 
@@ -95,9 +96,9 @@ export default function Home() {
           className="form-input"
           required
         />
-        <button type="submit" className="login-btn" disabled={loginLoading}>
+        <Button type="submit" variant="info" className="login-btn" disabled={loginLoading}>
           {loginLoading ? 'Logging in...' : 'Login'}
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { X } from "lucide-react";
 import clsx from "clsx";
+import { Button } from "./ui/button";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -57,15 +58,16 @@ export default function ConfirmModal({
   return (
     <div className={clsx("modal-overlay", overlayClassName)}>
       <div className={clsx("modal-container", containerClassName)}>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon"
           className={clsx("modal-close", closeButtonClassName)}
           onClick={handleClose}
           disabled={isLoading}
           aria-label="Close dialog"
         >
           <X />
-        </button>
+        </Button>
         <div className={clsx(contentClassName)}>
           {icon && (
             <div className={clsx(iconWrapperClassName)} aria-hidden="true">
@@ -75,22 +77,22 @@ export default function ConfirmModal({
           {title && <h2 className={clsx(titleClassName)}>{title}</h2>}
           <div className={clsx(messageClassName)}>{message}</div>
           <div className={clsx(actionsClassName)}>
-            <button
-              type="button"
+            <Button
+              variant="outline"
               className={clsx(cancelButtonClassName)}
               onClick={handleClose}
               disabled={isLoading}
             >
               {cancelLabel}
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="destructive"
               className={clsx(confirmButtonClassName)}
               onClick={onConfirm}
               disabled={isLoading}
             >
               {confirmLabel}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

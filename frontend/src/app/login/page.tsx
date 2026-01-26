@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { signInWithEmail } from '@/lib/authService';
+import { Button } from '@/components/ui/button';
 import './login.css';
 
 export default function LoginPage() {
@@ -17,7 +18,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     try {
       const { success, error: errorMsg } = await signInWithEmail(email, password);
 
@@ -65,9 +66,9 @@ export default function LoginPage() {
           className="form-input"
           required
         />
-        <button type="submit" className="login-btn" disabled={loading}>
+        <Button type="submit" variant="info" className="login-btn" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
-        </button>
+        </Button>
       </form>
     </div>
   );
