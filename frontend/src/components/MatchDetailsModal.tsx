@@ -465,7 +465,7 @@ export default function MatchDetailsModal({
                     <FileText size={18} />
                     Export Players
                   </Button>
-                  <Button className="add-player-btn" onClick={() => setShowAddPlayer((value) => !value)}>
+                  <Button variant="primary" onClick={() => setShowAddPlayer((value) => !value)}>
                     + Add Player
                   </Button>
                 </div>
@@ -537,7 +537,7 @@ export default function MatchDetailsModal({
                         className="form-input"
                       />
                       <Button
-                        className="create-player-btn"
+                        variant="success"
                         onClick={handleCreateAndAddPlayer}
                         disabled={!newPlayerName.trim()}
                       >
