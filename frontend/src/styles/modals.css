@@ -534,3 +534,38 @@
     color: #ccc;
     line-height: 1.5;
 }
+
+/* Modal close button - used across all modals */
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-close:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Delete modal close */
+.delete-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
