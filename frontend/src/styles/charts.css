@@ -102,13 +102,16 @@
 .chart-container {
     padding: 20px 24px 24px 24px;
     border-radius: 0 0 16px 16px;
+    min-height: 344px;
+    /* 300px chart + padding */
+    position: relative;
 }
 
 .chart-container.loading {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 300px;
+    min-height: 344px;
 }
 
 .loading-spinner {
@@ -145,7 +148,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 300px;
+    min-height: 344px;
 }
 
 .empty-state {
