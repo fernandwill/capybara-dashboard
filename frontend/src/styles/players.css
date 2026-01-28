@@ -254,7 +254,7 @@
 .status-btn,
 .payment-btn {
     padding: 3px 6px;
-    border-radius: 8px;
+    border-radius: 9999px;
     border: 1px solid var(--border-color);
     background-color: var(--card-bg);
     color: var(--text-color);
