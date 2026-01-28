@@ -64,38 +64,6 @@ export default function StatsChart() {
     authFetchMonthly();
   }, [selectedYear]);
 
-  if (loading) {
-    return (
-      <div className="monthly-stats-chart">
-        <div className="chart-header">
-          <h3>Monthly Statistics</h3>
-        </div>
-        <div className="chart-container loading">
-          <div className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-3" />
-            <p className="text-muted-foreground">Loading chart data...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="monthly-stats-chart">
-        <div className="chart-header">
-          <h3>Monthly Statistics</h3>
-        </div>
-        <div className="chart-container empty">
-          <div className="empty-state">
-            <p>No match data available yet</p>
-            <span>Create some matches to see statistics</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="monthly-stats-chart">
       <div className="chart-header">
@@ -126,36 +94,49 @@ export default function StatsChart() {
           </div>
         </div>
       </div>
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <XAxis
-              dataKey="month"
-              stroke="var(--text-color)"
-              fontSize={12}
-            />
-            <YAxis
-              stroke="var(--text-color)"
-              fontSize={12}
-              label={{
-                value: "Hours Played",
-                angle: -90,
-                position: "insideLeft",
-                style: { textAnchor: "middle", fill: "var(--text-color)", fontSize: "12px" }
-              }}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--card-bg)",
-                border: "1px solid var(--border-color)",
-                borderRadius: "8px",
-                color: "var(--text-color)"
-              }}
-            />
-            <Bar dataKey="count" fill="var(--primary-color)" name="Matches" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="totalHours" fill="var(--secondary-color)" name="Total Hours" radius={[4, 4, 0, 0]} />
-          </ComposedChart>
-        </ResponsiveContainer>
+
+      <div className={`chart-container ${loading ? "loading" : ""} ${!loading && data.length === 0 ? "empty" : ""}`}>
+        {loading ? (
+          <div className="loading-spinner">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            <span className="ml-2 text-muted-foreground">Loading chart data...</span>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="empty-state">
+            <p>No match data available yet</p>
+            <span>Create some matches to see statistics</span>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <ComposedChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <XAxis
+                dataKey="month"
+                stroke="var(--text-color)"
+                fontSize={12}
+              />
+              <YAxis
+                stroke="var(--text-color)"
+                fontSize={12}
+                label={{
+                  value: "Hours Played",
+                  angle: -90,
+                  position: "insideLeft",
+                  style: { textAnchor: "middle", fill: "var(--text-color)", fontSize: "12px" }
+                }}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--card-bg)",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "8px",
+                  color: "var(--text-color)"
+                }}
+              />
+              <Bar dataKey="count" fill="var(--primary-color)" name="Matches" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="totalHours" fill="var(--secondary-color)" name="Total Hours" radius={[4, 4, 0, 0]} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
