@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Match } from "@/types/types";
-import { Button } from "./ui/button";
+
 
 interface MatchData {
   title: string;
@@ -164,9 +164,9 @@ export default function NewMatchModal({
       <div className="modal-container">
         <div className="modal-header">
           <h2>{editingMatch ? "Edit Match" : "Create New Match"}</h2>
-          <Button variant="ghost" size="icon" className="modal-close" onClick={onClose} aria-label="Close match form">
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close match form">
             ×
-          </Button>
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -309,12 +309,12 @@ export default function NewMatchModal({
           </div>
 
           <div className="modal-actions">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <button type="button" className="btn-outline" onClick={onClose}>
               Cancel
-            </Button>
-            <Button type="submit">
+            </button>
+            <button type="submit" className="btn-primary">
               {editingMatch ? "Update" : "Create"}
-            </Button>
+            </button>
           </div>
         </form>
       </div>
