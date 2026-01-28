@@ -360,6 +360,55 @@ export default function MatchDetailsModal({
     }
   };
 
+  const handleMarkAllAsPaid = useCallback(async () => {
+    if (!matchId || players.length === 0) return;
+
+    const unpaidPlayers = players.filter((p) => p.paymentStatus === "BELUM_SETOR");
+    if (unpaidPlayers.length === 0) return;
+
+    const confirmUpdate = window.confirm(
+      `Mark all ${unpaidPlayers.length} unpaid players as SUDAH SETOR?`
+    );
+    if (!confirmUpdate) return;
+
+    try {
+      await Promise.all(
+        unpaidPlayers.map((player) =>
+          authFetch(`/api/matches/${matchId}/players/${player.id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ paymentStatus: "SUDAH_SETOR" }),
+          })
+        )
+      );
+
+      await fetchCurrentPlayers();
+      onMatchUpdate?.();
+    } catch (error) {
+      console.error("Error batch updating payment status:", error);
+      window.alert("Failed to update some players.");
+    }
+  }, [matchId, players, fetchCurrentPlayers, onMatchUpdate]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        handleMarkAllAsPaid();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, handleMarkAllAsPaid]);
+
   const availablePastPlayers = useMemo(
     () => pastPlayers.filter((pastPlayer) => !players.some((player) => player.id === pastPlayer.id)),
     [pastPlayers, players],
