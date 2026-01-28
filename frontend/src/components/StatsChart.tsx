@@ -98,7 +98,6 @@ export default function StatsChart() {
       <div className={`chart-container ${loading ? "loading" : ""} ${!loading && data.length === 0 ? "empty" : ""}`}>
         {loading ? (
           <div className="loading-spinner">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
             <span className="ml-2 text-muted-foreground">Loading chart data...</span>
           </div>
         ) : data.length === 0 ? (
