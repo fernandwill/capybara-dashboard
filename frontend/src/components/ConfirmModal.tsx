@@ -15,6 +15,7 @@ interface ConfirmModalProps {
   isLoading?: boolean;
   confirmLabel?: ReactNode;
   cancelLabel?: ReactNode;
+  confirmVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "primary" | "success" | "warning" | "info" | "premium" | "glass";
   overlayClassName?: string;
   containerClassName?: string;
   closeButtonClassName?: string;
@@ -37,6 +38,7 @@ export default function ConfirmModal({
   isLoading = false,
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
+  confirmVariant = "destructive",
   overlayClassName,
   containerClassName,
   closeButtonClassName,
@@ -86,7 +88,7 @@ export default function ConfirmModal({
               {cancelLabel}
             </Button>
             <Button
-              variant="destructive"
+              variant={confirmVariant}
               className={clsx(confirmButtonClassName)}
               onClick={onConfirm}
               disabled={isLoading}

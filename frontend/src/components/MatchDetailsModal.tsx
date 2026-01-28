@@ -124,6 +124,8 @@ export default function MatchDetailsModal({
     title: "",
     message: "",
   });
+  const [isMarkAllPaidConfirmOpen, setIsMarkAllPaidConfirmOpen] = useState(false);
+  const [isMarkingAllPaid, setIsMarkingAllPaid] = useState(false);
 
   const matchId = match?.id;
 
@@ -360,17 +362,25 @@ export default function MatchDetailsModal({
     }
   };
 
-  const handleMarkAllAsPaid = useCallback(async () => {
+  const handleRequestMarkAllPaid = useCallback(() => {
     if (!matchId || players.length === 0) return;
 
     const unpaidPlayers = players.filter((p) => p.paymentStatus === "BELUM_SETOR");
     if (unpaidPlayers.length === 0) return;
 
-    const confirmUpdate = window.confirm(
-      `Mark all ${unpaidPlayers.length} unpaid players as SUDAH SETOR?`
-    );
-    if (!confirmUpdate) return;
+    setIsMarkAllPaidConfirmOpen(true);
+  }, [matchId, players]);
 
+  const handleConfirmMarkAllPaid = useCallback(async () => {
+    if (!matchId || players.length === 0) return;
+
+    const unpaidPlayers = players.filter((p) => p.paymentStatus === "BELUM_SETOR");
+    if (unpaidPlayers.length === 0) {
+      setIsMarkAllPaidConfirmOpen(false);
+      return;
+    }
+
+    setIsMarkingAllPaid(true);
     try {
       await Promise.all(
         unpaidPlayers.map((player) =>
@@ -386,9 +396,12 @@ export default function MatchDetailsModal({
 
       await fetchCurrentPlayers();
       onMatchUpdate?.();
+      setIsMarkAllPaidConfirmOpen(false);
     } catch (error) {
       console.error("Error batch updating payment status:", error);
       window.alert("Failed to update some players.");
+    } finally {
+      setIsMarkingAllPaid(false);
     }
   }, [matchId, players, fetchCurrentPlayers, onMatchUpdate]);
 
@@ -396,7 +409,7 @@ export default function MatchDetailsModal({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.altKey && e.key.toLowerCase() === "s") {
         e.preventDefault();
-        handleMarkAllAsPaid();
+        handleRequestMarkAllPaid();
       }
     };
 
@@ -407,7 +420,7 @@ export default function MatchDetailsModal({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, handleMarkAllAsPaid]);
+  }, [isOpen, handleRequestMarkAllPaid]);
 
   const availablePastPlayers = useMemo(
     () => pastPlayers.filter((pastPlayer) => !players.some((player) => player.id === pastPlayer.id)),
@@ -685,6 +698,30 @@ export default function MatchDetailsModal({
         actionsClassName="delete-modal-actions"
         cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
         confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
+      />
+      <ConfirmModal
+        isOpen={isMarkAllPaidConfirmOpen}
+        onClose={() => setIsMarkAllPaidConfirmOpen(false)}
+        onConfirm={handleConfirmMarkAllPaid}
+        title="Confirm Batch Update"
+        message={
+          <p>
+            Mark all <strong>{players.filter((p) => p.paymentStatus === "BELUM_SETOR").length}</strong> unpaid players as <strong>SUDAH SETOR</strong>?
+          </p>
+        }
+        confirmLabel={
+          isMarkingAllPaid ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Updating...
+            </span>
+          ) : (
+            "Yes, Mark All Paid"
+          )
+        }
+        cancelLabel="Cancel"
+        isLoading={isMarkingAllPaid}
+        confirmVariant="success"
       />
       <ErrorModal
         isOpen={errorModal.isOpen}
