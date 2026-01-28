@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import { X } from "lucide-react";
 import clsx from "clsx";
-import { Button } from "./ui/button";
+
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -60,16 +60,15 @@ export default function ConfirmModal({
   return (
     <div className={clsx("modal-overlay", overlayClassName)}>
       <div className={clsx("modal-container", containerClassName)}>
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
+          type="button"
           className={clsx("modal-close", closeButtonClassName)}
           onClick={handleClose}
           disabled={isLoading}
           aria-label="Close dialog"
         >
           <X />
-        </Button>
+        </button>
         <div className={clsx(contentClassName)}>
           {icon && (
             <div className={clsx(iconWrapperClassName)} aria-hidden="true">
@@ -79,22 +78,22 @@ export default function ConfirmModal({
           {title && <h2 className={clsx(titleClassName)}>{title}</h2>}
           <div className={clsx(messageClassName)}>{message}</div>
           <div className={clsx(actionsClassName)}>
-            <Button
-              variant="outline"
-              className={clsx(cancelButtonClassName)}
+            <button
+              type="button"
+              className={clsx("btn-outline", cancelButtonClassName)}
               onClick={handleClose}
               disabled={isLoading}
             >
               {cancelLabel}
-            </Button>
-            <Button
-              variant={confirmVariant}
-              className={clsx(confirmButtonClassName)}
+            </button>
+            <button
+              type="button"
+              className={clsx(confirmVariant === "success" ? "btn-success" : "btn-primary", confirmButtonClassName)}
               onClick={onConfirm}
               disabled={isLoading}
             >
               {confirmLabel}
-            </Button>
+            </button>
           </div>
         </div>
       </div>
