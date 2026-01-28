@@ -16,6 +16,23 @@ const buttonVariants = cva(
                 // Custom variants used in the app
                 primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
                 success: "bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm",
+                warning: "bg-amber-500 text-white hover:bg-amber-600 shadow-sm",
+                info: "bg-sky-500 text-white hover:bg-sky-600 shadow-sm",
+                premium: "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white border-0 shadow-md hover:opacity-90",
+                glass: "bg-white/10 backdrop-blur-md border border-white/20 text-foreground hover:bg-white/20",
+            },
+            size: {
+                default: "h-9 px-6 py-2",
+                sm: "h-8 px-4 text-xs",
+                lg: "h-10 px-10",
+                icon: "h-9 w-9",
+            },
+        },
+        defaultVariants: {
+            variant: "default",
+            size: "default",
+        },
+    }
 )
 
 export interface ButtonProps
