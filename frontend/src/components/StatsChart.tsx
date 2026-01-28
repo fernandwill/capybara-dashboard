@@ -9,7 +9,7 @@ import {
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { authFetch } from "@/lib/authFetch";
-import { Button } from "./ui/button";
+
 
 interface ChartData {
   month: string;
@@ -71,15 +71,13 @@ export default function StatsChart() {
           <h3>Monthly Statistics</h3>
           <div className="year-selector">
             {availableYears.map((year) => (
-              <Button
+              <button
                 key={year}
-                variant={selectedYear === year ? "default" : "ghost"}
-                size="sm"
                 className={`year-btn ${selectedYear === year ? "active" : ""}`}
                 onClick={() => setSelectedYear(year)}
               >
                 {year}
-              </Button>
+              </button>
             ))}
           </div>
         </div>

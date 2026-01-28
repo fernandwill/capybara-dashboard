@@ -8,7 +8,6 @@ import ErrorModal from "../components/ErrorModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
 import DeleteMatchModal from "../components/DeleteMatchModal";
 import { Select } from "../components/ui/select";
-import { Button } from "../components/ui/button";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
@@ -289,7 +288,7 @@ export function Dashboard() {
           </div>
           <h1 className="dashboard-title">Capybara&apos;s Dashboard</h1>
           <div className="header-actions">
-            <Button variant="ghost" size="icon" className="theme-toggle" onClick={toggleTheme}>
+            <button type="button" className="theme-toggle" onClick={toggleTheme}>
               {isDarkMode ? (
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -299,10 +298,9 @@ export function Dashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
+            </button>
+            <button
+              type="button"
               className="logout-button"
               onClick={handleLogout}
               disabled={isLoggingOut}
@@ -314,7 +312,7 @@ export function Dashboard() {
               ) : (
                 <LogOut className="h-5 w-5" aria-hidden="true" />
               )}
-            </Button>
+            </button>
           </div>
         </div>
         <div className="header-desktop">
@@ -331,7 +329,7 @@ export function Dashboard() {
             Capybara&apos;s Dashboard
           </div>
           <div className="header-actions">
-            <Button variant="ghost" size="icon" className="theme-toggle" onClick={toggleTheme}>
+            <button type="button" className="theme-toggle" onClick={toggleTheme}>
               {isDarkMode ? (
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -341,10 +339,9 @@ export function Dashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
+            </button>
+            <button
+              type="button"
               className="logout-button"
               onClick={handleLogout}
               disabled={isLoggingOut}
@@ -356,7 +353,7 @@ export function Dashboard() {
               ) : (
                 <LogOut className="h-5 w-5" aria-hidden="true" />
               )}
-            </Button>
+            </button>
           </div>
         </div>
       </header>
@@ -481,10 +478,10 @@ export function Dashboard() {
             Past Matches
           </div>
         </div>
-        <Button variant="primary" onClick={handleNewMatch}>
+        <button type="button" className="btn-primary" onClick={handleNewMatch}>
           <span>+</span>
           New Match
-        </Button>
+        </button>
       </div>
 
       <div className="matches-container">
@@ -528,9 +525,8 @@ export function Dashboard() {
                     {match.status}
                   </span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <button
+                  type="button"
                   className="delete-btn"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -540,10 +536,9 @@ export function Dashboard() {
                   style={{ position: "absolute", top: "16px", right: "56px", zIndex: 10 }}
                 >
                   <Trash2 size={16} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
+                </button>
+                <button
+                  type="button"
                   className="edit-btn"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -555,7 +550,7 @@ export function Dashboard() {
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
-                </Button>
+                </button>
                 <div className="match-header">
                   <h3 className="match-title">{match.location} - {formatDate(match.date)}</h3>
                 </div>
@@ -605,28 +600,26 @@ export function Dashboard() {
         )}
         {totalPages > 1 && (
           <div className="pagination-container">
-            <Button
-              variant="outline"
-              size="icon"
+            <button
+              type="button"
               className="pagination-btn"
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
               <ChevronLeft size={20} />
-            </Button>
+            </button>
             <div className="pagination-info">
               <span className="pagination-page">Page {currentPage} of {totalPages}</span>
               <span className="pagination-range">Showing {startMatch} - {endMatch} of {filteredMatches.length}</span>
             </div>
-            <Button
-              variant="outline"
-              size="icon"
+            <button
+              type="button"
               className="pagination-btn"
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
             >
               <ChevronRight size={20} />
-            </Button>
+            </button>
           </div>
         )}
       </div>

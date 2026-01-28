@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, X, FileText } from "lucide-react";
-import { Button } from "./ui/button";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
 import { authFetch } from "@/lib/authFetch";
@@ -408,6 +407,7 @@ export default function MatchDetailsModal({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.altKey && e.key.toLowerCase() === "s") {
+        console.log("Alt+S pressed - triggering handleRequestMarkAllPaid");
         e.preventDefault();
         handleRequestMarkAllPaid();
       }
@@ -478,9 +478,9 @@ export default function MatchDetailsModal({
           <div className="modal-header">
             <h2>Match Details</h2>
             <div className="modal-header-actions">
-              <Button variant="ghost" size="icon" className="modal-close" onClick={onClose} aria-label="Close match details">
+              <button type="button" className="modal-close" onClick={onClose} aria-label="Close match details">
                 <X />
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -518,19 +518,19 @@ export default function MatchDetailsModal({
               <div className="players-header">
                 <h3>Players ({players.length})</h3>
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="export-pdf-btn"
+                  <button
+                    type="button"
+                    className="export-pdf-btn btn-outline"
                     onClick={() => exportPlayerList(match, players)}
                     title="Export Players to PDF"
                   >
                     <FileText size={18} />
                     Export Players
-                  </Button>
-                  <Button variant="primary" onClick={() => setShowAddPlayer((value) => !value)}>
+                  </button>
+                  <button type="button" className="btn-primary" onClick={() => setShowAddPlayer((value) => !value)}>
                     <span className="text-lg font-bold leading-none">+</span>
                     Add Player
-                  </Button>
+                  </button>
                 </div>
               </div>
 
@@ -561,15 +561,14 @@ export default function MatchDetailsModal({
                             <ul className="existing-player-options">
                               {filteredExistingPlayers.map((player) => (
                                 <li key={player.id}>
-                                  <Button
+                                  <button
                                     type="button"
-                                    variant="ghost"
                                     className="existing-player-option"
                                     onClick={() => handleAddPlayer(player.id)}
                                     aria-label={`Add ${player.name} to this match`}
                                   >
                                     {player.name}
-                                  </Button>
+                                  </button>
                                 </li>
                               ))}
                             </ul>
@@ -599,13 +598,14 @@ export default function MatchDetailsModal({
                         onChange={(event) => setNewPlayerName(event.target.value)}
                         className="form-input"
                       />
-                      <Button
-                        variant="success"
+                      <button
+                        type="button"
+                        className="btn-success"
                         onClick={handleCreateAndAddPlayer}
                         disabled={!newPlayerName.trim()}
                       >
                         Create and Add Player
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -623,36 +623,31 @@ export default function MatchDetailsModal({
                       <div key={player.id} className="player-card">
                         <div className="player-header">
                           <h4 className="player-name">{player.name}</h4>
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          <button
+                            type="button"
                             className="remove-player-btn"
                             onClick={() => handleRemovePlayer(player.id)}
                             title="Remove player"
                             aria-label={`Remove ${player.name} from this match`}
                           >
                             <X />
-                          </Button>
+                          </button>
                         </div>
                         <div className="player-status-controls">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className={`payment-btn ${player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"
-                              }`}
+                          <button
+                            type="button"
+                            className={`payment-btn ${player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"}`}
                             onClick={() => handleSetPaymentStatus(player.id, "BELUM_SETOR")}
                           >
                             BELUM SETOR
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className={`payment-btn ${player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"
-                              }`}
+                          </button>
+                          <button
+                            type="button"
+                            className={`payment-btn ${player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"}`}
                             onClick={() => handleSetPaymentStatus(player.id, "SUDAH_SETOR")}
                           >
                             SUDAH SETOR
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     ))

@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Button } from "./ui/button";
+
 
 type StatusVariant = "success" | "error";
 
@@ -92,13 +92,12 @@ export default function StatusModal({
           <div className={iconWrapper}>{icon}</div>
           <h2 className={titleClass}>{title}</h2>
           <p className={messageClass}>{message}</p>
-          <Button
-            variant={variant === "success" ? "success" : "destructive"}
+          <button
             className={button}
             onClick={onClose}
           >
             {buttonLabel}
-          </Button>
+          </button>
         </div>
       </div>
     </div>
