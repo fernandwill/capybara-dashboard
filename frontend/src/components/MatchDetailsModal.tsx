@@ -717,6 +717,14 @@ export default function MatchDetailsModal({
         cancelLabel="Cancel"
         isLoading={isMarkingAllPaid}
         confirmVariant="success"
+        containerClassName="delete-modal"
+        closeButtonClassName="delete-modal-close"
+        contentClassName="delete-modal-content"
+        titleClassName="delete-modal-title"
+        messageClassName="delete-modal-message"
+        actionsClassName="delete-modal-actions"
+        cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
+        confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
       />
       <ErrorModal
         isOpen={errorModal.isOpen}
