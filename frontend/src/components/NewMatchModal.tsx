@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Match } from "@/types/types";
+import { X } from "lucide-react";
 
 
 interface MatchData {
@@ -165,7 +166,7 @@ export default function NewMatchModal({
         <div className="modal-header">
           <h2>{editingMatch ? "Edit Match" : "Create New Match"}</h2>
           <button type="button" className="modal-close" onClick={onClose} aria-label="Close match form">
-            ×
+            <X />
           </button>
         </div>
 
