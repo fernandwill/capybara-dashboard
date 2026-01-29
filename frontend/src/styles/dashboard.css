@@ -55,10 +55,11 @@
     justify-content: center;
 }
 
+/* Header actions - increased gap for toggle/logout spacing */
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     flex-wrap: wrap;
 }
 
@@ -368,4 +369,107 @@
     border: 1px solid rgba(251, 191, 36, 0.2);
     min-width: 120px;
     text-align: center;
+}
+
+/* =============================================================================
+   ICON BUTTONS - Theme toggle, logout, edit, delete
+   ============================================================================= */
+
+/* Base icon button styles */
+.theme-toggle,
+.logout-button,
+.delete-btn,
+.edit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 9999px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease,
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.theme-toggle:hover,
+.edit-btn:hover {
+    background-color: var(--card-bg);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: scale(1.05);
+}
+
+/* Red hover for delete and logout */
+.delete-btn:hover,
+.logout-button:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    transform: scale(1.05);
+}
+
+.theme-toggle:active,
+.logout-button:active,
+.delete-btn:active,
+.edit-btn:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle:disabled,
+.logout-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Card edit/delete icons - hidden by default, show on hover */
+.delete-btn,
+.edit-btn {
+    width: 32px;
+    height: 32px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.match-card:hover .delete-btn,
+.match-card:hover .edit-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Pagination buttons - keep distinct style (not pill) */
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: var(--card-bg);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
