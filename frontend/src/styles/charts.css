@@ -114,34 +114,26 @@
     min-height: 344px;
 }
 
-.loading-spinner {
-    color: #888;
-    font-size: 16px;
+/* Skeleton Loader */
+.chart-skeleton {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 300px;
+    width: 100%;
+    padding: 0 10px;
+    gap: 12px;
 }
 
-.loading-spinner::before {
-    content: "";
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #888;
-    border-radius: 50%;
-    border-top-color: transparent;
-    animation: spin 1s linear infinite;
-    margin-right: 8px;
+.skeleton-bar {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px 4px 0 0;
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
+.dark .skeleton-bar {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .chart-container.empty {

@@ -41,6 +41,50 @@
     flex-direction: column;
 }
 
+/* Match Card Skeleton */
+.match-card-skeleton {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.match-skeleton-header {
+    width: 70%;
+    height: 18px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+.dark .match-skeleton-header {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.match-skeleton-line {
+    width: 100%;
+    height: 14px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.dark .match-skeleton-line {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.match-skeleton-line.short {
+    width: 60%;
+}
+
+.match-skeleton-line.medium {
+    width: 80%;
+}
+
 .match-card:hover {
     border-color: #555;
     transform: translateY(-1px);
