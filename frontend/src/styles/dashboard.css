@@ -208,50 +208,116 @@
     margin: 0;
 }
 
-/* Sort section - pill shaped dropdown */
-.sort-section-inline {
+/* Sort section - Modern Custom Dropdown */
+.sort-dropdown-container {
+    position: relative;
+    z-index: 50;
+}
+
+.sort-trigger {
     display: flex;
     align-items: center;
-    gap: 12px;
-}
-
-.sort-label {
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 9999px;
+    color: var(--text-color);
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-color);
-    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.sort-select-inline {
-    min-width: 180px;
-    padding: 8px 16px;
-    background-color: var(--card-bg);
+.sort-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+}
+
+.sort-trigger:active {
+    transform: translateY(0);
+}
+
+.sort-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow:
+        0 10px 25px -5px rgba(0, 0, 0, 0.1),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    animation: dropdownFadeIn 0.2s ease-out;
+    z-index: 100;
+}
+
+.dark .sort-menu {
+    background: rgba(26, 26, 26, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.3),
+        0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.sort-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
     color: var(--text-color);
     font-size: 13px;
     font-weight: 500;
+    text-align: left;
     cursor: pointer;
-    outline: none;
-    transition:
-        border-color 0.2s ease,
-        background-color 0.2s ease;
+    transition: all 0.15s ease;
 }
 
-.sort-select-inline:hover {
-    border-color: rgba(59, 130, 246, 0.4);
-    background-color: rgba(59, 130, 246, 0.05);
+.sort-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
 }
 
-.sort-select-inline:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+.sort-item.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
 }
 
-.sort-select-inline option {
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    padding: 8px;
+.sort-item svg {
+    color: #3b82f6;
+}
+
+/* Click outside backdrop */
+.dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
 }
 
 /* Footer */
