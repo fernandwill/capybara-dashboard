@@ -35,8 +35,8 @@ export function Dashboard() {
   const { setUser } = useAuth();
 
   // Data hooks
-  const { stats, fetchStats } = useStats();
-  const { matches, fetchMatches, autoUpdateMatches, deleteMatch } = useMatches();
+  const { stats, fetchStats, isLoading: isStatsLoading } = useStats();
+  const { matches, fetchMatches, autoUpdateMatches, deleteMatch, isLoading: isMatchesLoading } = useMatches();
 
   // UI state
   const [activeTab, setActiveTab] = useState<"upcoming" | "completed">("upcoming");
@@ -370,7 +370,13 @@ export function Dashboard() {
         </div>
       </header>
 
-      {closestMatch && (
+      {isMatchesLoading ? (
+        <div className="upcoming-banner-skeleton">
+          <div className="banner-skeleton-title" />
+          <div className="banner-skeleton-name" />
+          <div className="banner-skeleton-meta" />
+        </div>
+      ) : closestMatch && (
         <div className="upcoming-match-banner">
           <div className="upcoming-match-content">
             <div className="upcoming-match-header">
@@ -418,45 +424,58 @@ export function Dashboard() {
       <StatsChart />
 
       <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Total Matches</span>
-            <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.totalMatches}</div>
-        </div>
+        {isStatsLoading ? (
+          <>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="stat-card-skeleton">
+                <div className="stat-skeleton-title" />
+                <div className="stat-skeleton-value" />
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            <div className="stat-card">
+              <div className="stat-card-header">
+                <span className="stat-card-title">Total Matches</span>
+                <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div className="stat-card-value">{stats.totalMatches}</div>
+            </div>
 
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Upcoming Matches</span>
-            <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.upcomingMatches}</div>
-        </div>
+            <div className="stat-card">
+              <div className="stat-card-header">
+                <span className="stat-card-title">Upcoming Matches</span>
+                <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="stat-card-value">{stats.upcomingMatches}</div>
+            </div>
 
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Completed Matches</span>
-            <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.completedMatches}</div>
-        </div>
+            <div className="stat-card">
+              <div className="stat-card-header">
+                <span className="stat-card-title">Completed Matches</span>
+                <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="stat-card-value">{stats.completedMatches}</div>
+            </div>
 
-        <div className="stat-card">
-          <div className="stat-card-header">
-            <span className="stat-card-title">Hours Played</span>
-            <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="stat-card-value">{stats.hoursPlayed}</div>
-        </div>
+            <div className="stat-card">
+              <div className="stat-card-header">
+                <span className="stat-card-title">Hours Played</span>
+                <svg className="stat-card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="stat-card-value">{stats.hoursPlayed}</div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="tabs-section">
@@ -537,7 +556,21 @@ export function Dashboard() {
           </div>
         )}
 
-        {filteredMatches.length === 0 ? (
+        {isMatchesLoading ? (
+          <div className="matches-list">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="match-card-skeleton">
+                <div className="match-skeleton-header" />
+                <div className="match-skeleton-line" />
+                <div className="match-skeleton-line medium" />
+                <div className="match-skeleton-line short" />
+                <div style={{ marginTop: 'auto' }}>
+                  <div className="match-skeleton-line short" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredMatches.length === 0 ? (
           <div className="no-matches">
             {activeTab === "upcoming" ? "No upcoming matches found" : "No past matches found"}
           </div>
