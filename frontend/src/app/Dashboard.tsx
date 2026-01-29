@@ -409,7 +409,14 @@ export function Dashboard() {
                 <div className="match-meta-hero">
                   <div className="meta-pill-glass">
                     <Clock size={16} />
-                    <span>{formatTimeWithDuration(closestMatch.time)}</span>
+                    <div className="flex flex-col leading-tight">
+                      <span>{formatTimeWithDuration(closestMatch.time).split(" (")[0]}</span>
+                      {formatTimeWithDuration(closestMatch.time).includes(" (") && (
+                        <span className="text-[11px] opacity-70">
+                          ({formatTimeWithDuration(closestMatch.time).split(" (")[1]}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="meta-pill-glass">
                     <Hash size={16} />
@@ -636,7 +643,14 @@ export function Dashboard() {
                 <div className="match-info-grid">
                   <div className="info-item">
                     <Clock size={14} />
-                    <span>{formatTimeWithDuration(match.time)}</span>
+                    <div className="flex flex-col leading-tight">
+                      <span>{formatTimeWithDuration(match.time).split(" (")[0]}</span>
+                      {formatTimeWithDuration(match.time).includes(" (") && (
+                        <span className="text-[11px] opacity-70">
+                          ({formatTimeWithDuration(match.time).split(" (")[1]}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="info-item">
                     <Hash size={14} />
@@ -645,10 +659,6 @@ export function Dashboard() {
                   <div className="info-item">
                     <Users size={14} />
                     <span>{match.players?.length || 0} Players</span>
-                  </div>
-                  <div className="info-item">
-                    <Calendar size={14} />
-                    <span>{match.description?.includes("Week") ? match.description.split(" ")[1] : "Week -"}</span>
                   </div>
                 </div>
                 <div className="match-description">{match.description || ""}</div>
