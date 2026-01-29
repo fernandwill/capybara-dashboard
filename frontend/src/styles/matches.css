@@ -5,15 +5,18 @@
 
 .no-matches {
     text-align: center;
-    color: #666;
+    color: #64748b;
     font-size: 16px;
-    padding: 48px 24px;
+    padding: 64px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
 .matches-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
     padding: 0;
 }
 
@@ -29,278 +32,341 @@
     }
 }
 
-/* Match card */
+/* Match card - Modern Glassmorphism Design */
 .match-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    transition: all 0.2s ease;
-    height: 380px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 24px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    height: auto;
+    min-height: 360px;
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .match-card {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.match-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.match-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent 70%);
+    pointer-events: none;
+}
+
+.match-status-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    z-index: 1;
+}
+
+.match-header {
+    margin-bottom: 24px;
+    z-index: 1;
+}
+
+.match-date-hero {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.match-location-sub {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-top: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Info Grid */
+.match-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+    z-index: 1;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #cbd5e1;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info-item svg {
+    color: #3b82f6;
+    flex-shrink: 0;
+}
+
+/* Match description */
+.match-description {
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 3.2em;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    z-index: 1;
+}
+
+/* Match bottom section */
+.match-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 1;
+}
+
+.price-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.price-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.match-fee-modern {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+}
+
+.match-fee-modern.paid {
+    color: #4ade80;
+}
+
+.match-fee-modern.unpaid {
+    color: #f87171;
+}
+
+.payment-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.payment-status-pill.all-paid {
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.payment-status-pill.pending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+/* Status badges */
+.status-badge-modern {
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-badge-modern::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-badge-modern.upcoming {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-badge-modern.upcoming::before {
+    background: #3b82f6;
+    box-shadow: 0 0 10px #3b82f6;
+}
+
+.status-badge-modern.completed {
+    background: rgba(71, 85, 105, 0.1);
+    color: #94a3b8;
+    border: 1px solid rgba(71, 85, 105, 0.2);
+}
+
+.status-badge-modern.completed::before {
+    background: #94a3b8;
+}
+
+/* Action buttons */
+.card-actions {
+    display: flex;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.match-card:hover .card-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.action-btn-glass {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn-glass:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.action-btn-glass.delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
 }
 
 /* Match Card Skeleton */
 .match-card-skeleton {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    height: 380px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 24px;
+    height: 360px;
     display: flex;
     flex-direction: column;
     animation: pulse 1.5s ease-in-out infinite;
 }
 
 .match-skeleton-header {
-    width: 70%;
-    height: 18px;
-    background: rgba(0, 0, 0, 0.08);
-    border-radius: 4px;
-    margin-bottom: 16px;
-}
-
-.dark .match-skeleton-header {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.match-skeleton-line {
-    width: 100%;
-    height: 14px;
-    background: rgba(0, 0, 0, 0.06);
-    border-radius: 4px;
-    margin-bottom: 12px;
-}
-
-.dark .match-skeleton-line {
+    width: 100px;
+    height: 24px;
     background: rgba(255, 255, 255, 0.05);
+    border-radius: 9999px;
+    margin-bottom: 20px;
 }
 
-.match-skeleton-line.short {
-    width: 60%;
-}
-
-.match-skeleton-line.medium {
-    width: 80%;
-}
-
-.match-card:hover {
-    border-color: #555;
-    transform: translateY(-1px);
-}
-
-.match-status-top {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 12px;
-}
-
-.match-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.match-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-color);
-    margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    height: 2.8em;
-    line-height: 1.4;
-}
-
-.match-header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Match details */
-.match-details {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.match-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.match-location,
-.match-court,
-.match-players {
-    font-size: 14px;
-    color: #888;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.match-location {
-    font-weight: 600;
-}
-
-.match-players {
-    font-weight: 500;
-}
-
-.match-datetime {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-}
-
-.match-date {
-    font-size: 14px;
-    color: var(--text-color);
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.match-time {
-    font-size: 14px;
-    color: #888;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* Match description - fixed padding to prevent cutoff */
-.match-description {
-    margin-bottom: 16px;
+.match-skeleton-title {
+    width: 70%;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 8px;
-    font-size: 14px;
-    color: #ccc;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    min-height: 4.8em;
-    padding: 10px;
+    margin-bottom: 24px;
 }
 
-/* match-time and match-location in banner context */
-.upcoming-match-banner .match-time,
-.upcoming-match-banner .match-location,
-.upcoming-match-banner .match-court {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.9);
+.match-skeleton-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.match-skeleton-item {
+    height: 38px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+/* Pagination */
+.pagination-container {
     display: flex;
+    justify-content: center;
     align-items: center;
-    font-weight: 500;
+    gap: 24px;
+    margin-top: 48px;
+    padding: 24px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Match bottom section */
-.match-bottom {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: auto;
-}
-
-.match-price {
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.fee-section {
+.pagination-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 4px;
 }
 
-.match-status-price {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* Fee badges */
-.match-fee {
-    font-size: 16px;
-    font-weight: 600;
-    color: #4ade80;
-    background-color: rgba(74, 222, 128, 0.1);
-    padding: 4px 12px;
-    border-radius: 6px;
-}
-
-.match-fee.fee-paid {
-    color: #22c55e;
-    background-color: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.match-fee.fee-unpaid {
-    color: #ef4444;
-    background-color: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.pending-payment {
-    font-size: 12px;
-    color: #f59e0b;
-    background-color: rgba(245, 158, 11, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
-    border: 1px solid rgba(245, 158, 11, 0.2);
-    font-weight: 500;
-}
-
-/* Status badges */
-.status-badge {
-    padding: 3px 6px;
-    border-radius: 16px;
+.pagination-range {
     font-size: 11px;
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 1px;
+    color: #64748b;
+    font-weight: 700;
 }
 
-.status-badge.upcoming {
-    background-color: rgba(59, 130, 246, 0.1);
-    color: #3b82f6;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-.status-badge.completed {
-    background-color: rgba(34, 197, 94, 0.1);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-/* Clickable card styles */
-.clickable-card {
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.clickable-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    border-color: #555;
-}
-
-.clickable-card:active {
-    transform: translateY(0);
+.pagination-page {
+    font-size: 15px;
+    color: #fff;
+    font-weight: 700;
 }
 
 /* Payment filters */
@@ -308,71 +374,37 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .payment-filters {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .payment-filter {
-    padding: 4px 12px;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    background-color: var(--card-bg);
-    color: #888;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: #94a3b8;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .payment-filter:hover {
-    background-color: #444;
-    border-color: #555;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .payment-filter.active {
-    background-color: #3b82f6;
+    background: #3b82f6;
     border-color: #3b82f6;
     color: white;
-}
-
-.or-divider {
-    text-align: center;
-    margin: 16px 0;
-    color: #888;
-    font-weight: 600;
-}
-
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 32px;
-    padding: 20px 0;
-    border-top: 1px solid var(--border-color);
-}
-
-.pagination-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    min-width: 120px;
-}
-
-.pagination-range {
-    font-size: 12px;
-    color: #666;
-}
-
-.pagination-page {
-    font-size: 14px;
-    color: var(--text-color);
-    font-weight: 600;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
 }
