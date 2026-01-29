@@ -477,11 +477,9 @@ export default function MatchDetailsModal({
         <div className="match-details-modal">
           <div className="modal-header">
             <h2>Match Details</h2>
-            <div className="modal-header-actions">
-              <button type="button" className="modal-close" onClick={onClose} aria-label="Close match details">
-                <X />
-              </button>
-            </div>
+            <button type="button" className="modal-close" onClick={onClose} aria-label="Close match details">
+              <X />
+            </button>
           </div>
 
           <div className="match-details-content">

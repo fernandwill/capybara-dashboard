@@ -124,13 +124,14 @@
 
 .search-input {
     width: 100%;
-    padding: 16px 20px;
+    padding: 12px 16px;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 10px;
     color: var(--text-color);
-    font-size: 16px;
+    font-size: 14px;
     outline: none;
+    transition: border-color 0.2s ease;
 }
 
 .search-input::placeholder {
@@ -138,7 +139,7 @@
 }
 
 .search-input:focus {
-    border-color: #555;
+    border-color: rgba(59, 130, 246, 0.5);
 }
 
 /* Tabs */
@@ -204,7 +205,7 @@
     margin: 0;
 }
 
-/* Sort section */
+/* Sort section - pill shaped dropdown */
 .sort-section-inline {
     display: flex;
     align-items: center;
@@ -220,25 +221,32 @@
 
 .sort-select-inline {
     min-width: 180px;
-    padding: 8px 12px;
+    padding: 8px 16px;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 9999px;
     color: var(--text-color);
     font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     outline: none;
-    transition: border-color 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.sort-select-inline:hover {
+    border-color: rgba(59, 130, 246, 0.3);
 }
 
 .sort-select-inline:focus {
-    border-color: #555;
+    border-color: rgba(59, 130, 246, 0.5);
 }
 
 .sort-select-inline option {
     background-color: var(--card-bg);
     color: var(--text-color);
-    padding: 6px;
+    padding: 8px;
 }
 
 /* Footer */
