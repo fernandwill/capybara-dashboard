@@ -10,7 +10,23 @@ import DeleteMatchModal from "../components/DeleteMatchModal";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
-import { Loader2, LogOut, Trash2, ChevronLeft, ChevronRight, Check, ChevronDown } from "lucide-react";
+import {
+  Loader2,
+  LogOut,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  ChevronDown,
+  Calendar,
+  MapPin,
+  Clock,
+  Hash,
+  Users,
+  CheckCircle2,
+  AlertCircle,
+  Edit2
+} from "lucide-react";
 
 // Import shared types and utilities
 import { Match, SortOption, ModalState } from "@/types/types";
@@ -561,11 +577,12 @@ export function Dashboard() {
             {[...Array(6)].map((_, i) => (
               <div key={i} className="match-card-skeleton">
                 <div className="match-skeleton-header" />
-                <div className="match-skeleton-line" />
-                <div className="match-skeleton-line medium" />
-                <div className="match-skeleton-line short" />
-                <div style={{ marginTop: 'auto' }}>
-                  <div className="match-skeleton-line short" />
+                <div className="match-skeleton-title" />
+                <div className="match-skeleton-grid">
+                  <div className="match-skeleton-item" />
+                  <div className="match-skeleton-item" />
+                  <div className="match-skeleton-item" />
+                  <div className="match-skeleton-item" />
                 </div>
               </div>
             ))}
@@ -581,81 +598,82 @@ export function Dashboard() {
                 key={match.id}
                 className="match-card clickable-card"
                 onClick={() => handleMatchClick(match)}
-                style={{ position: "relative" }}
               >
                 <div className="match-status-top">
-                  <span className={`status-badge ${match.status.toLowerCase()}`}>
+                  <span className={`status-badge-modern ${match.status.toLowerCase()}`}>
                     {match.status}
                   </span>
+                  <div className="card-actions">
+                    <button
+                      type="button"
+                      className="action-btn-glass"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditMatch(match);
+                      }}
+                      title="Edit match"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="action-btn-glass delete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRequestDeleteMatch(match);
+                      }}
+                      title="Delete match"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  className="delete-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRequestDeleteMatch(match);
-                  }}
-                  title="Delete match"
-                  style={{ position: "absolute", top: "16px", right: "56px", zIndex: 10 }}
-                >
-                  <Trash2 size={16} />
-                </button>
-                <button
-                  type="button"
-                  className="edit-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditMatch(match);
-                  }}
-                  title="Edit match"
-                  style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
+
                 <div className="match-header">
-                  <h3 className="match-title">{match.location} - {formatDate(match.date)}</h3>
+                  <h3 className="match-date-hero">{formatDate(match.date)}</h3>
+                  <div className="match-location-sub">
+                    <MapPin size={14} />
+                    {match.location}
+                  </div>
                 </div>
-                <div className="match-details">
-                  <div className="match-info">
-                    <span className="match-time">
-                      <svg className="h-4 w-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {formatTimeWithDuration(match.time)}
-                    </span>
-                    <span className="match-court">
-                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="4" x2="20" y1="9" y2="9" />
-                        <line x1="4" x2="20" y1="15" y2="15" />
-                        <line x1="10" x2="8" y1="3" y2="21" />
-                        <line x1="16" x2="14" y1="3" y2="21" />
-                      </svg>
-                      Court {match.courtNumber}
-                    </span>
-                    <span className="match-players">
-                      <svg className="h-4 w-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      Players: {match.players?.length || 0}
-                    </span>
+                <div className="match-info-grid">
+                  <div className="info-item">
+                    <Clock size={14} />
+                    <span>{formatTimeWithDuration(match.time)}</span>
+                  </div>
+                  <div className="info-item">
+                    <Hash size={14} />
+                    <span>Court {match.courtNumber}</span>
+                  </div>
+                  <div className="info-item">
+                    <Users size={14} />
+                    <span>{match.players?.length || 0} Players</span>
+                  </div>
+                  <div className="info-item">
+                    <Calendar size={14} />
+                    <span>{match.description?.includes("Week") ? match.description.split(" ")[1] : "Week -"}</span>
                   </div>
                 </div>
                 <div className="match-description">{match.description || ""}</div>
                 <div className="match-bottom">
-                  <div className="match-price">
-                    <div className="fee-section">
-                      <span className={`match-fee ${areAllPlayersPaid(match) ? "fee-paid" : "fee-unpaid"}`}>
-                        {formatCurrency(match.fee)}
-                      </span>
-                      {getPendingPaymentCount(match) > 0 && (
-                        <span className="pending-payment">
-                          Pending payment: {getPendingPaymentCount(match)} player{getPendingPaymentCount(match) > 1 ? "s" : ""}
-                        </span>
-                      )}
-                    </div>
+                  <div className="price-container">
+                    <span className="price-label">Total Fee</span>
+                    <span className={`match-fee-modern ${areAllPlayersPaid(match) ? "paid" : "unpaid"}`}>
+                      {formatCurrency(match.fee)}
+                    </span>
                   </div>
+
+                  {areAllPlayersPaid(match) ? (
+                    <div className="payment-status-pill all-paid">
+                      <CheckCircle2 size={14} />
+                      <span>All Paid</span>
+                    </div>
+                  ) : (
+                    <div className="payment-status-pill pending">
+                      <AlertCircle size={14} />
+                      <span>{getPendingPaymentCount(match)} Pending</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
