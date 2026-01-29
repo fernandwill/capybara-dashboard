@@ -135,19 +135,20 @@
     gap: 6px;
 }
 
+/* Match description - fixed padding to prevent cutoff */
 .match-description {
     margin-bottom: 16px;
     border-radius: 8px;
     font-size: 14px;
     color: #ccc;
-    line-height: 1.5;
+    line-height: 1.6;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 4.5em;
-    padding: 8px;
+    min-height: 4.8em;
+    padding: 10px;
 }
 
 /* match-time and match-location in banner context */
