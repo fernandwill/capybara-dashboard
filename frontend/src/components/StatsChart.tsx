@@ -7,7 +7,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
 import { authFetch } from "@/lib/authFetch";
 
 
@@ -95,8 +94,17 @@ export default function StatsChart() {
 
       <div className={`chart-container ${loading ? "loading" : ""} ${!loading && data.length === 0 ? "empty" : ""}`}>
         {loading ? (
-          <div className="loading-spinner">
-            <span className="ml-2 text-muted-foreground">Loading chart data...</span>
+          <div className="chart-skeleton">
+            {[60, 75, 45, 80, 50, 65, 90, 55, 70, 85, 60, 75].map((height, i) => (
+              <div
+                key={i}
+                className="skeleton-bar"
+                style={{
+                  height: `${height}%`,
+                  animationDelay: `${i * 0.1}s`
+                }}
+              />
+            ))}
           </div>
         ) : data.length === 0 ? (
           <div className="empty-state">
