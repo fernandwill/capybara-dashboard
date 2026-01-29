@@ -142,7 +142,7 @@
     border-color: rgba(59, 130, 246, 0.5);
 }
 
-/* Tabs */
+/* Tabs - with smooth transitions */
 .tabs-section {
     display: flex;
     align-items: center;
@@ -162,7 +162,10 @@
     border-bottom: 2px solid transparent;
     font-weight: 500;
     font-size: 16px;
-    transition: all 0.2s ease;
+    transition:
+        color 0.25s ease,
+        border-color 0.25s ease;
+    position: relative;
 }
 
 .tab.active {
