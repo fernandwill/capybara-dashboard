@@ -475,15 +475,17 @@ export function Dashboard() {
       </div>
 
       <div className="matches-container">
-        <div className="search-section">
-          <input
-            type="text"
-            placeholder="Search matches by title or location..."
-            className="search-input"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        {filterMatches(matches, activeTab === "upcoming" ? "upcoming" : "completed", "").length > 0 && (
+          <div className="search-section">
+            <input
+              type="text"
+              placeholder="Search matches by title or location..."
+              className="search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        )}
         {filteredMatches.length > 0 && (
           <div className="matches-header">
             <h3 className="matches-title">Matches List</h3>
