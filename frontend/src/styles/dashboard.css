@@ -227,7 +227,7 @@
     padding: 8px 16px;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 9999px;
+    border-radius: 12px;
     color: var(--text-color);
     font-size: 13px;
     font-weight: 500;
@@ -239,11 +239,13 @@
 }
 
 .sort-select-inline:hover {
-    border-color: rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.4);
+    background-color: rgba(59, 130, 246, 0.05);
 }
 
 .sort-select-inline:focus {
-    border-color: rgba(59, 130, 246, 0.5);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .sort-select-inline option {
