@@ -7,11 +7,10 @@ import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import MatchDetailsModal from "../components/MatchDetailsModal";
 import DeleteMatchModal from "../components/DeleteMatchModal";
-import { Select } from "../components/ui/select";
 import Image from "next/image";
 import StatsChart from "../components/StatsChart";
 import { signOut } from "@/lib/authService";
-import { Loader2, LogOut, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, LogOut, Trash2, ChevronLeft, ChevronRight, Check, ChevronDown } from "lucide-react";
 
 // Import shared types and utilities
 import { Match, SortOption, ModalState } from "@/types/types";
@@ -43,6 +42,7 @@ export function Dashboard() {
   const [activeTab, setActiveTab] = useState<"upcoming" | "completed">("upcoming");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("date-earliest");
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const MATCHES_PER_PAGE = 6;
@@ -58,6 +58,18 @@ export function Dashboard() {
   // Loading states
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isDeletingMatch, setIsDeletingMatch] = useState(false);
+
+  // Sort options
+  const sortOptions: { value: SortOption; label: string }[] = [
+    { value: "date-earliest", label: "Date: Earliest to Latest" },
+    { value: "date-latest", label: "Date: Latest to Earliest" },
+    { value: "fee-low", label: "Fee: Low to High" },
+    { value: "fee-high", label: "Fee: High to Low" },
+  ];
+
+  const getSortLabel = (value: SortOption) => {
+    return sortOptions.find((opt) => opt.value === value)?.label || value;
+  };
 
   // Feedback modals
   const [successModal, setSuccessModal] = useState<ModalState>({
@@ -489,21 +501,38 @@ export function Dashboard() {
         {filteredMatches.length > 0 && (
           <div className="matches-header">
             <h3 className="matches-title">Matches List</h3>
-            <div className="sort-section-inline">
-              <label htmlFor="sort-select" className="sort-label">
-                Sort by:
-              </label>
-              <Select
-                id="sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="sort-select-inline"
+            <div className="sort-dropdown-container">
+              <button
+                type="button"
+                className="sort-trigger"
+                onClick={() => setIsSortOpen(!isSortOpen)}
               >
-                <option value="date-earliest">Date: Earliest to Latest</option>
-                <option value="date-latest">Date: Latest to Earliest</option>
-                <option value="fee-low">Fee: Low to High</option>
-                <option value="fee-high">Fee: High to Low</option>
-              </Select>
+                <span>{getSortLabel(sortBy)}</span>
+                <ChevronDown size={16} className={`transition-transform duration-200 ${isSortOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {isSortOpen && (
+                <>
+                  <div className="dropdown-backdrop" onClick={() => setIsSortOpen(false)} />
+                  <div className="sort-menu">
+                    {sortOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={`sort-item ${sortBy === option.value ? "active" : ""}`}
+                        onClick={() => {
+                          setSortBy(option.value);
+                          setIsSortOpen(false);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        {option.label}
+                        {sortBy === option.value && <Check size={14} />}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
