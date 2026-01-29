@@ -287,27 +287,29 @@ export default function NewMatchModal({
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="players-grid">Initial Players</label>
-            <div id="players-grid" className="players-selection-grid">
-              {isLoadingPlayers ? (
-                <div className="loading-players">Loading players...</div>
-              ) : availablePlayers.length === 0 ? (
-                <div className="no-players">No players found.</div>
-              ) : (
-                availablePlayers.map((player) => (
-                  <label key={player.id} className="player-checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={formData.playerIds.includes(player.id)}
-                      onChange={() => handlePlayerToggle(player.id)}
-                    />
-                    <span>{player.name}</span>
-                  </label>
-                ))
-              )}
+          {editingMatch?.status?.toUpperCase() !== "COMPLETED" && (
+            <div className="form-group">
+              <label htmlFor="players-grid">Initial Players</label>
+              <div id="players-grid" className="players-selection-grid">
+                {isLoadingPlayers ? (
+                  <div className="loading-players">Loading players...</div>
+                ) : availablePlayers.length === 0 ? (
+                  <div className="no-players">No players found.</div>
+                ) : (
+                  availablePlayers.map((player) => (
+                    <label key={player.id} className="player-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={formData.playerIds.includes(player.id)}
+                        onChange={() => handlePlayerToggle(player.id)}
+                      />
+                      <span>{player.name}</span>
+                    </label>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="modal-actions">
             <button type="button" className="btn-outline" onClick={onClose}>
