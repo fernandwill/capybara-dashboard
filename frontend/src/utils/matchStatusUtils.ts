@@ -5,6 +5,11 @@ import prisma from "@/lib/database";
 import { logger } from "@/lib/logger";
 
 type MatchStatus = "UPCOMING" | "COMPLETED";
+type MatchStatusUpdateCandidate = {
+    id: string;
+    date: Date;
+    time: string;
+};
 
 /**
  * Parses end time from a time range string like "18:00-20:00"
@@ -64,6 +69,35 @@ export function determineMatchStatus(
 }
 
 /**
+ * Returns upcoming match IDs whose end time has already passed.
+ */
+export function getMatchIdsToComplete(
+    matches: MatchStatusUpdateCandidate[],
+    now: Date = new Date()
+): string[] {
+    const matchIdsToComplete: string[] = [];
+
+    for (const match of matches) {
+        const endTimeParts = parseEndTime(match.time);
+
+        if (!endTimeParts) {
+            logger.warn(`Invalid time format for match ${match.id}: ${match.time}`);
+            continue;
+        }
+
+        const [endHour, endMin] = endTimeParts;
+        const matchEndDate = new Date(match.date);
+        matchEndDate.setHours(endHour, endMin, 0, 0);
+
+        if (matchEndDate < now) {
+            matchIdsToComplete.push(match.id);
+        }
+    }
+
+    return matchIdsToComplete;
+}
+
+/**
  * Batch updates all matches that should be marked as COMPLETED.
  * Checks upcoming matches where the end time has passed.
  * Returns the count of updated matches.
@@ -71,7 +105,6 @@ export function determineMatchStatus(
 export async function updateMatchStatuses(): Promise<number> {
     try {
         const now = new Date();
-        let updatedCount = 0;
 
         const upcomingMatches = await prisma.match.findMany({
             where: {
@@ -84,34 +117,33 @@ export async function updateMatchStatuses(): Promise<number> {
                 id: true,
                 date: true,
                 time: true,
-                title: true,
             },
         });
 
-        for (const match of upcomingMatches) {
-            const endTimeParts = parseEndTime(match.time);
+        const matchIdsToComplete = getMatchIdsToComplete(upcomingMatches, now);
 
-            if (!endTimeParts) {
-                logger.warn(`Invalid time format for match ${match.id}: ${match.time}`);
-                continue;
-            }
-
-            const [endHour, endMin] = endTimeParts;
-            const matchEndDate = new Date(match.date);
-            matchEndDate.setHours(endHour, endMin, 0, 0);
-
-            if (matchEndDate < now) {
-                await prisma.match.update({
-                    where: { id: match.id },
-                    data: { status: "COMPLETED" },
-                });
-
-                logger.info(`Auto-completed match: ${match.title} (${match.id})`);
-                updatedCount++;
-            }
+        if (matchIdsToComplete.length === 0) {
+            return 0;
         }
 
-        return updatedCount;
+        const result = await prisma.match.updateMany({
+            where: {
+                id: {
+                    in: matchIdsToComplete,
+                },
+                status: "UPCOMING",
+            },
+            data: {
+                status: "COMPLETED",
+            },
+        });
+
+        logger.info("Auto-completed matches.", {
+            attemptedCount: matchIdsToComplete.length,
+            updatedCount: result.count,
+        });
+
+        return result.count;
     } catch (error) {
         logger.error("Error updating match statuses", error);
         throw error;

@@ -20,7 +20,6 @@ interface UseMatchesReturn {
     isLoading: boolean;
     error: string | null;
     fetchMatches: () => Promise<void>;
-    autoUpdateMatches: () => Promise<void>;
     createMatch: (data: MatchFormData) => Promise<boolean>;
     updateMatch: (id: string, data: MatchFormData) => Promise<boolean>;
     deleteMatch: (id: string) => Promise<boolean>;
@@ -50,23 +49,6 @@ export function useMatches(): UseMatchesReturn {
             setIsLoading(false);
         }
     }, []);
-
-    const autoUpdateMatches = useCallback(async () => {
-        try {
-            const response = await authFetch("/api/matches/auto-update", {
-                method: "POST",
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            // Silently refresh after auto-update
-            await fetchMatches();
-        } catch (err) {
-            console.error("Error auto-updating matches:", err);
-        }
-    }, [fetchMatches]);
 
     const createMatch = useCallback(async (data: MatchFormData): Promise<boolean> => {
         try {
@@ -130,7 +112,6 @@ export function useMatches(): UseMatchesReturn {
         isLoading,
         error,
         fetchMatches,
-        autoUpdateMatches,
         createMatch,
         updateMatch,
         deleteMatch,
