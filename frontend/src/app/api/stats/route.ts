@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
-import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
+import { requireAdminUser } from '@/lib/apiAuth';
 
 // Add interface for match type
 interface MatchWithTime {
@@ -8,9 +8,9 @@ interface MatchWithTime {
 }
 
 export async function GET() {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return unauthorizedResponse();
+  const auth = await requireAdminUser();
+  if (!auth.ok) {
+    return auth.response;
   }
 
   try {

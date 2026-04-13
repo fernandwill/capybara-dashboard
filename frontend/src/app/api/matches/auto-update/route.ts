@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
+import { requireAdminUser } from '@/lib/apiAuth';
 import { updateMatchStatuses } from '@/utils/matchStatusUtils';
 
 export async function POST() {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return unauthorizedResponse();
+  const auth = await requireAdminUser();
+  if (!auth.ok) {
+    return auth.response;
   }
 
   try {
