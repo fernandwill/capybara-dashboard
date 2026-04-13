@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
 import { getCurrentUser } from "@/lib/authService"
+import { isAdminUser } from "@/lib/supabaseAuth"
 import { supabase } from "@/lib/supabaseClient"
 import { User } from "@supabase/supabase-js"
 
@@ -35,6 +36,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        if (session?.user && !isAdminUser(session.user)) {
+          setUser(null)
+          setLoading(false)
+          void supabase.auth.signOut()
+          return
+        }
+
         setUser(session?.user || null)
         setLoading(false)
       }
@@ -58,12 +66,4 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider")
   }
   return context
-}
-
-if (typeof window !== "undefined") {
-  Object.keys(localStorage).forEach(key => {
-    if (key.startsWith("sb-")) {
-      localStorage.removeItem(key)
-    }
-  });
 }

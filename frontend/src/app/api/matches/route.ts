@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/database';
-import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/apiAuth';
+import { requireAdminUser } from '@/lib/apiAuth';
 import { determineMatchStatus } from '@/utils/matchStatusUtils';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
 
 export async function GET() {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return unauthorizedResponse();
+  const auth = await requireAdminUser();
+  if (!auth.ok) {
+    return auth.response;
   }
 
   try {
@@ -32,9 +32,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return unauthorizedResponse();
+  const auth = await requireAdminUser();
+  if (!auth.ok) {
+    return auth.response;
   }
 
   try {

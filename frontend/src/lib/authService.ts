@@ -1,5 +1,8 @@
 import { supabase } from '@/lib/supabaseClient'
+import { isAdminUser } from '@/lib/supabaseAuth'
 import { AuthResponse, UserResponse, AuthError } from '@supabase/supabase-js'
+
+const ADMIN_ACCESS_ERROR = 'You do not have admin access.'
 
 export async function signInWithEmail(email: string, password: string): Promise<{ success: boolean; data?: AuthResponse['data']; error?: string }> {
   try {
@@ -10,6 +13,11 @@ export async function signInWithEmail(email: string, password: string): Promise<
 
     if (error) {
       return { success: false, error: error.message }
+    }
+
+    if (!data.user || !isAdminUser(data.user)) {
+      await supabase.auth.signOut()
+      return { success: false, error: ADMIN_ACCESS_ERROR }
     }
 
     return { success: true, data }
@@ -40,6 +48,11 @@ export async function getCurrentUser(): Promise<{ success: boolean; data?: UserR
 
     if (error) {
       return { success: false, error: error.message }
+    }
+
+    if (data.user && !isAdminUser(data.user)) {
+      await supabase.auth.signOut()
+      return { success: false, error: ADMIN_ACCESS_ERROR }
     }
 
     return { success: true, data: data.user }
