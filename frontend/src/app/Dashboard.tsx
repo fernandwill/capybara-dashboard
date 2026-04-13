@@ -45,14 +45,14 @@ import { useMatches } from "@/hooks/useMatches";
 import { useCountdown } from "@/hooks/useCountdown";
 
 // Constants
-const AUTO_UPDATE_INTERVAL_MS = 60 * 1000;
+const BACKGROUND_REFRESH_INTERVAL_MS = 60 * 1000;
 
 export function Dashboard() {
   const { setUser } = useAuth();
 
   // Data hooks
   const { stats, fetchStats, isLoading: isStatsLoading } = useStats();
-  const { matches, fetchMatches, autoUpdateMatches, deleteMatch, isLoading: isMatchesLoading } = useMatches();
+  const { matches, fetchMatches, deleteMatch, isLoading: isMatchesLoading } = useMatches();
 
   // UI state
   const [activeTab, setActiveTab] = useState<"upcoming" | "completed">("upcoming");
@@ -113,19 +113,19 @@ export function Dashboard() {
   const startMatch = filteredMatches.length > 0 ? startIndex + 1 : 0;
   const endMatch = Math.min(currentPage * MATCHES_PER_PAGE, filteredMatches.length)
 
-  // Initial data fetch and auto-update interval
+  // Initial data fetch and read-only refresh interval
   useEffect(() => {
-    fetchStats();
-    fetchMatches();
-    autoUpdateMatches();
+    const refreshDashboardData = () => {
+      void fetchStats();
+      void fetchMatches();
+    };
 
-    const intervalId = setInterval(() => {
-      autoUpdateMatches();
-      fetchStats();
-    }, AUTO_UPDATE_INTERVAL_MS);
+    refreshDashboardData();
+
+    const intervalId = setInterval(refreshDashboardData, BACKGROUND_REFRESH_INTERVAL_MS);
 
     return () => clearInterval(intervalId);
-  }, [fetchStats, fetchMatches, autoUpdateMatches]);
+  }, [fetchStats, fetchMatches]);
 
   // Theme toggle
   const toggleTheme = () => {

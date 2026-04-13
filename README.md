@@ -255,9 +255,8 @@ DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 
-# Admin Credentials (Required)
-ADMIN_EMAIL="admin@example.com"
-ADMIN_PASSWORD_HASH="$2a$12$..."  # bcrypt hash
+# Vercel Cron (Required for automatic status updates in production)
+CRON_SECRET="use-a-random-16-plus-character-string"
 
 # Optional
 NODE_ENV="development"
@@ -269,9 +268,9 @@ NODE_ENV="development"
 
 ### Authentication
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/auth/login` | POST | Admin login, returns JWT |
+| Mechanism | Description |
+|----------|-------------|
+| Supabase JWT | Browser auth is handled by Supabase; admin access requires `app_metadata.role = "admin"` |
 
 ### Matches
 
@@ -286,7 +285,7 @@ NODE_ENV="development"
 | `/api/matches/[id]/players` | POST | Add player to match |
 | `/api/matches/[id]/players/[playerId]` | PUT | Update player status |
 | `/api/matches/[id]/players/[playerId]` | DELETE | Remove player |
-| `/api/matches/auto-update` | POST | Auto-complete past matches |
+| `/api/matches/auto-update` | GET | Vercel Cron route that batch-updates past matches |
 
 ### Players
 
@@ -338,9 +337,10 @@ npm run test:run
 ### Vercel (Recommended)
 
 1. Push to GitHub
-2. Import project in Vercel
-3. Add environment variables in Vercel dashboard
+2. Import the frontend app in Vercel, or set the project Root Directory to `frontend`
+3. Add environment variables in Vercel dashboard, including `CRON_SECRET`
 4. Deploy
+5. Ensure the cron schedule in `frontend/vercel.json` matches your Vercel plan limits
 
 ---
 
