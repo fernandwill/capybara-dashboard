@@ -1,0 +1,8 @@
+.agents
+.claude
+.copilot
+prod_issue.md
+
+backend/dist/
+backend/dist-ssr/
+*.tsbuildinfo
