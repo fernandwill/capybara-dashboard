@@ -340,7 +340,7 @@ npm run test:run
 2. Import the frontend app in Vercel, or set the project Root Directory to `frontend`
 3. Add environment variables in Vercel dashboard, including `CRON_SECRET`
 4. Deploy
-5. Ensure the cron schedule in `frontend/vercel.json` matches your Vercel plan limits
+5. On Vercel Hobby, keep the cron schedule at `0 17 * * *` so `/api/matches/auto-update` runs once per day at 24:00 WIB
 
 ---
 
