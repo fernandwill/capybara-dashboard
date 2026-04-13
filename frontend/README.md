@@ -134,12 +134,12 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 ### Authentication Flow
 
 ```
-1. User logs in via /api/auth/login
-2. Supabase returns JWT token
-3. Token stored in localStorage
-4. authFetch adds "Authorization: Bearer <token>" to requests
-5. API routes validate token via getAuthenticatedUser()
-6. Unauthorized requests return 401
+1. An administrator creates the user in Supabase Authentication
+2. The user signs in through the Supabase-backed login page
+3. Supabase returns a JWT token
+4. The token is stored in localStorage
+5. authFetch adds "Authorization: Bearer <token>" to requests
+6. API routes validate the session and require app_metadata.role = "admin" for admin access
 ```
 
 ---
