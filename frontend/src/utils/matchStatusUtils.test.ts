@@ -31,7 +31,8 @@ import { getMatchIdsToComplete, updateMatchStatuses } from "./matchStatusUtils";
 describe("getMatchIdsToComplete", () => {
     beforeEach(() => {
         vi.useFakeTimers();
-        vi.setSystemTime(new Date(2026, 3, 13, 21, 0, 0));
+        // 2026-04-13 21:00:00 WIB
+        vi.setSystemTime(new Date("2026-04-13T21:00:00+07:00"));
         warn.mockReset();
     });
 
@@ -40,7 +41,8 @@ describe("getMatchIdsToComplete", () => {
     });
 
     it("returns only IDs whose end time has passed", () => {
-        const today = new Date(2026, 3, 13, 0, 0, 0);
+        // Prisma stores dates as UTC (start of day)
+        const today = new Date("2026-04-13T00:00:00Z");
 
         const result = getMatchIdsToComplete([
             { id: "past", date: today, time: "18:00-20:00" },
@@ -56,7 +58,8 @@ describe("getMatchIdsToComplete", () => {
 describe("updateMatchStatuses", () => {
     beforeEach(() => {
         vi.useFakeTimers();
-        vi.setSystemTime(new Date(2026, 3, 13, 21, 0, 0));
+        // 2026-04-13 21:00:00 WIB
+        vi.setSystemTime(new Date("2026-04-13T21:00:00+07:00"));
         findMany.mockReset();
         updateMany.mockReset();
         info.mockReset();
@@ -69,8 +72,8 @@ describe("updateMatchStatuses", () => {
     });
 
     it("updates eligible matches in a single batch", async () => {
-        const now = new Date(2026, 3, 13, 21, 0, 0);
-        const today = new Date(2026, 3, 13, 0, 0, 0);
+        const now = new Date("2026-04-13T21:00:00+07:00");
+        const today = new Date("2026-04-13T00:00:00Z");
 
         findMany.mockResolvedValue([
             { id: "past", date: today, time: "18:00-20:00" },
@@ -112,11 +115,12 @@ describe("updateMatchStatuses", () => {
     });
 
     it("skips the batch write when nothing needs updating", async () => {
-        const today = new Date(2026, 3, 13, 0, 0, 0);
+        const today = new Date("2026-04-13T00:00:00Z");
 
         findMany.mockResolvedValue([
             { id: "future", date: today, time: "22:00-23:00" },
         ]);
+        updateMany.mockResolvedValue({ count: 0 });
 
         const updatedCount = await updateMatchStatuses();
 
