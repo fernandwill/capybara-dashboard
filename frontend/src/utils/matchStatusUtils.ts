@@ -54,8 +54,16 @@ export function determineMatchStatus(
         }
 
         const [endHour, endMin] = endTimeParts;
-        const matchEndDate = new Date(matchDate);
-        matchEndDate.setHours(endHour, endMin, 0, 0);
+        
+        // Construct the end time ISO string explicitly in WIB (UTC+7)
+        // matchDate is typically the start of the day in UTC from Prisma
+        const year = matchDate.getUTCFullYear();
+        const month = String(matchDate.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(matchDate.getUTCDate()).padStart(2, '0');
+        const hours = String(endHour).padStart(2, '0');
+        const minutes = String(endMin).padStart(2, '0');
+        
+        const matchEndDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00+07:00`);
 
         if (matchEndDate < now) {
             return "COMPLETED";
@@ -86,8 +94,15 @@ export function getMatchIdsToComplete(
         }
 
         const [endHour, endMin] = endTimeParts;
-        const matchEndDate = new Date(match.date);
-        matchEndDate.setHours(endHour, endMin, 0, 0);
+        const matchDate = new Date(match.date);
+        
+        const year = matchDate.getUTCFullYear();
+        const month = String(matchDate.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(matchDate.getUTCDate()).padStart(2, '0');
+        const hours = String(endHour).padStart(2, '0');
+        const minutes = String(endMin).padStart(2, '0');
+        
+        const matchEndDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00+07:00`);
 
         if (matchEndDate < now) {
             matchIdsToComplete.push(match.id);
@@ -138,12 +153,14 @@ export async function updateMatchStatuses(): Promise<number> {
             },
         });
 
+        const updatedCount = result?.count ?? 0;
+
         logger.info("Auto-completed matches.", {
             attemptedCount: matchIdsToComplete.length,
-            updatedCount: result.count,
+            updatedCount: updatedCount,
         });
 
-        return result.count;
+        return updatedCount;
     } catch (error) {
         logger.error("Error updating match statuses", error);
         throw error;

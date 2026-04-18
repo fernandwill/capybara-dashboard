@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
-import { determineMatchStatus } from '@/utils/matchStatusUtils';
+import { determineMatchStatus, updateMatchStatuses } from '@/utils/matchStatusUtils';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
 
@@ -12,6 +12,9 @@ export async function GET() {
   }
 
   try {
+    // Auto-update match statuses before fetching
+    await updateMatchStatuses();
+
     const matches = await prisma.match.findMany({
       include: {
         players: {
