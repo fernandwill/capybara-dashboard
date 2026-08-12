@@ -243,22 +243,25 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Environment Variables
 
-Create `.env.local` in the frontend directory:
+Create a single `.env.local` at the **repo root** — shared by both the frontend and the backend:
 
 ```env
-# Database (Required)
-DATABASE_URL="postgresql://user:pass@host:5432/dbname"
-
 # Supabase (Required)
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+
+# Database (Required)
+DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 
 # Vercel Cron (Required for automatic status updates in production)
 CRON_SECRET="use-a-random-16-plus-character-string"
 
 # Optional
-NODE_ENV="development"
+FRONTEND_URL="http://localhost:3000"
+PORT=8000
 ```
+
+Both apps load it automatically — the frontend via `next.config.ts`, the backend via `dotenv` — and the backend's `npm run db:*` scripts load it too.
 
 ---
 
