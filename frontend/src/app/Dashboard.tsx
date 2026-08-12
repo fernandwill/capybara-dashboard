@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock3, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,14 +9,13 @@ import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import DeleteMatchModal from "../components/DeleteMatchModal";
 import { signOut } from "@/lib/authService";
-import { authFetch } from "@/lib/authFetch";
-import { Match, ModalState, Player } from "@/types/types";
+import { Match, ModalState } from "@/types/types";
 import { sortMatches, getClosestUpcomingMatch } from "@/utils/matchUtils";
 import { useStats } from "@/hooks/useStats";
 import { useMatches } from "@/hooks/useMatches";
 import { useMonthlyStats } from "@/hooks/useMonthlyStats";
 import { useCountdown } from "@/hooks/useCountdown";
-import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
+import { usePlayers } from "@/hooks/usePlayers";
 import AppLayout from "../components/layout/AppLayout";
 import StatCard from "../components/dashboard/StatCard";
 import MonthlyActivityCard from "../components/dashboard/MonthlyActivityCard";
@@ -43,37 +42,24 @@ export function Dashboard() {
   const router = useRouter();
   const { setUser } = useAuth();
 
-  // Data hooks
-  const { stats, fetchStats, isLoading: isStatsLoading } = useStats();
+  // Data hooks — all SWR-backed and shared with the other pages via the
+  // global cache, so navigating here never refetches what's already loaded.
+  const { stats, isLoading: isStatsLoading } = useStats();
   const {
     matches,
-    fetchMatches,
     createMatch,
     updateMatch,
     deleteMatch,
     isLoading: isMatchesLoading,
   } = useMatches();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [players, setPlayers] = useState<Player[]>([]);
+  const { players } = usePlayers();
   const {
     monthlyData,
     availableYears,
     isLoading: isMonthlyLoading,
-    fetchMonthly,
     raw: rawMonthly,
   } = useMonthlyStats(selectedYear);
-
-  const fetchPlayers = useCallback(async () => {
-    try {
-      const res = await authFetch("/api/players");
-      if (res.ok) {
-        const data = await res.json();
-        setPlayers(data);
-      }
-    } catch (err) {
-      console.error("Error fetching players for insights:", err);
-    }
-  }, []);
 
   // UI state
   const [menu, setMenu] = useState<{ match: Match; x: number; y: number } | null>(null);
@@ -253,23 +239,6 @@ export function Dashboard() {
   useEffect(() => {
     document.documentElement.classList.add("dark");
   }, []);
-
-  const refreshDashboardData = useCallback(() => {
-    void fetchStats();
-    void fetchMatches();
-    void fetchMonthly();
-    void fetchPlayers();
-  }, [fetchStats, fetchMatches, fetchMonthly, fetchPlayers]);
-
-  // Push-based real-time refresh via Supabase Postgres Changes.
-  // Any row change in matches/players/match_players/payments triggers a refetch.
-  useRealtimeRefresh(refreshDashboardData);
-
-  // Initial data fetch on mount. Subsequent updates come purely from the
-  // realtime subscription above — no polling needed.
-  useEffect(() => {
-    refreshDashboardData();
-  }, [refreshDashboardData]);
 
   // Logout handler
   const handleLogout = async () => {

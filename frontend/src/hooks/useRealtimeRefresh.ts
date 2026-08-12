@@ -13,31 +13,37 @@ const DEBOUNCE_MS = 500;
 
 /**
  * Subscribes to Supabase Postgres Changes for every watched table and invokes
- * `onChange` whenever a row is inserted, updated, or deleted. This replaces
+ * `onChange(tables)` with the names of the tables that changed. This replaces
  * polling with push-based real-time refresh: any write (from this app, another
- * client, or the status-update cron) triggers a refetch within ~1s.
+ * client, or the status-update cron) triggers a refresh within ~1s.
  *
  * Events are debounced (trailing edge) so bursts of row changes collapse into a
- * single `onChange` call. The subscription is created once per mount and always
- * calls the latest `onChange` callback via a ref, so callers don't need to
- * memoize it.
+ * single `onChange` call carrying the deduplicated set of changed tables. The
+ * subscription is created once per mount and always calls the latest `onChange`
+ * callback via a ref, so callers don't need to memoize it.
  */
-export function useRealtimeRefresh(onChange: () => void) {
+export function useRealtimeRefresh(onChange: (tables: string[]) => void) {
   const onChangeRef = useRef(onChange);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingTablesRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
 
   useEffect(() => {
-    const scheduleRefresh = () => {
+    const pendingTables = pendingTablesRef.current;
+
+    const scheduleRefresh = (table: string) => {
+      pendingTables.add(table);
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
       timerRef.current = setTimeout(() => {
         timerRef.current = null;
-        onChangeRef.current();
+        const tables = Array.from(pendingTables);
+        pendingTables.clear();
+        onChangeRef.current(tables);
       }, DEBOUNCE_MS);
     };
 
@@ -47,7 +53,9 @@ export function useRealtimeRefresh(onChange: () => void) {
       channel.on(
         "postgres_changes",
         { event: "*", schema: "public", table },
-        scheduleRefresh
+        (payload) => {
+          scheduleRefresh(payload.table as string);
+        }
       );
     }
 
@@ -58,6 +66,7 @@ export function useRealtimeRefresh(onChange: () => void) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
+      pendingTables.clear();
       void supabase.removeChannel(channel);
     };
   }, []);

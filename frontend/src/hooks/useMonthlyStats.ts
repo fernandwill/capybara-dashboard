@@ -1,7 +1,11 @@
-// Custom hook for fetching and managing monthly stats data
+// Custom hook for fetching and processing monthly statistics.
+//
+// Backed by SWR: the "/api/stats/monthly" key is cached globally and deduped
+// across pages. SWR fetches on mount (replacing the old mount effect), so the
+// raw data arrives automatically and realtime keeps it fresh.
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { authFetch } from "@/lib/authFetch";
+import { useMemo, useCallback } from "react";
+import useSWR from "swr";
 
 export interface MonthlyPoint {
     month: string;
@@ -19,45 +23,29 @@ const MONTH_NAMES = [
 ];
 
 export function useMonthlyStats(selectedYear: number) {
-    const [raw, setRaw] = useState<RawMonthly>({});
-    const [availableYears, setAvailableYears] = useState<number[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const {
+        data: raw = {},
+        isLoading,
+        mutate,
+    } = useSWR<RawMonthly>("/api/stats/monthly");
 
     const fetchMonthly = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const response = await authFetch("/api/stats/monthly");
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+        await mutate();
+    }, [mutate]);
 
-            const data = (await response.json()) as RawMonthly;
-            setRaw(data);
+    // Available years derived from the fetched data; always include the
+    // current year even if it has no completed matches yet.
+    const availableYears = useMemo(() => {
+        const years = Array.from(
+            new Set(Object.keys(raw).map((key) => parseInt(key.split("-")[0], 10)))
+        ).sort((a, b) => b - a);
 
-            const years = Array.from(
-                new Set(Object.keys(data).map((key) => parseInt(key.split("-")[0], 10)))
-            ).sort((a, b) => b - a);
-
-            const currentYear = new Date().getFullYear();
-            if (!years.includes(currentYear)) {
-                years.unshift(currentYear);
-            }
-            setAvailableYears(years);
-        } catch (err) {
-            console.error("Error fetching monthly stats:", err);
-            // Keep the previously loaded data on transient failures so the
-            // chart doesn't blank out; only fall back on a true first load.
-            setAvailableYears((prev) =>
-                prev.length > 0 ? prev : [new Date().getFullYear()]
-            );
-        } finally {
-            setIsLoading(false);
+        const currentYear = new Date().getFullYear();
+        if (!years.includes(currentYear)) {
+            years.unshift(currentYear);
         }
-    }, []);
-
-    useEffect(() => {
-        fetchMonthly();
-    }, [fetchMonthly]);
+        return years;
+    }, [raw]);
 
     // Build the 12-month series for the selected year
     const monthlyData = useMemo<MonthlyPoint[]>(() => {

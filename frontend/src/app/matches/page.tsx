@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMatches } from "@/hooks/useMatches";
-import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { Match, ModalState, SortOption } from "@/types/types";
 import { formatCurrency, formatDurationHours, formatShortDate } from "@/utils/formatters";
 import { sortMatches } from "@/utils/matchUtils";
@@ -52,7 +51,6 @@ export default function AllMatchesHistoryPage() {
   const {
     matches,
     isLoading: isMatchesLoading,
-    fetchMatches,
     createMatch,
     updateMatch,
     deleteMatch,
@@ -87,17 +85,6 @@ export default function AllMatchesHistoryPage() {
   useEffect(() => {
     document.documentElement.classList.add("dark");
   }, []);
-
-  // Fetch matches on mount
-  useEffect(() => {
-    void fetchMatches();
-  }, [fetchMatches]);
-
-  // Real-time refresh: refetch whenever match/player data changes
-  const refreshFromRealtime = useCallback(() => {
-    void fetchMatches();
-  }, [fetchMatches]);
-  useRealtimeRefresh(refreshFromRealtime);
 
   // Redirect if unauthenticated
   useEffect(() => {
@@ -250,8 +237,8 @@ export default function AllMatchesHistoryPage() {
 
       setIsModalOpen(false);
       setEditingMatch(null);
-      // createMatch/updateMatch already refetch internally; realtime also
-      // fires on the write — no explicit refetch needed here.
+      // createMatch/updateMatch optimistically update the shared SWR cache;
+      // realtime revalidates on the write — no explicit refetch needed here.
 
       setSuccessModal({
         isOpen: true,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import {
   Calendar,
@@ -22,9 +22,8 @@ import AppLayout from "@/components/layout/AppLayout";
 import AddPlayerModal from "@/components/players/AddPlayerModal";
 import EditPlayerModal, { PlayerRecord } from "@/components/players/EditPlayerModal";
 import DeletePlayerModal from "@/components/players/DeletePlayerModal";
-import { authFetch } from "@/lib/authFetch";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
+import { usePlayers } from "@/hooks/usePlayers";
 import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 8;
@@ -34,8 +33,7 @@ export default function PlayersPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  const [players, setPlayers] = useState<PlayerRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { players, isLoading, fetchPlayers } = usePlayers();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
@@ -46,46 +44,12 @@ export default function PlayersPage() {
   const [editingPlayer, setEditingPlayer] = useState<PlayerRecord | null>(null);
   const [deletingPlayer, setDeletingPlayer] = useState<PlayerRecord | null>(null);
 
-  // Fetch players from API
-  const fetchPlayers = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const res = await authFetch("/api/players");
-      if (res.ok) {
-        const data = await res.json();
-        setPlayers(data);
-      }
-    } catch (err) {
-      console.error("Error fetching players:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Fetch players once, when the user becomes authenticated. Do NOT depend on
-  // the `user` object identity: Supabase fires auth events (e.g. token refresh)
-  // which change it, and that previously triggered a refetch every time.
-  const hasFetchedRef = useRef(false);
-
-  useEffect(() => {
-    if (!authLoading && user && !hasFetchedRef.current) {
-      hasFetchedRef.current = true;
-      void fetchPlayers();
-    }
-  }, [user, authLoading, fetchPlayers]);
-
   // Redirect if unauthenticated
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/");
     }
   }, [authLoading, user, router]);
-
-  // Real-time refresh: refetch silently whenever player data changes
-  const refreshFromRealtime = useCallback(() => {
-    void fetchPlayers();
-  }, [fetchPlayers]);
-  useRealtimeRefresh(refreshFromRealtime);
 
   // Only show loading states on the first load; background refetches stay silent
   const isLoadingFirstPass = isLoading && players.length === 0;

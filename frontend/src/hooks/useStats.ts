@@ -1,7 +1,10 @@
-// Custom hook for fetching and managing stats data
+// Custom hook for fetching and managing stats data.
+//
+// Backed by SWR: the "/api/stats" key is cached globally and deduped across
+// pages, and revalidated by realtime whenever a match row changes.
 
-import { useState, useCallback } from "react";
-import { authFetch } from "@/lib/authFetch";
+import { useCallback } from "react";
+import useSWR from "swr";
 import { Stats } from "@/types/types";
 
 const DEFAULT_STATS: Stats = {
@@ -12,33 +15,21 @@ const DEFAULT_STATS: Stats = {
 };
 
 export function useStats() {
-    const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const fetchStats = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const response = await authFetch("/api/stats");
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            setStats(data);
-        } catch (err) {
-            console.error("Error fetching stats:", err);
-            setError("Failed to fetch stats");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    return {
-        stats,
+    const {
+        data = DEFAULT_STATS,
         isLoading,
         error,
+        mutate,
+    } = useSWR<Stats>("/api/stats");
+
+    const fetchStats = useCallback(async () => {
+        await mutate();
+    }, [mutate]);
+
+    return {
+        stats: data,
+        isLoading,
+        error: error ? "Failed to fetch stats" : null,
         fetchStats,
     };
 }

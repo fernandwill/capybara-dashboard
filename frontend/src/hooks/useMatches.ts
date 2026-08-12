@@ -1,6 +1,11 @@
-// Custom hook for fetching and managing match data
+// Custom hook for fetching and managing match data.
+//
+// Backed by SWR: the "/api/matches" key is cached globally (via DataProvider)
+// and deduped across pages, so navigating between the dashboard and the match
+// history reuses already-loaded data instead of refetching.
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import useSWR from "swr";
 import { authFetch } from "@/lib/authFetch";
 import { Match } from "@/types/types";
 
@@ -27,30 +32,16 @@ interface UseMatchesReturn {
 }
 
 export function useMatches(): UseMatchesReturn {
-    const [matches, setMatches] = useState<Match[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const {
+        data: matches = [],
+        isLoading,
+        error,
+        mutate,
+    } = useSWR<Match[]>("/api/matches");
 
     const fetchMatches = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const response = await authFetch("/api/matches");
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            setMatches(data);
-        } catch (err) {
-            console.error("Error fetching matches:", err);
-            setError("Failed to fetch matches");
-            // Keep existing data on transient failures so the UI never blanks
-            // out from a single flaky background refetch. Realtime retries.
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+        await mutate();
+    }, [mutate]);
 
     const createMatch = useCallback(async (data: MatchFormData): Promise<boolean> => {
         try {
@@ -64,15 +55,17 @@ export function useMatches(): UseMatchesReturn {
             }
 
             // Optimistically prepend the created match so the UI updates
-            // instantly; the realtime refetch reconciles any drift.
+            // instantly; the realtime revalidation reconciles any drift.
             const match: Match = await response.json();
-            setMatches((prev) => [match, ...prev]);
+            await mutate((current: Match[] = []) => [match, ...current], {
+                revalidate: false,
+            });
             return true;
         } catch (err) {
             console.error("Error creating match:", err);
             return false;
         }
-    }, []);
+    }, [mutate]);
 
     const updateMatch = useCallback(async (id: string, data: MatchFormData): Promise<boolean> => {
         try {
@@ -87,13 +80,16 @@ export function useMatches(): UseMatchesReturn {
 
             // Optimistically replace the match in place; realtime reconciles.
             const match: Match = await response.json();
-            setMatches((prev) => prev.map((m) => (m.id === id ? match : m)));
+            await mutate((current: Match[] = []) =>
+                current.map((m) => (m.id === id ? match : m)),
+                { revalidate: false }
+            );
             return true;
         } catch (err) {
             console.error("Error updating match:", err);
             return false;
         }
-    }, []);
+    }, [mutate]);
 
     const deleteMatch = useCallback(async (id: string): Promise<boolean> => {
         try {
@@ -105,19 +101,22 @@ export function useMatches(): UseMatchesReturn {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Optimistically remove from local state
-            setMatches((prev) => prev.filter((match) => match.id !== id));
+            // Optimistically remove from the cache; realtime reconciles.
+            await mutate(
+                (current: Match[] = []) => current.filter((match) => match.id !== id),
+                { revalidate: false }
+            );
             return true;
         } catch (err) {
             console.error("Error deleting match:", err);
             return false;
         }
-    }, []);
+    }, [mutate]);
 
     return {
         matches,
         isLoading,
-        error,
+        error: error ? "Failed to fetch matches" : null,
         fetchMatches,
         createMatch,
         updateMatch,
