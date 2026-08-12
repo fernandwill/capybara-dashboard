@@ -17,8 +17,27 @@ export async function authFetch(
         headers.set("Content-Type", "application/json");
     }
 
-    return fetch(url, {
+    const response = await fetch(url, {
         ...options,
         headers,
     });
+
+    // The access token may have expired while the app sat idle. Silently
+    // refresh the session and retry the request once before surfacing the 401.
+    if (response.status === 401) {
+        const { data, error } = await supabase.auth.refreshSession();
+        if (!error && data.session?.access_token) {
+            const retryHeaders = new Headers(headers);
+            retryHeaders.set(
+                "Authorization",
+                `Bearer ${data.session.access_token}`
+            );
+            return fetch(url, {
+                ...options,
+                headers: retryHeaders,
+            });
+        }
+    }
+
+    return response;
 }

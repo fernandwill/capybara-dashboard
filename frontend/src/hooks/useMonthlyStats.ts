@@ -45,8 +45,11 @@ export function useMonthlyStats(selectedYear: number) {
             setAvailableYears(years);
         } catch (err) {
             console.error("Error fetching monthly stats:", err);
-            setRaw({});
-            setAvailableYears([new Date().getFullYear()]);
+            // Keep the previously loaded data on transient failures so the
+            // chart doesn't blank out; only fall back on a true first load.
+            setAvailableYears((prev) =>
+                prev.length > 0 ? prev : [new Date().getFullYear()]
+            );
         } finally {
             setIsLoading(false);
         }

@@ -45,7 +45,8 @@ export function useMatches(): UseMatchesReturn {
         } catch (err) {
             console.error("Error fetching matches:", err);
             setError("Failed to fetch matches");
-            setMatches([]);
+            // Keep existing data on transient failures so the UI never blanks
+            // out from a single flaky background refetch. Realtime retries.
         } finally {
             setIsLoading(false);
         }
@@ -62,13 +63,16 @@ export function useMatches(): UseMatchesReturn {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            await fetchMatches();
+            // Optimistically prepend the created match so the UI updates
+            // instantly; the realtime refetch reconciles any drift.
+            const match: Match = await response.json();
+            setMatches((prev) => [match, ...prev]);
             return true;
         } catch (err) {
             console.error("Error creating match:", err);
             return false;
         }
-    }, [fetchMatches]);
+    }, []);
 
     const updateMatch = useCallback(async (id: string, data: MatchFormData): Promise<boolean> => {
         try {
@@ -81,13 +85,15 @@ export function useMatches(): UseMatchesReturn {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            await fetchMatches();
+            // Optimistically replace the match in place; realtime reconciles.
+            const match: Match = await response.json();
+            setMatches((prev) => prev.map((m) => (m.id === id ? match : m)));
             return true;
         } catch (err) {
             console.error("Error updating match:", err);
             return false;
         }
-    }, [fetchMatches]);
+    }, []);
 
     const deleteMatch = useCallback(async (id: string): Promise<boolean> => {
         try {

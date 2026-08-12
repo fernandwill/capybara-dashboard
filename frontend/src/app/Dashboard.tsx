@@ -348,7 +348,6 @@ export function Dashboard() {
       const success = await deleteMatch(matchPendingDeletion.id);
 
       if (success) {
-        fetchStats();
         handleCloseDeleteModal();
         setSuccessModal({
           isOpen: true,
@@ -396,7 +395,6 @@ export function Dashboard() {
 
       setIsModalOpen(false);
       setEditingMatch(null);
-      fetchStats();
 
       setSuccessModal({
         isOpen: true,

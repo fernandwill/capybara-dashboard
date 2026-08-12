@@ -205,7 +205,6 @@ export default function AllMatchesHistoryPage() {
     try {
       const success = await deleteMatch(matchPendingDeletion.id);
       if (success) {
-        await fetchMatches();
         handleCloseDeleteModal();
         setSuccessModal({
           isOpen: true,
