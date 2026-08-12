@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CalendarDays, Clock3, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import NewMatchModal from "../components/NewMatchModal";
@@ -40,6 +41,7 @@ const WEEKDAY_NAMES = [
 
 
 export function Dashboard() {
+  const router = useRouter();
   const { setUser } = useAuth();
 
   // Data hooks
@@ -76,6 +78,7 @@ export function Dashboard() {
   // Loading states
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isDeletingMatch, setIsDeletingMatch] = useState(false);
+  const [isSubmittingMatch, setIsSubmittingMatch] = useState(false);
 
   // Feedback modals
   const [successModal, setSuccessModal] = useState<ModalState>({
@@ -226,8 +229,7 @@ export function Dashboard() {
   };
 
   const handleMatchClick = (match: Match) => {
-    setSelectedMatch(match);
-    setIsDetailsModalOpen(true);
+    router.push(`/matches/${match.id}`);
   };
 
   const handleCloseDetailsModal = () => {
@@ -309,6 +311,7 @@ export function Dashboard() {
     description?: string;
     playerIds?: string[];
   }) => {
+    setIsSubmittingMatch(true);
     try {
       const isEditing = editingMatch !== null;
 
@@ -336,6 +339,8 @@ export function Dashboard() {
         title: "Error!",
         message: `Failed to ${editingMatch ? "update" : "create"} match. Please try again.`,
       });
+    } finally {
+      setIsSubmittingMatch(false);
     }
   };
 
@@ -478,6 +483,7 @@ export function Dashboard() {
         onClose={handleCloseModal}
         onSubmit={handleSubmitMatch}
         editingMatch={editingMatch}
+        isSubmitting={isSubmittingMatch}
       />
 
       <SuccessModal

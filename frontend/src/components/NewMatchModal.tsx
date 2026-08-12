@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Match } from "@/types/types";
 import Modal from "./ui/Modal";
 import SelectPlayersModal, {
@@ -11,6 +11,7 @@ import SelectPlayersModal, {
 import {
   Calendar,
   Clock,
+  Loader2,
   Minus,
   Plus,
   UserPlus,
@@ -34,6 +35,7 @@ interface NewMatchModalProps {
   onClose: () => void;
   onSubmit: (matchData: MatchData) => void;
   editingMatch?: Match | null;
+  isSubmitting?: boolean;
 }
 
 interface MatchFormState {
@@ -74,14 +76,31 @@ export default function NewMatchModal({
   onClose,
   onSubmit,
   editingMatch,
+  isSubmitting = false,
 }: NewMatchModalProps) {
   const [formData, setFormData] = useState<MatchFormState>(INITIAL_FORM_STATE);
   const [availablePlayers, setAvailablePlayers] = useState<PlayerOption[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
   const [isPlayerPickerOpen, setIsPlayerPickerOpen] = useState(false);
+  const submittingRef = useRef(false);
+
+  // Block closing the modal while a create/update request is in flight
+  const handleClose = () => {
+    if (isSubmitting) return;
+    onClose();
+  };
+
+  // Keep the ref in sync so a fast double-click can't fire two submits
+  useEffect(() => {
+    submittingRef.current = isSubmitting;
+  }, [isSubmitting]);
 
   useEffect(() => {
     if (isOpen) {
+      // Reset the form and double-submit guard whenever the modal opens
+      // (editing data is applied afterwards by the editingMatch effect)
+      setFormData(INITIAL_FORM_STATE);
+      submittingRef.current = false;
       const fetchPlayers = async () => {
         setIsLoadingPlayers(true);
         try {
@@ -135,6 +154,12 @@ export default function NewMatchModal({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    // Prevent duplicate submissions while a request is in flight.
+    // Flip the ref immediately (before the parent's isSubmitting prop lands)
+    // so even a same-tick double click can't fire twice.
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+
     const trimmedTitle = formData.title.trim();
     const trimmedLocation = formData.location.trim();
     const trimmedCourtNumber = formData.courtNumber.trim();
@@ -153,8 +178,9 @@ export default function NewMatchModal({
       playerIds: formData.playerIds,
     };
 
+    // The form is NOT reset here so the entered values stay visible while
+    // the request is in flight (and survive an error). It resets on next open.
     onSubmit(matchData);
-    setFormData(INITIAL_FORM_STATE);
   };
 
   const handleChange = (
@@ -178,7 +204,7 @@ export default function NewMatchModal({
     <>
       <Modal
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={handleClose}
         title={editingMatch ? "Edit Match" : "Create New Match"}
         subtitle="Schedule a match and track your game."
         size="xl"
@@ -186,17 +212,28 @@ export default function NewMatchModal({
           <>
             <button
               type="button"
-              onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               form="new-match-form"
-              className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-500"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {editingMatch ? "Update Match" : "Create Match"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  {editingMatch ? "Updating..." : "Creating..."}
+                </>
+              ) : editingMatch ? (
+                "Update Match"
+              ) : (
+                "Create Match"
+              )}
             </button>
           </>
         }

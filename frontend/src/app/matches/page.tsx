@@ -65,6 +65,7 @@ export default function AllMatchesHistoryPage() {
   const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeletingMatch, setIsDeletingMatch] = useState(false);
+  const [isSubmittingMatch, setIsSubmittingMatch] = useState(false);
   const [menu, setMenu] = useState<{ match: Match; x: number; y: number } | null>(null);
   const [successModal, setSuccessModal] = useState<ModalState>({
     isOpen: false,
@@ -161,8 +162,7 @@ export default function AllMatchesHistoryPage() {
 
   // Modal Handlers
   const handleMatchClick = (match: Match) => {
-    setSelectedMatch(match);
-    setIsDetailsModalOpen(true);
+    router.push(`/matches/${match.id}`);
   };
 
   const handleCloseDetailsModal = () => {
@@ -237,6 +237,7 @@ export default function AllMatchesHistoryPage() {
     description?: string;
     playerIds?: string[];
   }) => {
+    setIsSubmittingMatch(true);
     try {
       const isEditing = editingMatch !== null;
       const success = isEditing
@@ -263,6 +264,8 @@ export default function AllMatchesHistoryPage() {
         title: "Error!",
         message: `Failed to ${editingMatch ? "update" : "create"} match. Please try again.`,
       });
+    } finally {
+      setIsSubmittingMatch(false);
     }
   };
 
@@ -631,6 +634,7 @@ export default function AllMatchesHistoryPage() {
         onClose={handleCloseModal}
         onSubmit={handleSubmitMatch}
         editingMatch={editingMatch}
+        isSubmitting={isSubmittingMatch}
       />
 
       <DeleteMatchModal
