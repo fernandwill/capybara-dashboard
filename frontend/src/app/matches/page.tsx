@@ -131,6 +131,23 @@ export default function AllMatchesHistoryPage() {
     return filteredMatches.slice(startIndex, startIndex + MATCHES_PER_PAGE);
   }, [filteredMatches, currentPage]);
 
+  const visiblePageNumbers = useMemo<number[]>(() => {
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    let start = Math.max(1, currentPage - 2);
+    let end = start + 4;
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - 4);
+    }
+    const pages: number[] = [];
+    for (let p = start; p <= end; p++) {
+      pages.push(p);
+    }
+    return pages;
+  }, [totalPages, currentPage]);
+
   // Reset page to 1 when filters or search change
   const handleFilterChange = (status: FilterStatus) => {
     setStatusFilter(status);
@@ -558,22 +575,19 @@ export default function AllMatchesHistoryPage() {
                 </Button>
 
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }).map((_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={currentPage === pageNum ? "primary" : "secondary"}
-                        size="icon"
-                        className={`text-xs font-semibold ${
-                          currentPage === pageNum ? "" : "text-app-text-secondary hover:text-white"
-                        }`}
-                        onClick={() => setCurrentPage(pageNum)}
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
+                  {visiblePageNumbers.map((pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "primary" : "secondary"}
+                      size="icon"
+                      className={`text-xs font-semibold ${
+                        currentPage === pageNum ? "" : "text-app-text-secondary hover:text-white"
+                      }`}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  ))}
                 </div>
 
                 <Button

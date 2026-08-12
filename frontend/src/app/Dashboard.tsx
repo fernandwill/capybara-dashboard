@@ -17,7 +17,7 @@ import { useMatches } from "@/hooks/useMatches";
 import { useMonthlyStats } from "@/hooks/useMonthlyStats";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
-import DashboardHeader from "../components/dashboard/DashboardHeader";
+import AppLayout from "../components/layout/AppLayout";
 import StatCard from "../components/dashboard/StatCard";
 import MonthlyActivityCard from "../components/dashboard/MonthlyActivityCard";
 import InsightsCard from "../components/dashboard/InsightsCard";
@@ -384,22 +384,13 @@ export function Dashboard() {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col overflow-x-clip bg-app-bg text-app-text-primary">
-      <DashboardHeader
-        selectedYear={selectedYear}
-        availableYears={availableYears}
-        isYearMenuOpen={isYearMenuOpen}
-        isLoggingOut={isLoggingOut}
-        onToggleYearMenu={() => setIsYearMenuOpen((open) => !open)}
-        onSelectYear={(year) => {
-          setSelectedYear(year);
-          setIsYearMenuOpen(false);
-        }}
-        onLogout={handleLogout}
-      />
-
-      <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-6">
+    <AppLayout
+      selectedYear={selectedYear}
+      availableYears={availableYears}
+      onSelectYear={setSelectedYear}
+      onLogout={handleLogout}
+    >
+      <div className="flex flex-col gap-6">
           {/* Hero */}
           <header>
             <h1 className="mb-2 text-3xl font-bold tracking-tight text-app-text-primary">
@@ -472,7 +463,6 @@ export function Dashboard() {
             <p>Badminton Management Dashboard</p>
           </footer>
         </div>
-      </div>
 
       {/* Row action menu */}
       <MatchRowMenu
@@ -522,6 +512,6 @@ export function Dashboard() {
         matchTitle={matchPendingDeletion?.title || matchPendingDeletion?.location}
         isLoading={isDeletingMatch}
       />
-    </main>
+    </AppLayout>
   );
 }

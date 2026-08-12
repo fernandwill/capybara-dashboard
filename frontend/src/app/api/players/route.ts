@@ -11,30 +11,68 @@ export async function GET() {
   }
 
   try {
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1);
+    const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59, 999);
+
     const players = await prisma.player.findMany({
       orderBy: {
         name: "asc",
       },
       include: {
-        _count: {
-          select: {
-            matchPlayers: {
-              where: {
-                match: {
-                  status: "COMPLETED",
-                },
+        matchPlayers: {
+          include: {
+            match: {
+              select: {
+                id: true,
+                date: true,
+                status: true,
               },
             },
           },
         },
       },
     });
-    return NextResponse.json(
-      players.map(({ _count, ...player }) => ({
-        ...player,
-        playCount: _count.matchPlayers,
-      }))
-    );
+
+    const enriched = players.map((player) => {
+      const allMatchPlayers = player.matchPlayers || [];
+      const completedMatchPlayers = allMatchPlayers.filter(
+        (mp) => mp.match?.status === "COMPLETED"
+      );
+      const thisYearMatches = completedMatchPlayers.filter((mp) => {
+        const d = new Date(mp.match.date);
+        return d >= startOfYear && d <= endOfYear;
+      });
+
+      // Find latest played date
+      let lastPlayed: string | null = null;
+      if (allMatchPlayers.length > 0) {
+        const validDates = allMatchPlayers
+          .map((mp) => new Date(mp.match?.date).getTime())
+          .filter((t) => !isNaN(t))
+          .sort((a, b) => b - a);
+
+        if (validDates.length > 0) {
+          lastPlayed = new Date(validDates[0]).toISOString();
+        }
+      }
+
+      return {
+        id: player.id,
+        name: player.name,
+        email: player.email,
+        phone: player.phone,
+        status: player.status,
+        createdAt: player.createdAt,
+        updatedAt: player.updatedAt,
+        playCount: completedMatchPlayers.length,
+        totalMatches: completedMatchPlayers.length,
+        thisYearMatches: thisYearMatches.length,
+        lastPlayed,
+      };
+    });
+
+    return NextResponse.json(enriched);
   } catch (error) {
     return handleApiError(error, ApiErrors.serverError('fetch players'));
   }
