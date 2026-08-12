@@ -24,12 +24,12 @@ export default function MatchRowMenu({
       <div className="fixed inset-0 z-40" onClick={onClose} />
 
       <div
-        className="fixed z-50 w-36 overflow-hidden rounded-lg border border-white/[0.1] bg-[#1c1d1d] py-1 text-sm shadow-xl"
+        className="fixed z-50 w-36 overflow-hidden rounded-lg border border-app-border bg-app-card py-1 text-sm shadow-xl"
         style={{ top: y + 6, left: x }}
       >
         <button
           type="button"
-          className="block w-full px-4 py-2 text-left text-white/80 transition hover:bg-white/[0.06]"
+          className="block w-full px-4 py-2 text-left text-app-text-primary/80 transition hover:bg-white/[0.06]"
           onClick={() => {
             onClose();
             onDetails(match);
@@ -39,7 +39,7 @@ export default function MatchRowMenu({
         </button>
         <button
           type="button"
-          className="block w-full px-4 py-2 text-left text-white/80 transition hover:bg-white/[0.06]"
+          className="block w-full px-4 py-2 text-left text-app-text-primary/80 transition hover:bg-white/[0.06]"
           onClick={() => {
             onClose();
             onEdit(match);

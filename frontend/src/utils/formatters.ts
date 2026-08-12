@@ -42,12 +42,12 @@ export function formatCurrency(amount: number): string {
 }
 
 /**
- * Formats a time range string and appends the duration in hours.
- * Input: "18:00-20:00" -> Output: "18:00-20:00 (2 hrs)"
+ * Parses a "HH:MM-HH:MM" time range into total minutes, handling overnight.
+ * Returns null when the input cannot be parsed.
  */
-export function formatTimeWithDuration(timeString: string): string {
+function parseTimeRangeMinutes(timeString: string): number | null {
     if (!timeString || !timeString.includes("-")) {
-        return timeString;
+        return null;
     }
 
     try {
@@ -61,28 +61,48 @@ export function formatTimeWithDuration(timeString: string): string {
             isNaN(endHours) ||
             isNaN(endMinutes)
         ) {
-            return timeString;
+            return null;
         }
 
-        const startDate = new Date();
-        startDate.setHours(startHours, startMinutes, 0, 0);
-
-        const endDate = new Date();
-        endDate.setHours(endHours, endMinutes, 0, 0);
-
-        let durationMillis = endDate.getTime() - startDate.getTime();
-        if (durationMillis < 0) {
+        const startTotal = startHours * 60 + startMinutes;
+        let endTotal = endHours * 60 + endMinutes;
+        if (endTotal < startTotal) {
             // Handle overnight case
-            const dayInMillis = 24 * 60 * 60 * 1000;
-            durationMillis += dayInMillis;
+            endTotal += 24 * 60;
         }
 
-        const durationHours = durationMillis / (1000 * 60 * 60);
-        const roundedDuration = Math.round(durationHours * 10) / 10;
-
-        return `${timeString} (${roundedDuration} hrs)`;
+        return endTotal - startTotal;
     } catch (error) {
-        console.error("Error formatting time with duration:", error);
+        console.error("Error parsing time range:", error);
+        return null;
+    }
+}
+
+/**
+ * Formats a time range string and appends the duration in hours.
+ * Input: "18:00-20:00" -> Output: "18:00-20:00 (2 hrs)"
+ */
+export function formatTimeWithDuration(timeString: string): string {
+    const durationMinutes = parseTimeRangeMinutes(timeString);
+    if (durationMinutes === null) {
         return timeString;
     }
+
+    const durationHours = durationMinutes / 60;
+    const roundedDuration = Math.round(durationHours * 10) / 10;
+
+    return `${timeString} (${roundedDuration} hrs)`;
+}
+
+/**
+ * Formats a time range string into a compact duration label, e.g. "2.0 h".
+ * Input: "18:00-20:00" -> Output: "2.0 h". Returns "--" when it cannot parse.
+ */
+export function formatDurationHours(timeString: string): string {
+    const durationMinutes = parseTimeRangeMinutes(timeString);
+    if (durationMinutes === null) {
+        return "--";
+    }
+
+    return `${(durationMinutes / 60).toFixed(1)} h`;
 }

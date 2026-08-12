@@ -1,10 +1,10 @@
-import { TrendingUp, type LucideIcon } from "lucide-react";
+import { ChevronUp, type LucideIcon } from "lucide-react";
 
 const accentStyles = {
-  green: { icon: "bg-emerald-500/20 text-emerald-400" },
-  blue: { icon: "bg-blue-500/20 text-blue-400" },
-  purple: { icon: "bg-violet-500/20 text-violet-400" },
-  orange: { icon: "bg-orange-500/20 text-orange-400" },
+  green: { icon: "bg-green-500/10 text-app-icon-green" },
+  blue: { icon: "bg-blue-500/10 text-app-icon-blue" },
+  purple: { icon: "bg-purple-500/10 text-app-icon-purple" },
+  orange: { icon: "bg-orange-500/10 text-app-icon-orange" },
 } as const;
 
 type Accent = keyof typeof accentStyles;
@@ -31,38 +31,31 @@ export default function StatCard({
   showTrendIcon = true,
 }: StatCardProps) {
   const Icon = icon;
-  const accentClass = accentStyles[accent].icon;
 
   return (
-    <div className="flex min-h-[170px] flex-col rounded-xl border border-white/[0.1] bg-[#141515] p-6 transition-colors hover:border-white/[0.2]">
-      <div className="flex items-center gap-3">
-        <div
-          className={`flex h-11 w-11 items-center justify-center rounded-xl ${accentClass}`}
-        >
-          <Icon size={21} />
+    <article className="flex h-full min-w-0 flex-col rounded-xl border border-app-border bg-app-card p-5 transition-colors hover:border-gray-600">
+      <div className="mb-4 flex items-center gap-3">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${accentStyles[accent].icon}`}>
+          <Icon size={18} />
         </div>
-
-        <span className="text-sm text-white/60">{label}</span>
+        <span className="truncate text-sm font-medium text-app-text-secondary">{label}</span>
       </div>
 
-      <div className="mt-6 flex items-baseline gap-1">
-        <span
-          className={`text-4xl font-semibold tracking-tight ${
-            isLoading ? "animate-pulse" : ""
-          }`}
-        >
-          {isLoading ? "..." : value}
-        </span>
-
-        {suffix && !isLoading && (
-          <span className="text-sm text-white/50">{suffix}</span>
-        )}
+      <div className="flex items-end justify-between">
+        <div className="flex min-w-0 items-baseline gap-1">
+          <span className={`truncate text-4xl font-bold tracking-tight text-white ${isLoading ? "animate-pulse" : ""}`}>
+            {isLoading ? "..." : value}
+          </span>
+          {suffix && !isLoading && (
+            <span className="ml-1 shrink-0 text-xl font-normal text-app-text-secondary">{suffix}</span>
+          )}
+        </div>
       </div>
 
-      <div className="mt-auto flex items-center gap-1.5 pt-4 text-xs text-emerald-400">
-        {showTrendIcon && <TrendingUp size={13} className="shrink-0" />}
-        <span className="truncate">{trend}</span>
+      <div className="mt-auto flex items-center gap-1 pt-3 text-sm">
+        {showTrendIcon && <ChevronUp size={14} className="shrink-0 text-app-success" />}
+        <span className="truncate text-app-text-muted">{trend}</span>
       </div>
-    </div>
+    </article>
   );
 }

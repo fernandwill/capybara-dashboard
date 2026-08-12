@@ -22,52 +22,55 @@ export default function ActivityChart({
   const gridLines = [gridMax, (gridMax * 3) / 4, gridMax / 2, gridMax / 4, 0];
 
   return (
-    <div className="relative min-h-[240px] flex-1">
-      {/* Grid */}
-      <div className="absolute inset-0 flex flex-col justify-between">
+    <div className="relative min-h-[256px] w-full flex-1">
+      {/* Y-Axis Labels & Grid Lines */}
+      <div className="pointer-events-none absolute inset-0 z-0 flex flex-col justify-between pb-8 text-xs font-medium text-app-text-muted">
         {gridLines.map((value) => (
-          <div key={value} className="flex items-center gap-3">
-            <span className="w-8 shrink-0 text-right text-[11px] text-white/40">
-              {mode === "hours" ? `${value}h` : value}
-            </span>
-
-            <div className="h-px flex-1 bg-white/[0.07]" />
+          <div key={value} className="flex w-full items-center">
+            <span className="w-8">{mode === "hours" ? `${value}h` : value}</span>
+            <div className="h-px flex-1 bg-app-border/50" />
           </div>
         ))}
       </div>
 
-      {/* Bars */}
-      <div className="absolute bottom-0 left-11 right-0 top-0 flex items-end gap-2.5">
+      {/* X-Axis Labels & Bars */}
+      <div className="absolute inset-x-8 bottom-0 top-0 z-10 flex items-end justify-between pb-8">
         {data.map((item) => {
           const value = mode === "hours" ? item.hours : item.matches;
           const height = value === 0 ? 0 : Math.max((value / gridMax) * 100, 2);
-
           return (
             <div
               key={item.month}
-              className="group flex h-full flex-1 flex-col justify-end"
+              className="group relative flex h-full w-[8%] flex-col items-center justify-end"
             >
-              <div className="relative flex flex-1 items-end justify-center">
-                {value > 0 && (
-                  <div
-                    className="relative w-4 rounded-t-sm bg-emerald-500/90 transition-all duration-200 group-hover:bg-emerald-400"
-                    style={{ height: `${height}%` }}
-                  >
-                    <div className="absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/[0.1] bg-[#1c1d1d] px-4 py-3 shadow-xl group-hover:block">
-                      <div className="text-xs font-medium">
-                        {item.month} {selectedYear}
-                      </div>
-
-                      <div className="mt-2 space-y-1 text-xs text-white/60">
-                        <div>🔵 {item.matches} matches</div>
-                        <div>🟢 {item.hours} hours</div>
-                      </div>
-                    </div>
+              {value > 0 && (
+                <div
+                  className="pointer-events-none absolute left-1/2 z-20 hidden w-40 -translate-x-1/2 rounded-lg border border-app-border bg-[#1E232B] p-3 shadow-xl group-hover:block"
+                  style={{ bottom: `calc(${height}% + 2.25rem)` }}
+                >
+                  <div className="mb-2 text-sm font-semibold text-white">
+                    {item.month} {selectedYear}
                   </div>
-                )}
-              </div>
+                  <div className="mb-1 flex items-center gap-2 text-sm text-app-text-secondary">
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-app-icon-blue" />
+                    {item.matches} matches
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-app-text-secondary">
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-app-success" />
+                    {item.hours} hours
+                  </div>
+                </div>
+              )}
 
-              <span className="mt-3 text-center text-[11px] text-white/50">
+              <div
+                className="chart-bar w-full max-w-[24px] bg-app-success transition-opacity group-hover:opacity-80"
+                style={{ height: `${height}%` }}
+              />
+              <span
+                className={`mt-3 text-xs ${
+                  item.month === "Mar" ? "font-medium text-white" : "text-app-text-muted"
+                }`}
+              >
                 {item.month}
               </span>
             </div>

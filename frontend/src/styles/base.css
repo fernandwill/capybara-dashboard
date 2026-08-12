@@ -6,13 +6,31 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-* {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+/* =============================================================================
+   APP DESIGN TOKENS
+   Dark slate palette shared by all dashboard components (Tailwind v4 @theme)
+   ============================================================================= */
+@theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+    --color-app-bg: #0f1115;
+    --color-app-card: #16191f;
+    --color-app-border: #282c35;
+    --color-app-text-primary: #f3f4f6;
+    --color-app-text-secondary: #9ca3af;
+    --color-app-text-muted: #6b7280;
+    --color-app-primary: #3b82f6;
+    --color-app-primary-hover: #2563eb;
+    --color-app-success: #22c55e;
+    --color-app-success-bg: rgba(34, 197, 94, 0.1);
+    --color-app-success-text: #4ade80;
+    --color-app-icon-green: #22c55e;
+    --color-app-icon-blue: #3b82f6;
+    --color-app-icon-purple: #a855f7;
+    --color-app-icon-orange: #f97316;
 }
 
-/* Light theme variables */
+/* Light theme variables and base elements */
 @layer base {
     :root {
         --bg-color: #ffffff;
@@ -59,10 +77,10 @@
 
     /* Dark theme variables */
     .dark {
-        --bg-color: #0a0a0a;
-        --text-color: #ffffff;
-        --card-bg: #1a1a1a;
-        --border-color: #333333;
+        --bg-color: #0f1115;
+        --text-color: #f3f4f6;
+        --card-bg: #16191f;
+        --border-color: #282c35;
 
         /* Shadcn dark theme */
         --background: oklch(0.145 0 0);
@@ -97,15 +115,27 @@
         --sidebar-border: oklch(1 0 0 / 10%);
         --sidebar-ring: oklch(0.556 0 0);
     }
+
+    body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+            "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+            "Helvetica Neue", sans-serif;
+        background-color: #0f1115;
+        color: #f3f4f6;
+        line-height: 1.6;
+    }
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-        sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    line-height: 1.6;
+/* Chart bars */
+.chart-bar {
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease, opacity 0.2s ease;
+}
+
+/* Dashed empty-state container (from design mockup) */
+.dashed-border {
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='12' ry='12' stroke='%23282c35' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+    border-radius: 12px;
 }
 
 /* Time input styling */

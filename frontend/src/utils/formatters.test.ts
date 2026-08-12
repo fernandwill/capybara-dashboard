@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { formatDate, formatCurrency, formatShortDate, formatTimeWithDuration } from "./formatters";
+import {
+    formatDate,
+    formatCurrency,
+    formatDurationHours,
+    formatShortDate,
+    formatTimeWithDuration,
+} from "./formatters";
 
 describe("formatShortDate", () => {
     it("formats a date into a day + month label", () => {
@@ -79,5 +85,25 @@ describe("formatTimeWithDuration", () => {
     it("handles overnight time ranges", () => {
         const result = formatTimeWithDuration("22:00-02:00");
         expect(result).toBe("22:00-02:00 (4 hrs)");
+    });
+});
+
+describe("formatDurationHours", () => {
+    it("formats a time range as a one-decimal hour label", () => {
+        expect(formatDurationHours("18:00-20:00")).toBe("2.0 h");
+    });
+
+    it("handles fractional hours", () => {
+        expect(formatDurationHours("18:00-19:30")).toBe("1.5 h");
+    });
+
+    it("handles overnight time ranges", () => {
+        expect(formatDurationHours("22:00-02:00")).toBe("4.0 h");
+    });
+
+    it("returns '--' for malformed input", () => {
+        expect(formatDurationHours("18:00")).toBe("--");
+        expect(formatDurationHours("")).toBe("--");
+        expect(formatDurationHours("not-a-time")).toBe("--");
     });
 });

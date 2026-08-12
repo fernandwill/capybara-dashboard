@@ -36,12 +36,7 @@ const WEEKDAY_NAMES = [
   "Saturday",
 ];
 
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-}
+
 
 export function Dashboard() {
   const { setUser } = useAuth();
@@ -385,97 +380,96 @@ export function Dashboard() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#080909] text-white">
-      <div className="mx-auto max-w-[1400px] px-6 py-5 lg:px-8">
-        <DashboardHeader
-          selectedYear={selectedYear}
-          availableYears={availableYears}
-          isYearMenuOpen={isYearMenuOpen}
-          isLoggingOut={isLoggingOut}
-          onToggleYearMenu={() => setIsYearMenuOpen((open) => !open)}
-          onSelectYear={(year) => {
-            setSelectedYear(year);
-            setIsYearMenuOpen(false);
-          }}
-          onLogout={handleLogout}
-        />
+    <main className="flex min-h-screen flex-col overflow-x-clip bg-app-bg text-app-text-primary">
+      <DashboardHeader
+        selectedYear={selectedYear}
+        availableYears={availableYears}
+        isYearMenuOpen={isYearMenuOpen}
+        isLoggingOut={isLoggingOut}
+        onToggleYearMenu={() => setIsYearMenuOpen((open) => !open)}
+        onSelectYear={(year) => {
+          setSelectedYear(year);
+          setIsYearMenuOpen(false);
+        }}
+        onLogout={handleLogout}
+      />
 
-        {/* Hero */}
-        <section className="py-8">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            {getGreeting()}, Capybara 👋
-          </h1>
+      <div className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6">
+          {/* Hero */}
+          <header>
+            <h1 className="mb-2 text-3xl font-bold tracking-tight text-app-text-primary">
+              Halo, Admin Magang Capy 👋
+            </h1>
 
-          <p className="mt-2 text-sm text-white/50">
-            Here&apos;s how your badminton is going this year.
-          </p>
-        </section>
+            <p className="text-base text-app-text-secondary">
+              Here&apos;s how your badminton is going this year.
+            </p>
+          </header>
 
-        {/* Stats */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {statCards.map((stat) => (
-            <StatCard
-              key={stat.label}
-              label={stat.label}
-              value={stat.value}
-              suffix={stat.suffix}
-              trend={stat.trend}
-              icon={stat.icon}
-              accent={stat.accent}
-              showTrendIcon={stat.showTrendIcon}
-              isLoading={showStatsLoading}
+          {/* Stats */}
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {statCards.map((stat) => (
+              <StatCard
+                key={stat.label}
+                label={stat.label}
+                value={stat.value}
+                suffix={stat.suffix}
+                trend={stat.trend}
+                icon={stat.icon}
+                accent={stat.accent}
+                showTrendIcon={stat.showTrendIcon}
+                isLoading={showStatsLoading}
+              />
+            ))}
+          </section>
+
+          {/* Chart & Insights */}
+          <section className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
+            <div className="min-w-0 lg:col-span-2">
+              <MonthlyActivityCard
+                data={monthlyData}
+                selectedYear={selectedYear}
+                isLoading={isMonthlyLoading}
+              />
+            </div>
+
+            <InsightsCard
+              selectedYear={selectedYear}
+              strongestMonth={strongestMonth}
+              mostActiveDay={mostActiveDay}
+              typicalStartHour={typicalStartHour}
             />
-          ))}
-        </section>
+          </section>
 
-        {/* Analytics */}
-        <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-          <MonthlyActivityCard
-            data={monthlyData}
-            selectedYear={selectedYear}
-            isLoading={isMonthlyLoading}
+          {/* Upcoming Matches */}
+          <UpcomingMatchesCard
+            matches={upcomingMatches}
+            closestMatch={closestMatch}
+            countdown={countdown}
+            isLoading={isLoadingFirstPass}
+            onNewMatch={handleNewMatch}
+            onMatchClick={handleMatchClick}
+            onOpenMenu={openRowMenu}
           />
 
-          <InsightsCard
-            selectedYear={selectedYear}
-            strongestMonth={strongestMonth}
-            mostActiveDay={mostActiveDay}
-            typicalStartHour={typicalStartHour}
+          {/* Recent Matches */}
+          <RecentMatchesCard
+            matches={recentMatches}
+            totalCount={completedMatches.length}
+            showAll={showAllRecent}
+            isLoading={isLoadingFirstPass}
+            onToggleShowAll={() => setShowAllRecent((value) => !value)}
+            onMatchClick={handleMatchClick}
+            onOpenMenu={openRowMenu}
           />
-        </section>
 
-        {/* Upcoming Matches */}
-        <UpcomingMatchesCard
-          matches={upcomingMatches}
-          closestMatch={closestMatch}
-          countdown={countdown}
-          isLoading={isLoadingFirstPass}
-          onNewMatch={handleNewMatch}
-          onMatchClick={handleMatchClick}
-          onOpenMenu={openRowMenu}
-        />
-
-        {/* Recent Matches */}
-        <RecentMatchesCard
-          matches={recentMatches}
-          totalCount={completedMatches.length}
-          showAll={showAllRecent}
-          isLoading={isLoadingFirstPass}
-          onToggleShowAll={() => setShowAllRecent((value) => !value)}
-          onMatchClick={handleMatchClick}
-          onOpenMenu={openRowMenu}
-        />
-
-        {/* Footer */}
-        <footer className="mt-10 border-t border-white/[0.07] pt-8 text-center">
-          <div className="text-xs text-white/50">
-            © {new Date().getFullYear()} Capybara
-          </div>
-
-          <div className="mt-2 text-[10px] text-white/30">
-            Badminton Management Dashboard
-          </div>
-        </footer>
+          {/* Footer */}
+          <footer className="flex flex-col items-center gap-1 pb-2 text-center text-sm text-app-text-muted">
+            <p>© {new Date().getFullYear()} Capybara</p>
+            <p>Badminton Management Dashboard</p>
+          </footer>
+        </div>
       </div>
 
       {/* Row action menu */}
