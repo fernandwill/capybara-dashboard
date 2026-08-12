@@ -93,7 +93,7 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 
 ### Design Principles
 
-1. **Modular CSS**: Styles split into 7 focused files instead of one large file
+1. **Modular CSS**: Styles split into 5 focused files instead of one large file
 2. **Custom Hooks**: Data fetching logic extracted into reusable hooks
 3. **Centralized Utilities**: Shared validation, logging, and error handling
 4. **Type Safety**: Shared TypeScript types across components
@@ -166,12 +166,12 @@ frontend/
 │   │   ├── ErrorModal.tsx
 │   │   ├── MatchDetailsModal.tsx
 │   │   ├── NewMatchModal.tsx
-│   │   ├── StatsChart.tsx
 │   │   └── SuccessModal.tsx
 │   │
 │   ├── hooks/                      # Custom React hooks
 │   │   ├── useCountdown.ts         # Match countdown timer
 │   │   ├── useMatches.ts           # Match data fetching
+│   │   ├── useMonthlyStats.ts      # Monthly chart data
 │   │   └── useStats.ts             # Stats data fetching
 │   │
 │   ├── lib/                        # Core utilities
@@ -186,11 +186,9 @@ frontend/
 │   │
 │   ├── styles/                     # Modular CSS
 │   │   ├── base.css                # Variables, reset
-│   │   ├── dashboard.css           # Layout, header
 │   │   ├── matches.css             # Match cards
 │   │   ├── modals.css              # All modals
 │   │   ├── players.css             # Player cards
-│   │   ├── charts.css              # Stats chart
 │   │   └── responsive.css          # Media queries
 │   │
 │   ├── types/                      # TypeScript types

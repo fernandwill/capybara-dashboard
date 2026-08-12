@@ -13,6 +13,7 @@ interface MatchFormData {
     fee: number;
     status: string;
     description?: string;
+    playerIds?: string[];
 }
 
 interface UseMatchesReturn {

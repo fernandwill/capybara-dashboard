@@ -1,5 +1,23 @@
 import { describe, it, expect } from "vitest";
-import { formatDate, formatCurrency, formatTimeWithDuration } from "./formatters";
+import { formatDate, formatCurrency, formatShortDate, formatTimeWithDuration } from "./formatters";
+
+describe("formatShortDate", () => {
+    it("formats a date into a day + month label", () => {
+        // Use noon UTC to avoid timezone shifting the day
+        const result = formatShortDate("2025-01-15T12:00:00.000Z");
+        expect(result).toBe("15 JAN");
+    });
+
+    it("pads single-digit days", () => {
+        const result = formatShortDate("2025-08-08T12:00:00.000Z");
+        expect(result).toBe("08 AUG");
+    });
+
+    it("returns '--' for invalid dates", () => {
+        expect(formatShortDate("not-a-date")).toBe("--");
+        expect(formatShortDate("")).toBe("--");
+    });
+});
 
 describe("formatDate", () => {
     it("formats a valid date string correctly", () => {

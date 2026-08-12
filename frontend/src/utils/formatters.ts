@@ -17,6 +17,20 @@ export function formatDate(dateString: string): string {
 }
 
 /**
+ * Formats a date string into a short "DD MMM" label, e.g. "08 AUG".
+ */
+export function formatShortDate(dateString: string): string {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return "--";
+    }
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+    return `${day} ${month}`;
+}
+
+/**
  * Formats a number as Indonesian Rupiah currency
  */
 export function formatCurrency(amount: number): string {

@@ -6,10 +6,7 @@
 /* Base styles: reset, variables, body */
 @import "../styles/base.css";
 
-/* Layout: dashboard, header, stats, search, tabs, footer, banner */
-@import "../styles/dashboard.css";
-
-/* Match cards and list */
+/* Match status badges */
 @import "../styles/matches.css";
 
 /* Modal dialogs */
@@ -17,9 +14,6 @@
 
 /* Player cards and management */
 @import "../styles/players.css";
-
-/* Charts and statistics */
-@import "../styles/charts.css";
 
 /* Responsive breakpoints */
 @import "../styles/responsive.css";
