@@ -5,6 +5,7 @@ import { determineMatchStatus, updateMatchStatuses } from '@/utils/matchStatusUt
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
 import { MATCH_INCLUDE } from '@/lib/prismaIncludes';
+import { rateLimitGuard } from '@/lib/rateLimit';
 
 export async function GET() {
   const auth = await requireAdminUser();
@@ -32,6 +33,11 @@ export async function POST(request: NextRequest) {
   const auth = await requireAdminUser();
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   try {

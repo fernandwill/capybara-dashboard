@@ -3,6 +3,7 @@ import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
+import { rateLimitGuard } from '@/lib/rateLimit';
 
 export async function GET() {
   const auth = await requireAdminUser();
@@ -83,6 +84,11 @@ export async function POST(request: Request) {
   const auth = await requireAdminUser();
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   try {

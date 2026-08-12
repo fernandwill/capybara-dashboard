@@ -3,6 +3,7 @@ import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
+import { rateLimitGuard } from '@/lib/rateLimit';
 
 export async function GET(
   _request: Request,
@@ -36,6 +37,11 @@ export async function PUT(
   const auth = await requireAdminUser();
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   try {
@@ -85,12 +91,17 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAdminUser();
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   try {

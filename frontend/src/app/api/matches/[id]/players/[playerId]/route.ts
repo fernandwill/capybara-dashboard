@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
+import { rateLimitGuard } from '@/lib/rateLimit';
 import { PaymentStatus } from "@/types/types";
 
 export async function PATCH(
@@ -11,6 +12,11 @@ export async function PATCH(
   const auth = await requireAdminUser();
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   try {
@@ -46,12 +52,17 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string; playerId: string }> }
 ) {
   const auth = await requireAdminUser();
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   try {

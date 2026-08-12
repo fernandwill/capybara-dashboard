@@ -4,6 +4,7 @@ import { requireAdminUser } from '@/lib/apiAuth';
 import { determineMatchStatus, updateMatchStatuses } from '@/utils/matchStatusUtils';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
 import { MATCH_INCLUDE } from '@/lib/prismaIncludes';
+import { rateLimitGuard } from '@/lib/rateLimit';
 
 export async function GET(
   _request: Request,
@@ -58,6 +59,11 @@ export async function PUT(
     return auth.response;
   }
 
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
+  }
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -79,44 +85,47 @@ export async function PUT(
       : status;
 
     // Preserve per-match round counts and payment status when the roster is
-    // re-saved (the update below replaces match_players rows entirely)
-    let existingRows: { playerId: string; playCount: number; paymentStatus: string }[] = [];
-    if (Array.isArray(playerIds) && playerIds.length > 0) {
-      existingRows = await prisma.matchPlayer.findMany({
-        where: { matchId: id, playerId: { in: playerIds } },
-        select: { playerId: true, playCount: true, paymentStatus: true },
-      });
-    }
-    const existingByPlayer = new Map(
-      existingRows.map((row) => [row.playerId, row])
-    );
+    // re-saved. The read + replace (deleteMany/create) run in one transaction
+    // so two concurrent roster saves can't overwrite each other's play counts.
+    const match = await prisma.$transaction(async (tx) => {
+      let existingRows: { playerId: string; playCount: number; paymentStatus: string }[] = [];
+      if (Array.isArray(playerIds) && playerIds.length > 0) {
+        existingRows = await tx.matchPlayer.findMany({
+          where: { matchId: id, playerId: { in: playerIds } },
+          select: { playerId: true, playCount: true, paymentStatus: true },
+        });
+      }
+      const existingByPlayer = new Map(
+        existingRows.map((row) => [row.playerId, row])
+      );
 
-    const match = await prisma.match.update({
-      where: { id },
-      data: {
-        title,
-        location,
-        courtNumber,
-        date: date ? new Date(date) : undefined,
-        time,
-        fee,
-        status: finalStatus,
-        description,
-        players: playerIds ? {
-          deleteMany: {},
-          create: playerIds.map((playerId: string) => {
-            const existing = existingByPlayer.get(playerId);
-            return {
-              player: {
-                connect: { id: playerId }
-              },
-              playCount: existing?.playCount ?? 0,
-              paymentStatus: existing?.paymentStatus ?? "BELUM_SETOR",
-            };
-          })
-        } : undefined
-      },
-      include: MATCH_INCLUDE,
+      return tx.match.update({
+        where: { id },
+        data: {
+          title,
+          location,
+          courtNumber,
+          date: date ? new Date(date) : undefined,
+          time,
+          fee,
+          status: finalStatus,
+          description,
+          players: playerIds ? {
+            deleteMany: {},
+            create: playerIds.map((playerId: string) => {
+              const existing = existingByPlayer.get(playerId);
+              return {
+                player: {
+                  connect: { id: playerId }
+                },
+                playCount: existing?.playCount ?? 0,
+                paymentStatus: existing?.paymentStatus ?? "BELUM_SETOR",
+              };
+            })
+          } : undefined
+        },
+        include: MATCH_INCLUDE,
+      });
     });
 
     // Auto-update other match statuses
@@ -129,7 +138,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAdminUser();
@@ -137,11 +146,22 @@ export async function DELETE(
     return auth.response;
   }
 
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
+  }
+
   try {
     const { id } = await params;
-    await prisma.match.delete({
-      where: { id },
-    });
+
+    // payments.matchId has no cascade, so clear them explicitly before the
+    // match delete. Wrapped in a transaction so a failure can't leave the
+    // match alive with its payments already gone (or vice versa).
+    await prisma.$transaction([
+      prisma.payment.deleteMany({ where: { matchId: id } }),
+      prisma.match.delete({ where: { id } }),
+    ]);
+
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return handleApiError(error, ApiErrors.serverError('delete match'));

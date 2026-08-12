@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
+import { rateLimitGuard } from '@/lib/rateLimit';
 
 export async function POST(
   request: Request,
@@ -10,6 +11,11 @@ export async function POST(
   const auth = await requireAdminUser();
   if (!auth.ok) {
     return auth.response;
+  }
+
+  const rateLimited = rateLimitGuard(request);
+  if (rateLimited) {
+    return rateLimited;
   }
 
   try {
