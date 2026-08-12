@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Modal from "../ui/Modal";
 import { Loader2 } from "lucide-react";
 import { authFetch } from "@/lib/authFetch";
@@ -38,6 +38,12 @@ export default function EditPlayerModal({
   const [status, setStatus] = useState("ACTIVE");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const submittingRef = useRef(false);
+
+  // Keep the ref in sync so a fast double-click/Enter can't fire two submits
+  useEffect(() => {
+    submittingRef.current = isSubmitting;
+  }, [isSubmitting]);
 
   useEffect(() => {
     if (player && isOpen) {
@@ -46,6 +52,7 @@ export default function EditPlayerModal({
       setNotes(player.notes || "");
       setError("");
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   }, [player, isOpen]);
 
@@ -58,6 +65,11 @@ export default function EditPlayerModal({
       setError("Player name is required.");
       return;
     }
+
+    // Prevent duplicate submissions while a request is in flight (guards the
+    // same-tick window before the disabled state lands)
+    if (submittingRef.current) return;
+    submittingRef.current = true;
 
     setIsSubmitting(true);
     setError("");
