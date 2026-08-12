@@ -62,7 +62,6 @@ export function Dashboard() {
 
   // UI state
   const [isYearMenuOpen, setIsYearMenuOpen] = useState(false);
-  const [showAllRecent, setShowAllRecent] = useState(false);
   const [menu, setMenu] = useState<{ match: Match; x: number; y: number } | null>(null);
 
   // Modal state
@@ -101,7 +100,7 @@ export function Dashboard() {
     () => sortMatches(matches.filter((m) => m.status === "COMPLETED"), "date-latest"),
     [matches]
   );
-  const recentMatches = showAllRecent ? completedMatches : completedMatches.slice(0, 5);
+  const recentMatches = completedMatches.slice(0, 5);
 
   // Year-scoped figures for the selected year
   const yearHours = monthlyData.reduce((sum, m) => sum + m.hours, 0);
@@ -457,9 +456,7 @@ export function Dashboard() {
           <RecentMatchesCard
             matches={recentMatches}
             totalCount={completedMatches.length}
-            showAll={showAllRecent}
             isLoading={isLoadingFirstPass}
-            onToggleShowAll={() => setShowAllRecent((value) => !value)}
             onMatchClick={handleMatchClick}
             onOpenMenu={openRowMenu}
           />

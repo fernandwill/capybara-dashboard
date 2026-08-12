@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight, Clock, History, MoreVertical } from "lucide-react";
 import { Match } from "@/types/types";
 import { formatDurationHours, formatShortDate } from "@/utils/formatters";
@@ -5,9 +6,9 @@ import { formatDurationHours, formatShortDate } from "@/utils/formatters";
 interface RecentMatchesCardProps {
   matches: Match[];
   totalCount: number;
-  showAll: boolean;
+  showAll?: boolean;
   isLoading: boolean;
-  onToggleShowAll: () => void;
+  onToggleShowAll?: () => void;
   onMatchClick: (match: Match) => void;
   onOpenMenu: (event: React.MouseEvent<HTMLButtonElement>, match: Match) => void;
 }
@@ -15,9 +16,7 @@ interface RecentMatchesCardProps {
 export default function RecentMatchesCard({
   matches,
   totalCount,
-  showAll,
   isLoading,
-  onToggleShowAll,
   onMatchClick,
   onOpenMenu,
 }: RecentMatchesCardProps) {
@@ -29,14 +28,13 @@ export default function RecentMatchesCard({
           Recent Matches
         </h2>
         {totalCount > 0 && (
-          <button
-            type="button"
+          <Link
+            href="/matches"
             className="flex items-center gap-1 text-sm font-medium text-app-primary transition-colors hover:text-blue-400"
-            onClick={onToggleShowAll}
           >
-            {showAll ? "Show less" : "View all matches"}
+            View All Match
             <ArrowRight size={12} />
-          </button>
+          </Link>
         )}
       </div>
 
