@@ -4,7 +4,7 @@
 
 A modern badminton match tracker and management system built with Next.js 16, React 19, and TypeScript.
 
-![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)
+![Next.js](https://img.shields.io/badge/Next.js-16.3.0-black)
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -64,7 +64,7 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 - No hardcoded secrets
 
 ### User Experience
-- Dark/Light theme with system preference detection
+- Dark theme across the app
 - Fully responsive (desktop, tablet, mobile)
 - Loading states and error handling
 - Professional modal-based interactions
@@ -75,7 +75,7 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 
 | Category | Technology |
 |----------|------------|
-| Framework | Next.js 16.1.1 (App Router) |
+| Framework | Next.js 16.3.0 (App Router) |
 | UI Library | React 19.2.3 |
 | Language | TypeScript 5 |
 | Styling | Tailwind CSS 4 |

@@ -9,3 +9,4 @@ backend/dist-ssr/
 
 # environment files (never commit secrets)
 .env*
+!.env.example

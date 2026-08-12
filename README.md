@@ -16,7 +16,7 @@ Open source under the MIT license. Contributions from club members and the commu
 - **Real-time sync.** Match, player, and payment changes appear on every screen within about a second, no manual refresh.
 - **2v2 court management.** A randomizer auto-assigns players to courts, and every finished game is recorded into per-player play counts.
 - **Player and payment tracking.** 200+ players, 60+ matches, and 180+ hours of play tracked end-to-end, with payment status in one place.
-- **Analytics dashboard.** Monthly activity charts and live match stats with a light/dark theme.
+- **Analytics dashboard.** Monthly activity charts and live match stats at a glance.
 - **Automatic status updates.** Match statuses update as matches progress, with a daily Vercel cron as a safety net.
 - **PDF match sheets.** One-click export of printable match sheets so coordinators can tally attendance and games by hand.
 
@@ -59,17 +59,23 @@ The app lives in `frontend/`. The backend was an early Express API server and is
 git clone https://github.com/fernandwill/capyhub.git
 cd capyhub
 
-# Create the shared environment file (see "Environment variables" below)
-touch .env.local
+# 1. Create the shared environment file from the template and fill in your own values
+cp .env.example .env.local
 
-# Install and start the frontend
+# 2. Make the variables available to your shell.
+#    The Prisma CLI needs DATABASE_URL during `npm install`, and it does not
+#    read the root .env.local by itself. (Git Bash or WSL on Windows.)
+set -a; source .env.local; set +a
+
+# 3. Install and start the frontend
 cd frontend
-npm install
-npx prisma generate
+npm install        # also generates the Prisma client (postinstall)
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+> Only exploring the code? `prisma generate` never connects to the database, it only validates the URL format, so a placeholder like `postgresql://user:pass@localhost:5432/capyhub` is enough to get past it.
 
 ### Environment variables
 
