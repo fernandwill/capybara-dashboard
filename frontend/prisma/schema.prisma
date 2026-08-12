@@ -12,6 +12,7 @@ model Player {
   name         String
   email        String?       @unique
   phone        String?
+  notes        String?
   status       String        @default("ACTIVE")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt

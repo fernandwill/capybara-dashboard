@@ -154,6 +154,7 @@ const schemas = {
         name: { validators: [validators.required, validators.string, validators.minLength(2)] },
         email: { validators: [validators.email] },
         phone: { validators: [validators.string] },
+        notes: { validators: [validators.string] },
         status: { validators: [validators.enum(["ACTIVE", "INACTIVE"])] },
     } as Schema,
 

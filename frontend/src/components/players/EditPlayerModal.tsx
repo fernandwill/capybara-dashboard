@@ -10,6 +10,7 @@ export interface PlayerRecord {
   name: string;
   email?: string | null;
   phone?: string | null;
+  notes?: string | null;
   status: string;
   createdAt?: string;
   updatedAt?: string;
@@ -42,7 +43,7 @@ export default function EditPlayerModal({
     if (player && isOpen) {
       setName(player.name || "");
       setStatus(player.status || "ACTIVE");
-      setNotes("");
+      setNotes(player.notes || "");
       setError("");
       setIsSubmitting(false);
     }
@@ -67,6 +68,7 @@ export default function EditPlayerModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: trimmedName,
+          notes: notes.trim() || null,
           status,
         }),
       });

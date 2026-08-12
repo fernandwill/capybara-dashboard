@@ -62,6 +62,7 @@ export async function GET() {
         name: player.name,
         email: player.email,
         phone: player.phone,
+        notes: player.notes,
         status: player.status,
         createdAt: player.createdAt,
         updatedAt: player.updatedAt,
@@ -93,7 +94,7 @@ export async function POST(request: Request) {
       return validationErrorResponse(validation.errors!);
     }
 
-    const { name, email, phone, status = "ACTIVE" } = body;
+    const { name, email, phone, notes, status = "ACTIVE" } = body;
     const trimmedName = name.trim();
 
     // Check for existing player
@@ -112,6 +113,7 @@ export async function POST(request: Request) {
         name: trimmedName,
         email: email || null,
         phone: phone || null,
+        notes: typeof notes === "string" && notes.trim() ? notes.trim() : null,
         status,
       },
     });

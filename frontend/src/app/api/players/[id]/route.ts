@@ -40,12 +40,15 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, email, phone, status } = body;
+    const { name, email, phone, notes, status } = body;
 
     const data: Record<string, unknown> = {};
     if (name !== undefined) data.name = name;
     if (email !== undefined) data.email = email;
     if (phone !== undefined) data.phone = phone;
+    if (notes !== undefined) {
+      data.notes = typeof notes === "string" && notes.trim() ? notes.trim() : null;
+    }
     if (status !== undefined) data.status = status;
 
     const player = await prisma.player.update({
