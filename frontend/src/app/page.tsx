@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dashboard } from './Dashboard';
 import { signInWithEmail } from '@/lib/authService';
@@ -96,9 +97,9 @@ export default function Home() {
           className="form-input"
           required
         />
-        <button type="submit" className="login-btn" disabled={loginLoading}>
+        <Button type="submit" size="lg" className="w-full" disabled={loginLoading}>
           {loginLoading ? 'Logging in...' : 'Login'}
-        </button>
+        </Button>
       </form>
     </div>
   );

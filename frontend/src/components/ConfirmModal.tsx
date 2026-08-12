@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import { X } from "lucide-react";
 import clsx from "clsx";
+import { Button } from "./ui/button";
 
 
 interface ConfirmModalProps {
@@ -78,22 +79,28 @@ export default function ConfirmModal({
           {title && <h2 className={clsx(titleClassName)}>{title}</h2>}
           <div className={clsx(messageClassName)}>{message}</div>
           <div className={clsx(actionsClassName)}>
-            <button
-              type="button"
-              className={clsx("btn-outline", cancelButtonClassName)}
+            <Button
+              variant="secondary"
+              className={clsx(cancelButtonClassName)}
               onClick={handleClose}
               disabled={isLoading}
             >
               {cancelLabel}
-            </button>
-            <button
-              type="button"
-              className={clsx(confirmVariant === "success" ? "btn-success" : "btn-primary", confirmButtonClassName)}
+            </Button>
+            <Button
+              variant={
+                confirmVariant === "success"
+                  ? "success"
+                  : confirmVariant === "destructive"
+                    ? "destructive"
+                    : "primary"
+              }
+              className={clsx(confirmButtonClassName)}
               onClick={onConfirm}
               disabled={isLoading}
             >
               {confirmLabel}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

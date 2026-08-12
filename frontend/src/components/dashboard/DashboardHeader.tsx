@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ChevronDown, Loader2, Moon, UserCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface DashboardHeaderProps {
   selectedYear: number;
@@ -47,9 +48,10 @@ export default function DashboardHeader({
           <div className="flex items-center gap-4">
             {/* Year Selector */}
             <div className="relative">
-              <button
-                type="button"
-                className="flex cursor-pointer items-center gap-3 rounded-lg border border-app-border bg-app-card py-1.5 pl-3 pr-2 text-sm font-medium text-app-text-primary transition focus:outline-none focus:ring-2 focus:ring-app-primary focus:ring-offset-2 focus:ring-offset-app-bg"
+              <Button
+                variant="secondary"
+                size="sm"
+                className="gap-3 pl-3 pr-2 font-medium"
                 onClick={onToggleYearMenu}
                 aria-haspopup="listbox"
                 aria-expanded={isYearMenuOpen}
@@ -61,25 +63,25 @@ export default function DashboardHeader({
                     isYearMenuOpen ? "rotate-180" : ""
                   }`}
                 />
-              </button>
+              </Button>
 
               {isYearMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={onToggleYearMenu} />
                   <div className="absolute right-0 top-full z-50 mt-2 w-24 overflow-hidden rounded-lg border border-app-border bg-app-card py-1 text-sm shadow-xl">
                     {availableYears.map((year) => (
-                      <button
+                      <Button
                         key={year}
-                        type="button"
+                        variant="ghost"
                         role="option"
                         aria-selected={year === selectedYear}
-                        className={`block w-full px-4 py-2 text-left transition hover:bg-white/[0.06] ${
+                        className={`h-auto w-full justify-start rounded-none px-4 py-2 font-normal ${
                           year === selectedYear ? "text-white" : "text-app-text-secondary"
                         }`}
                         onClick={() => onSelectYear(year)}
                       >
                         {year}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </>
@@ -87,19 +89,21 @@ export default function DashboardHeader({
             </div>
 
             {/* Theme Toggle */}
-            <button
-              type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-app-border text-app-text-secondary transition-colors hover:bg-app-card hover:text-app-text-primary"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full border border-app-border text-app-text-secondary hover:bg-app-card hover:text-app-text-primary"
               title="Theme"
               aria-label="Theme"
             >
               <Moon size={15} />
-            </button>
+            </Button>
 
             {/* User Profile / Logout */}
-            <button
-              type="button"
-              className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-app-border bg-gray-600 text-app-text-primary transition hover:bg-gray-500"
+            <Button
+              variant="secondary"
+              size="icon"
+              className="overflow-hidden rounded-full bg-gray-600 text-app-text-primary hover:bg-gray-500"
               onClick={onLogout}
               disabled={isLoggingOut}
               title={isLoggingOut ? "Logging out..." : "Logout"}
@@ -110,7 +114,7 @@ export default function DashboardHeader({
               ) : (
                 <UserCircle size={16} />
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

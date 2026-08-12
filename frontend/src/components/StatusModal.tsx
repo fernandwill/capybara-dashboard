@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import { Button } from "./ui/button";
 
 
 type StatusVariant = "success" | "error";
@@ -11,7 +12,6 @@ const variantConfig: Record<StatusVariant, {
   iconWrapper: string;
   title: string;
   message: string;
-  button: string;
   icon: ReactNode;
 }> = {
   success: {
@@ -20,7 +20,6 @@ const variantConfig: Record<StatusVariant, {
     iconWrapper: "success-icon",
     title: "success-title",
     message: "success-message",
-    button: "success-btn",
     icon: (
       <svg
         width="48"
@@ -43,7 +42,6 @@ const variantConfig: Record<StatusVariant, {
     iconWrapper: "error-icon",
     title: "error-title",
     message: "error-message",
-    button: "error-btn",
     icon: (
       <svg
         width="48"
@@ -82,7 +80,7 @@ export default function StatusModal({
 }: StatusModalProps) {
   if (!isOpen) return null;
 
-  const { container, content, iconWrapper, title: titleClass, message: messageClass, button, icon } =
+  const { container, content, iconWrapper, title: titleClass, message: messageClass, icon } =
     variantConfig[variant];
 
   return (
@@ -92,12 +90,9 @@ export default function StatusModal({
           <div className={iconWrapper}>{icon}</div>
           <h2 className={titleClass}>{title}</h2>
           <p className={messageClass}>{message}</p>
-          <button
-            className={button}
-            onClick={onClose}
-          >
+          <Button variant="primary" onClick={onClose}>
             {buttonLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

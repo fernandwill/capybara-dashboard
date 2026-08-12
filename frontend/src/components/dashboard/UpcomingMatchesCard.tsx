@@ -1,4 +1,5 @@
 import { CalendarDays, Check, Clock, Clock3, Hash, MoreVertical, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Match } from "@/types/types";
 import { formatShortDate } from "@/utils/formatters";
 
@@ -28,13 +29,9 @@ export default function UpcomingMatchesCard({
           <CalendarDays size={18} className="text-app-text-muted" />
           Upcoming Matches
         </h2>
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-lg bg-app-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-app-primary-hover"
-          onClick={onNewMatch}
-        >
+        <Button variant="primary" onClick={onNewMatch}>
           + New Match
-        </button>
+        </Button>
       </div>
 
       {isLoading ? (
@@ -57,13 +54,9 @@ export default function UpcomingMatchesCard({
             <br />
             Schedule your next match when you&apos;re ready.
           </p>
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-lg bg-app-primary px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-app-primary-hover"
-            onClick={onNewMatch}
-          >
+          <Button variant="primary" size="lg" onClick={onNewMatch}>
             + Schedule a match
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="divide-y divide-app-border/50">
@@ -109,14 +102,15 @@ export default function UpcomingMatchesCard({
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  className="justify-self-end text-app-text-muted transition hover:text-white sm:justify-self-auto"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="justify-self-end text-app-text-muted hover:text-white sm:justify-self-auto"
                   onClick={(event) => onOpenMenu(event, match)}
                   aria-label={`Actions for ${match.title}`}
                 >
                   <MoreVertical size={16} />
-                </button>
+                </Button>
               </div>
             );
           })}

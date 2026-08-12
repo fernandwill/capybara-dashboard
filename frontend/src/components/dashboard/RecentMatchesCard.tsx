@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Clock, History, MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Match } from "@/types/types";
 import { formatDurationHours, formatShortDate } from "@/utils/formatters";
 
@@ -79,14 +80,15 @@ export default function RecentMatchesCard({
                     <span className="rounded-full border border-app-success/20 bg-app-success-bg px-3 py-1 text-xs font-medium text-app-success-text">
                       Completed
                     </span>
-                    <button
-                      type="button"
-                      className="flex h-8 w-8 items-center justify-center rounded-md text-app-text-muted transition-colors hover:bg-gray-700 hover:text-white"
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-app-text-muted hover:bg-gray-700 hover:text-white"
                       onClick={(event) => onOpenMenu(event, match)}
                       aria-label={`Actions for ${match.title}`}
                     >
                       <MoreVertical size={15} />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

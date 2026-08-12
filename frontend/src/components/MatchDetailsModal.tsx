@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2, X, FileText, Plus } from "lucide-react";
+import { Button } from "./ui/button";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
 import { authFetch } from "@/lib/authFetch";
@@ -502,14 +503,14 @@ export default function MatchDetailsModal({
   const renderCourtSlot = (slotPlayer: PlayerInMatch | null) => {
     if (!slotPlayer) {
       return (
-        <button
-          type="button"
-          className="court-slot court-slot-empty"
+        <Button
+          variant="ghost"
+          className="court-slot court-slot-empty h-auto w-full"
           onClick={() => setShowAddPlayer(true)}
         >
           <Plus size={16} />
           Add Player
-        </button>
+        </Button>
       );
     }
 
@@ -520,15 +521,16 @@ export default function MatchDetailsModal({
           <span className="court-slot-count">{slotPlayer.playCount}x</span>
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon"
           className="remove-player-btn"
           onClick={() => handleRemovePlayer(slotPlayer.id)}
           title="Remove player"
           aria-label={`Remove ${slotPlayer.name} from this match`}
         >
           <X size={16} />
-        </button>
+        </Button>
       </div>
     );
   };
@@ -580,19 +582,19 @@ export default function MatchDetailsModal({
               <div className="players-header">
                 <h3>Players ({players.length})</h3>
                 <div className="flex gap-2">
-                  <button
-                    type="button"
-                    className="export-pdf-btn btn-outline"
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => exportPlayerList(match, players)}
                     title="Export Players to PDF"
                   >
                     <FileText size={18} />
                     Export Players
-                  </button>
-                  <button type="button" className="btn-primary" onClick={() => setShowAddPlayer((value) => !value)}>
+                  </Button>
+                  <Button variant="primary" size="sm" onClick={() => setShowAddPlayer((value) => !value)}>
                     <span className="text-lg font-bold leading-none">+</span>
                     Add Player
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -664,14 +666,14 @@ export default function MatchDetailsModal({
                         onChange={(event) => setNewPlayerName(event.target.value)}
                         className="form-input"
                       />
-                      <button
-                        type="button"
-                        className="btn-success"
+                      <Button
+                        variant="success"
+                        size="sm"
                         onClick={handleCreateAndAddPlayer}
                         disabled={!newPlayerName.trim()}
                       >
                         Create and Add Player
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -690,31 +692,32 @@ export default function MatchDetailsModal({
                       <div key={player.id} className="player-card">
                         <div className="player-header">
                           <h4 className="player-name">{player.name}</h4>
-                          <button
-                            type="button"
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="remove-player-btn"
                             onClick={() => handleRemovePlayer(player.id)}
                             title="Remove player"
                             aria-label={`Remove ${player.name} from this match`}
                           >
                             <X />
-                          </button>
+                          </Button>
                         </div>
                         <div className="player-status-controls">
-                          <button
-                            type="button"
+                          <Button
+                            variant="secondary"
                             className={`payment-btn ${player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"}`}
                             onClick={() => handleSetPaymentStatus(player.id, "BELUM_SETOR")}
                           >
                             BELUM SETOR
-                          </button>
-                          <button
-                            type="button"
+                          </Button>
+                          <Button
+                            variant="secondary"
                             className={`payment-btn ${player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"}`}
                             onClick={() => handleSetPaymentStatus(player.id, "SUDAH_SETOR")}
                           >
                             SUDAH SETOR
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ))
@@ -761,15 +764,16 @@ export default function MatchDetailsModal({
                             <span className="court-slot-name">{player.name}</span>
                             <span className="court-slot-count">{player.playCount}x</span>
                           </div>
-                          <button
-                            type="button"
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="remove-player-btn"
                             onClick={() => handleRemovePlayer(player.id)}
                             title="Remove player"
                             aria-label={`Remove ${player.name} from this match`}
                           >
                             <X size={16} />
-                          </button>
+                          </Button>
                         </div>
                       ))}
                     </div>

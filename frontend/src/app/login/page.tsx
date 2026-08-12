@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { signInWithEmail } from '@/lib/authService';
 
 import './login.css';
@@ -66,9 +67,9 @@ export default function LoginPage() {
           className="form-input"
           required
         />
-        <button type="submit" className="login-btn" disabled={loading}>
+        <Button type="submit" size="lg" className="w-full" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Button } from "./ui/button";
 import { Match } from "@/types/types";
 import { X } from "lucide-react";
 
@@ -337,12 +338,12 @@ export default function NewMatchModal({
           )}
 
           <div className="modal-actions">
-            <button type="button" className="btn-outline" onClick={onClose}>
+            <Button variant="secondary" onClick={onClose}>
               Cancel
-            </button>
-            <button type="submit" className="btn-primary">
+            </Button>
+            <Button type="submit" variant="primary">
               {editingMatch ? "Update" : "Create"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

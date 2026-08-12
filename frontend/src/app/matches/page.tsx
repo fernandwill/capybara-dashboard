@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMatches } from "@/hooks/useMatches";
 import { Match, ModalState, SortOption } from "@/types/types";
@@ -292,14 +293,10 @@ export default function AllMatchesHistoryPage() {
             </div>
 
             {/* Quick Action */}
-            <button
-              type="button"
-              onClick={handleNewMatch}
-              className="flex items-center gap-1.5 rounded-lg bg-app-primary px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-app-primary-hover shadow-sm"
-            >
+            <Button variant="primary" onClick={handleNewMatch}>
               <Plus size={16} />
               <span>New Match</span>
-            </button>
+            </Button>
           </div>
         </div>
       </nav>
@@ -324,39 +321,34 @@ export default function AllMatchesHistoryPage() {
 
             {/* Filter Pills */}
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
+              <Button
+                variant={statusFilter === "ALL" ? "primary" : "secondary"}
+                size="xs"
+                className="font-semibold"
                 onClick={() => handleFilterChange("ALL")}
-                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition ${
-                  statusFilter === "ALL"
-                    ? "bg-app-primary text-white"
-                    : "border border-app-border bg-app-card text-app-text-secondary hover:text-white"
-                }`}
               >
                 All ({matches.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFilterChange("COMPLETED")}
-                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition ${
-                  statusFilter === "COMPLETED"
-                    ? "bg-app-success text-white"
-                    : "border border-app-border bg-app-card text-app-text-secondary hover:text-white"
+              </Button>
+              <Button
+                variant={statusFilter === "COMPLETED" ? "success" : "secondary"}
+                size="xs"
+                className={`font-semibold ${
+                  statusFilter === "COMPLETED" ? "" : "text-app-text-secondary hover:text-white"
                 }`}
+                onClick={() => handleFilterChange("COMPLETED")}
               >
                 Completed ({completedCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFilterChange("UPCOMING")}
-                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition ${
-                  statusFilter === "UPCOMING"
-                    ? "bg-blue-500 text-white"
-                    : "border border-app-border bg-app-card text-app-text-secondary hover:text-white"
+              </Button>
+              <Button
+                variant={statusFilter === "UPCOMING" ? "primary" : "secondary"}
+                size="xs"
+                className={`font-semibold ${
+                  statusFilter === "UPCOMING" ? "bg-blue-500 hover:bg-blue-600" : "text-app-text-secondary hover:text-white"
                 }`}
+                onClick={() => handleFilterChange("UPCOMING")}
               >
                 Upcoming ({upcomingCount})
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -413,24 +405,26 @@ export default function AllMatchesHistoryPage() {
                   : "No matches recorded yet. Create your first match to get started."}
               </p>
               {searchQuery || statusFilter !== "ALL" ? (
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="mt-4"
                   onClick={() => {
                     setSearchQuery("");
                     setStatusFilter("ALL");
                   }}
-                  className="mt-4 rounded-lg border border-app-border bg-app-bg px-4 py-2 text-xs font-medium text-app-text-primary hover:bg-gray-700"
                 >
                   Clear Filters
-                </button>
+                </Button>
               ) : (
-                <button
-                  type="button"
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="mt-4"
                   onClick={handleNewMatch}
-                  className="mt-4 rounded-lg bg-app-primary px-4 py-2 text-xs font-medium text-white hover:bg-app-primary-hover"
                 >
                   + Create Match
-                </button>
+                </Button>
               )}
             </div>
           ) : (
@@ -472,14 +466,15 @@ export default function AllMatchesHistoryPage() {
                         </div>
 
                         {/* Action Menu */}
-                        <button
-                          type="button"
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-app-text-muted hover:bg-gray-700 hover:text-white"
                           onClick={(e) => openRowMenu(e, match)}
-                          className="rounded-md p-1 text-app-text-muted transition hover:bg-gray-700 hover:text-white"
                           aria-label={`Actions for ${match.title}`}
                         >
                           <MoreVertical size={16} />
-                        </button>
+                        </Button>
                       </div>
 
                       {/* Title & Location */}
@@ -545,45 +540,44 @@ export default function AllMatchesHistoryPage() {
               </p>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="flex items-center gap-1 rounded-lg border border-app-border bg-app-card px-3 py-1.5 text-xs font-medium text-app-text-primary transition disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-700 hover:text-white"
                 >
                   <ChevronLeft size={14} />
                   <span>Previous</span>
-                </button>
+                </Button>
 
                 <div className="flex items-center gap-1">
                   {Array.from({ length: totalPages }).map((_, i) => {
                     const pageNum = i + 1;
                     return (
-                      <button
+                      <Button
                         key={pageNum}
-                        type="button"
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={`h-8 w-8 rounded-lg text-xs font-semibold transition ${
-                          currentPage === pageNum
-                            ? "bg-app-primary text-white"
-                            : "border border-app-border bg-app-card text-app-text-secondary hover:text-white hover:bg-gray-700"
+                        variant={currentPage === pageNum ? "primary" : "secondary"}
+                        size="icon"
+                        className={`text-xs font-semibold ${
+                          currentPage === pageNum ? "" : "text-app-text-secondary hover:text-white"
                         }`}
+                        onClick={() => setCurrentPage(pageNum)}
                       >
                         {pageNum}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
 
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="flex items-center gap-1 rounded-lg border border-app-border bg-app-card px-3 py-1.5 text-xs font-medium text-app-text-primary transition disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-700 hover:text-white"
                 >
                   <span>Next</span>
                   <ChevronRight size={14} />
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -604,8 +598,6 @@ export default function AllMatchesHistoryPage() {
         isOpen={isDetailsModalOpen}
         onClose={handleCloseDetailsModal}
         match={selectedMatch}
-        onEdit={handleEditMatch}
-        onDelete={handleRequestDeleteMatch}
       />
 
       <NewMatchModal

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import ActivityChart from "./ActivityChart";
 import { MonthlyPoint } from "@/hooks/useMonthlyStats";
 
@@ -23,18 +24,19 @@ export default function MonthlyActivityCard({
         <h2 className="text-lg font-semibold text-app-text-primary">Monthly Activity</h2>
         <div className="flex rounded-lg border border-app-border bg-[#1E232B] p-1">
           {(["hours", "matches"] as const).map((mode) => (
-            <button
+            <Button
               key={mode}
-              type="button"
-              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+              variant="ghost"
+              size="sm"
+              className={`rounded-md px-4 py-1.5 font-medium ${
                 chartMode === mode
-                  ? "bg-[#282C35] text-white shadow-sm"
+                  ? "bg-[#282C35] text-white shadow-sm hover:bg-[#282C35]"
                   : "text-app-text-secondary hover:text-white"
               }`}
               onClick={() => setChartMode(mode)}
             >
               {mode === "hours" ? "Hours" : "Matches"}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
