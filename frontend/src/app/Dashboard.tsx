@@ -393,8 +393,7 @@ export function Dashboard() {
 
           {/* Footer */}
           <footer className="flex flex-col items-center gap-1 pb-2 text-center text-sm text-app-text-muted">
-            <p>© {new Date().getFullYear()} Capybara</p>
-            <p>Badminton Management Dashboard</p>
+            <p>Capy Club Badmin</p>
           </footer>
         </div>
 

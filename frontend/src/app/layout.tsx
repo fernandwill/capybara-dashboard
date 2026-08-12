@@ -7,13 +7,13 @@ import { DataProvider } from "@/providers/DataProvider";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Capybara's Dashboard",
+  title: "CapyHub's Dashboard",
   description: "Badminton match tracker and management system",
-  applicationName: "Capybara",
+  applicationName: "CapyHub",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Capybara",
+    title: "CapyHub",
   },
   icons: {
     icon: "/icons/icon.jpg",

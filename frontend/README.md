@@ -1,4 +1,4 @@
-# Capybara Dashboard Frontend
+# CapyHub Dashboard Frontend
 
 <img width="1000" height="1000" alt="capybara-dashboard" src="https://github.com/user-attachments/assets/c5afadbd-b799-41c7-8461-1dc0a48322f6" />
 

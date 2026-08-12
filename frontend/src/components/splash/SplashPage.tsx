@@ -120,13 +120,13 @@ export default function SplashPage({ onDismiss }: SplashPageProps) {
       <div className="logo-container">
         <Image
           src="/icons/icon.jpg"
-          alt="Capybara Logo"
+          alt="CapyHub Logo"
           width={120}
           height={120}
           className="splash-logo"
         />
       </div>
-      <h1 className="app-title">Capybara&apos;s Dashboard</h1>
+      <h1 className="app-title">CapyHub&apos;s Dashboard</h1>
       <div className="swipe-instruction">
         <span>{isMobile ? "Swipe up to continue" : "Click to continue"}</span>
         {isMobile && (

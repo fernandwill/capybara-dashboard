@@ -1,4 +1,4 @@
-// Shared type definitions for the Capybara Dashboard
+// Shared type definitions for the CapyHub Dashboard
 
 export type SortOption = "date-earliest" | "date-latest" | "fee-low" | "fee-high";
 

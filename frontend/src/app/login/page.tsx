@@ -42,13 +42,13 @@ export default function LoginPage() {
       <div className="logo-container">
         <Image
           src="/icons/icon.jpg"
-          alt="Capybara Logo"
+          alt="CapyHub Logo"
           width={120}
           height={120}
           className="login-logo"
         />
       </div>
-      <h1 className="app-title">Capybara&apos;s Dashboard</h1>
+      <h1 className="app-title">CapyHub&apos;s Dashboard</h1>
       {error && <div className="error-message">{error}</div>}
       <form className="login-form" onSubmit={handleLogin}>
         <input

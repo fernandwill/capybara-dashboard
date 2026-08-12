@@ -30,14 +30,14 @@ export default function DashboardHeader({
             <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-gray-700">
               <Image
                 src="/icons/icon.jpg"
-                alt="Capybara"
+                alt="CapyHub"
                 width={32}
                 height={32}
                 className="h-full w-full object-cover"
               />
             </div>
             <span className="flex items-center gap-1 text-lg font-bold tracking-tight text-app-text-primary">
-              Capybara
+              CapyHub
               <span aria-label="Active" className="text-xs text-app-success">
                 ✦
               </span>

@@ -277,13 +277,13 @@ export default function AllMatchesHistoryPage() {
                   <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-gray-700">
                     <Image
                       src="/icons/icon.jpg"
-                      alt="Capybara"
+                      alt="CapyHub"
                       width={28}
                       height={28}
                       className="h-full w-full object-cover"
                     />
                   </div>
-                  <span className="hidden sm:inline font-bold tracking-tight text-white">Capybara</span>
+                  <span className="hidden sm:inline font-bold tracking-tight text-white">CapyHub</span>
                 </div>
             </div>
 

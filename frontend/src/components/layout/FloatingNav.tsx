@@ -153,14 +153,14 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
         <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-700 shadow-sm transition-transform duration-200 group-hover:scale-105">
           <Image
             src="/icons/icon.jpg"
-            alt="Capybara"
+            alt="CapyHub"
             width={32}
             height={32}
             className="h-full w-full object-cover"
           />
         </div>
         <span className="flex items-center gap-1.5 text-sm font-bold tracking-tight text-white">
-          Capybara
+          CapyHub
           <span className="text-xs text-emerald-400">✦</span>
         </span>
         <ChevronDown
@@ -252,7 +252,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-700">
                     <Image
                       src="/capybara-avatar.png"
-                      alt="Capybara"
+                      alt="CapyHub"
                       width={32}
                       height={32}
                       className="h-full w-full object-cover"
@@ -260,7 +260,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-xs font-semibold text-white leading-tight">
-                      Capybara
+                      CapyHub
                     </p>
                     <p className="truncate text-[10px] text-gray-400">
                       {user?.email || "capybara@gmail.com"}
