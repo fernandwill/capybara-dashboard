@@ -294,7 +294,7 @@ export default function AllMatchesHistoryPage() {
   return (
     <div className="min-h-screen bg-app-bg text-app-text-primary">
       {/* Navigation Top Bar */}
-      <nav className="sticky top-0 z-50 border-b border-app-border bg-app-bg/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-50 border-b border-app-border bg-app-bg/80 pt-[env(safe-area-inset-top)] backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Brand and Back Link */}
@@ -306,19 +306,18 @@ export default function AllMatchesHistoryPage() {
                 <ArrowLeft size={16} />
                 <span>Dashboard</span>
               </Link>
-              <div className="h-5 w-px bg-app-border" />
-              <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-gray-700">
-                  <Image
-                    src="/icons/icon.jpg"
-                    alt="Capybara"
-                    width={28}
-                    height={28}
-                    className="h-full w-full object-cover"
-                  />
+              <div className="h-5 w-px bg-app-border" />                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-gray-700">
+                    <Image
+                      src="/icons/icon.jpg"
+                      alt="Capybara"
+                      width={28}
+                      height={28}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <span className="hidden sm:inline font-bold tracking-tight text-white">Capybara</span>
                 </div>
-                <span className="font-bold tracking-tight text-white">Capybara</span>
-              </div>
             </div>
 
             {/* Quick Action */}

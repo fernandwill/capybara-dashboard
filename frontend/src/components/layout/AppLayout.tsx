@@ -23,7 +23,7 @@ export default function AppLayout({
   return (
     <div className="min-h-screen bg-[#07090c] text-white">
       {/* Top Header with Floating Left Menu */}
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[#1a1e26] bg-[#07090c]/85 px-4 backdrop-blur-md sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-[#1a1e26] bg-[#07090c]/85 px-4 pb-0 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:px-6 lg:px-8" style={{ height: "calc(4rem + env(safe-area-inset-top))" }}>
         {/* Left: Floating Navigation Menu */}
         <div className="flex items-center">
           <FloatingNav onLogout={onLogout} />

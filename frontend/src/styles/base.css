@@ -7,6 +7,17 @@
 @import "tw-animate-css";
 
 /* =============================================================================
+   MOBILE WEB-APP SAFE AREAS
+   Keep content clear of notches, status bars, and home-indicator gesture bars.
+   ============================================================================= */
+body {
+  /* viewport-fit=cover lets the app paint edge-to-edge; keep scrollable
+     content out of the bottom gesture-bar area on phones. Desktop is a
+     no-op (env() resolves to 0). Fixed overlays manage their own insets. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* =============================================================================
    APP DESIGN TOKENS
    Dark slate palette shared by all dashboard components (Tailwind v4 @theme)
    ============================================================================= */

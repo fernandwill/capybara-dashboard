@@ -764,7 +764,7 @@ export default function MatchDetailsPage() {
           </div>
 
           {/* Header Action Buttons */}
-          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
             {/* 3-dots Menu */}
             <div className="relative" ref={menuRef}>
               <button
@@ -831,9 +831,10 @@ export default function MatchDetailsPage() {
               type="button"
               onClick={() => setIsEditModalOpen(true)}
               className="flex items-center gap-1.5 rounded-xl border border-[#232730] bg-[#12151c] px-3.5 py-2 text-xs font-medium text-gray-200 transition hover:bg-[#1a1f29] hover:text-white"
+              aria-label="Edit Match"
             >
               <Pencil size={13} />
-              <span>Edit Match</span>
+              <span className="hidden sm:inline">Edit Match</span>
             </button>
 
             {/* Finish Match Button */}
@@ -841,7 +842,8 @@ export default function MatchDetailsPage() {
               type="button"
               disabled={isUpdatingStatus}
               onClick={handleToggleMatchStatus}
-              className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-medium text-white shadow-sm transition disabled:opacity-50 ${
+              aria-label={isMatchCompleted ? "Reopen Match" : "Finish Match"}
+              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium text-white shadow-sm transition disabled:opacity-50 ${
                 isMatchCompleted
                   ? "bg-gray-700 hover:bg-gray-600"
                   : "bg-blue-600 hover:bg-blue-500"
@@ -854,7 +856,7 @@ export default function MatchDetailsPage() {
               ) : (
                 <CheckCircle2 size={14} />
               )}
-              <span>{isMatchCompleted ? "Reopen Match" : "Finish Match"}</span>
+              <span className="hidden sm:inline">{isMatchCompleted ? "Reopen Match" : "Finish Match"}</span>
             </button>
           </div>
         </div>
@@ -937,7 +939,7 @@ export default function MatchDetailsPage() {
                   Assign players to courts. Players will be prioritized based on play count (lower is prioritized).
                 </p>
               </div>
-              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
                 <button
                   type="button"
                   onClick={handleAutoAssign}
@@ -978,10 +980,9 @@ export default function MatchDetailsPage() {
             {/* Courts Grid */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
               {courts.map((court, courtIdx) => {
-                const isMobileVisible =
-                  typeof window === "undefined" ||
-                  activeMobileCourtIndex === courtIdx ||
-                  (typeof window !== "undefined" && window.innerWidth >= 1280);
+                // Show only the active court below xl (mobile tabs drive it);
+                // CSS classes handle the breakpoint — no window reads in render.
+                const isActiveCourt = activeMobileCourtIndex === courtIdx;
 
                 const courtHasPlayers =
                   court.teamA.some((s) => s.playerId) || court.teamB.some((s) => s.playerId);
@@ -990,8 +991,8 @@ export default function MatchDetailsPage() {
                 return (
                   <div
                     key={court.id}
-                    className={`flex flex-col justify-between rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4 transition-all hover:border-[#28303f] ${
-                      !isMobileVisible ? "hidden xl:flex" : "flex"
+                    className={`flex-col justify-between rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4 transition-all hover:border-[#28303f] ${
+                      isActiveCourt ? "flex" : "hidden xl:flex"
                     }`}
                   >
                     {/* Court Title & Status */}
