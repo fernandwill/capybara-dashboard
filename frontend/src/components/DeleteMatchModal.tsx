@@ -20,11 +20,10 @@ export default function DeleteMatchModal({
 }: DeleteMatchModalProps) {
   const message = matchTitle ? (
     <p>
-      Delete {" "}
-      <strong>{matchTitle}</strong>?
+      Are you sure you want to delete <strong className="text-white">&ldquo;{matchTitle}&rdquo;</strong>? This action cannot be undone.
     </p>
   ) : (
-    <p>Delete this match?</p>
+    <p>Are you sure you want to delete this match? This action cannot be undone.</p>
   );
 
   return (
@@ -32,19 +31,13 @@ export default function DeleteMatchModal({
       isOpen={isOpen}
       onClose={onClose}
       onConfirm={onConfirm}
+      title="Delete Match"
       message={message}
-      icon={<Trash2 size={72} />}
+      icon={<Trash2 size={28} />}
       isLoading={isLoading}
-      confirmLabel={isLoading ? "Deleting..." : "Delete"}
+      confirmLabel={isLoading ? "Deleting..." : "Delete Match"}
       cancelLabel="Cancel"
-      containerClassName="delete-modal"
-      closeButtonClassName="delete-modal-close"
-      contentClassName="delete-modal-content"
-      iconWrapperClassName="delete-modal-icon"
-      messageClassName="delete-modal-message"
-      actionsClassName="delete-modal-actions"
-      cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
-      confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
+      confirmVariant="destructive"
     />
   );
 }

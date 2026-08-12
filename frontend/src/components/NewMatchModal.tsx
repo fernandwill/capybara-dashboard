@@ -1,10 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "./ui/button";
 import { Match } from "@/types/types";
-import { X } from "lucide-react";
-
+import Modal from "./ui/Modal";
+import SelectPlayersModal, {
+  PlayerOption,
+  getAvatarGradient,
+  getInitials,
+} from "./SelectPlayersModal";
+import {
+  Calendar,
+  Clock,
+  Minus,
+  Plus,
+  UserPlus,
+  X,
+} from "lucide-react";
 
 interface MatchData {
   title: string;
@@ -37,15 +48,13 @@ interface MatchFormState {
   playerIds: string[];
 }
 
-const COURT_OPTIONS = Array.from({ length: 99 }, (_, index) => String(index + 1));
-
 const INITIAL_FORM_STATE: MatchFormState = {
   title: "",
   location: "",
-  courtNumber: "",
+  courtNumber: "1",
   date: "",
-  startTime: "00:00",
-  endTime: "23:59",
+  startTime: "19:00",
+  endTime: "21:00",
   fee: "",
   description: "",
   playerIds: [],
@@ -55,8 +64,8 @@ const parseTimeRange = (timeRange: string) => {
   const [start, end] = timeRange.split("-").map((value) => value.trim());
 
   return {
-    startTime: start || "00:00",
-    endTime: end || "23:59",
+    startTime: start || "19:00",
+    endTime: end || "21:00",
   };
 };
 
@@ -67,8 +76,9 @@ export default function NewMatchModal({
   editingMatch,
 }: NewMatchModalProps) {
   const [formData, setFormData] = useState<MatchFormState>(INITIAL_FORM_STATE);
-  const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
+  const [availablePlayers, setAvailablePlayers] = useState<PlayerOption[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
+  const [isPlayerPickerOpen, setIsPlayerPickerOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -88,6 +98,8 @@ export default function NewMatchModal({
         }
       };
       fetchPlayers();
+    } else {
+      setIsPlayerPickerOpen(false);
     }
   }, [isOpen]);
 
@@ -101,7 +113,7 @@ export default function NewMatchModal({
       setFormData({
         title: editingMatch.title,
         location: editingMatch.location,
-        courtNumber: editingMatch.courtNumber,
+        courtNumber: editingMatch.courtNumber || "1",
         date: formattedDate,
         startTime,
         endTime,
@@ -114,16 +126,11 @@ export default function NewMatchModal({
     }
   }, [editingMatch]);
 
-  // Legacy court numbers that are not in the 1-99 range still need an option
-  const courtOptions = useMemo(() => {
-    if (
-      formData.courtNumber &&
-      !COURT_OPTIONS.includes(formData.courtNumber)
-    ) {
-      return [formData.courtNumber, ...COURT_OPTIONS];
-    }
-    return COURT_OPTIONS;
-  }, [formData.courtNumber]);
+  const selectedPlayersList = useMemo(() => {
+    return formData.playerIds
+      .map((id) => availablePlayers.find((p) => p.id === id))
+      .filter((p): p is PlayerOption => Boolean(p));
+  }, [formData.playerIds, availablePlayers]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -160,193 +167,348 @@ export default function NewMatchModal({
     }));
   };
 
-  const handlePlayerToggle = (playerId: string) => {
-    setFormData((prev) => {
-      const isSelected = prev.playerIds.includes(playerId);
-      return {
-        ...prev,
-        playerIds: isSelected
-          ? prev.playerIds.filter((id) => id !== playerId)
-          : [...prev.playerIds, playerId],
-      };
-    });
+  const handleRemovePlayerChip = (playerId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      playerIds: prev.playerIds.filter((id) => id !== playerId),
+    }));
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <div className="modal-header">
-          <h2>{editingMatch ? "Edit Match" : "Create New Match"}</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close match form">
-            <X />
-          </button>
-        </div>
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={editingMatch ? "Edit Match" : "Create New Match"}
+        subtitle="Schedule a match and track your game."
+        size="xl"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="new-match-form"
+              className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-500"
+            >
+              {editingMatch ? "Update Match" : "Create Match"}
+            </button>
+          </>
+        }
+      >
+        <form id="new-match-form" onSubmit={handleSubmit} className="space-y-4">
+          {/* Section: MATCH DETAILS */}
+          <div>
+            <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+              MATCH DETAILS
+            </h3>
 
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
-            <label htmlFor="title">Title</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              className="form-input"
-              placeholder="Match title..."
-              minLength={3}
-            />
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="location">Location</label>
+            {/* Title */}
+            <div className="mb-3">
+              <label htmlFor="title" className="mb-1.5 block text-xs font-medium text-gray-300">
+                Title
+              </label>
               <input
                 type="text"
-                id="location"
-                name="location"
-                value={formData.location}
+                id="title"
+                name="title"
+                value={formData.title}
                 onChange={handleChange}
                 required
-                className="form-input"
-                placeholder="Court location..."
+                placeholder="Match title..."
+                minLength={3}
+                className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="courtNumber">Court #</label>
-              <select
-                id="courtNumber"
-                name="courtNumber"
-                value={formData.courtNumber}
-                onChange={handleChange}
-                required
-                className="form-input"
-              >
-                <option value="" disabled>
-                  Select court...
-                </option>
-                {courtOptions.map((court) => (
-                  <option key={court} value={court}>
-                    Court {court}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="date">Date</label>
-              <input
-                type="date"
-                id="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="startTime">Start Time</label>
-              <input
-                type="time"
-                id="startTime"
-                name="startTime"
-                value={formData.startTime}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="endTime">End Time</label>
-              <input
-                type="time"
-                id="endTime"
-                name="endTime"
-                value={formData.endTime}
-                onChange={handleChange}
-                required
-                className="form-input"
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="fee">Court Fee(s)</label>
-              <input
-                type="number"
-                id="fee"
-                name="fee"
-                value={formData.fee}
-                onChange={handleChange}
-                required
-                className="form-input"
-                placeholder="Court fee..."
-                min="0"
-                step="1000"
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="form-textarea"
-              placeholder="Optional description..."
-              rows={3}
-            />
-          </div>
-
-          {editingMatch?.status?.toUpperCase() !== "COMPLETED" && (
-            <div className="form-group">
-              <label htmlFor="players-grid">Initial Players</label>
-              <div id="players-grid" className="players-selection-grid">
-                {isLoadingPlayers ? (
-                  <div className="loading-players">Loading players...</div>
-                ) : availablePlayers.length === 0 ? (
-                  <div className="no-players">No players found.</div>
-                ) : (
-                  [...availablePlayers]
-                    .sort((a, b) => (a.playCount ?? 0) - (b.playCount ?? 0))
-                    .map((player) => (
-                      <label key={player.id} className="player-checkbox-label">
-                        <input
-                          type="checkbox"
-                          checked={formData.playerIds.includes(player.id)}
-                          onChange={() => handlePlayerToggle(player.id)}
-                        />
-                        <span>{player.name}</span>
-                        <span className="player-play-count">
-                          {player.playCount ?? 0}x
-                        </span>
-                      </label>
-                    ))
-                )}
+            {/* Location & Court # */}
+            <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="location" className="mb-1.5 block text-xs font-medium text-gray-300">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  required
+                  placeholder="Court location..."
+                  className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label htmlFor="courtNumber" className="mb-1.5 block text-xs font-medium text-gray-300">
+                  Court #
+                </label>
+                <div className="flex items-center rounded-lg border border-[#232730] bg-[#0c0e12] transition-colors focus-within:border-blue-500">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = Number.parseInt(formData.courtNumber, 10) || 1;
+                      setFormData((prev) => ({
+                        ...prev,
+                        courtNumber: String(Math.max(1, current - 1)),
+                      }));
+                    }}
+                    className="px-3 py-2 text-gray-400 hover:text-white transition-colors"
+                    aria-label="Decrease court number"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <input
+                    type="number"
+                    id="courtNumber"
+                    name="courtNumber"
+                    min="1"
+                    value={formData.courtNumber}
+                    onChange={handleChange}
+                    placeholder="1"
+                    required
+                    className="w-full bg-transparent py-2 text-center text-sm text-white placeholder:text-gray-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = Number.parseInt(formData.courtNumber, 10) || 0;
+                      setFormData((prev) => ({
+                        ...prev,
+                        courtNumber: String(current + 1),
+                      }));
+                    }}
+                    className="px-3 py-2 text-gray-400 hover:text-white transition-colors"
+                    aria-label="Increase court number"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
               </div>
             </div>
-          )}
 
-          <div className="modal-actions">
-            <Button variant="secondary" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary">
-              {editingMatch ? "Update" : "Create"}
-            </Button>
+            {/* Date & Start Time */}
+            <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="date" className="mb-1.5 block text-xs font-medium text-gray-300">
+                  Date
+                </label>
+                <div className="relative">
+                  <Calendar
+                    size={15}
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] py-2 pl-9 pr-3.5 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="startTime" className="mb-1.5 block text-xs font-medium text-gray-300">
+                  Start Time
+                </label>
+                <div className="relative">
+                  <Clock
+                    size={15}
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="time"
+                    id="startTime"
+                    name="startTime"
+                    value={formData.startTime}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] py-2 pl-9 pr-3.5 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* End Time & Court Fee (Rp) */}
+            <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label htmlFor="endTime" className="mb-1.5 block text-xs font-medium text-gray-300">
+                  End Time
+                </label>
+                <div className="relative">
+                  <Clock
+                    size={15}
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="time"
+                    id="endTime"
+                    name="endTime"
+                    value={formData.endTime}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] py-2 pl-9 pr-3.5 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="fee" className="mb-1.5 block text-xs font-medium text-gray-300">
+                  Court Fee (Rp)
+                </label>
+                <input
+                  type="number"
+                  id="fee"
+                  name="fee"
+                  value={formData.fee}
+                  onChange={handleChange}
+                  required
+                  placeholder="50,000"
+                  min="0"
+                  step="1000"
+                  className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Description (optional) */}
+            <div className="mb-3">
+              <label htmlFor="description" className="mb-1.5 block text-xs font-medium text-gray-300">
+                Description (optional)
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={3}
+                placeholder="Add any notes about this match..."
+                className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors resize-none"
+              />
+            </div>
           </div>
+
+          {/* Section: PLAYERS */}
+          {editingMatch?.status?.toUpperCase() !== "COMPLETED" && (
+            <div>
+              {formData.playerIds.length === 0 ? (
+                /* State 1: Clean empty state with Add Players CTA */
+                <div>
+                  <div className="mb-2">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                      PLAYERS
+                    </h3>
+                    <p className="text-xs text-gray-400">
+                      Add players to this match.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#232730] bg-[#0c0e12]/60 p-6 text-center">
+                    <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+                      <UserPlus size={20} />
+                    </div>
+                    <p className="text-sm font-semibold text-white">
+                      No players added yet
+                    </p>
+                    <p className="mt-0.5 text-xs text-gray-400">
+                      Add players to get started.
+                    </p>
+                    <button
+                      type="button"
+                      disabled={isLoadingPlayers}
+                      onClick={() => setIsPlayerPickerOpen(true)}
+                      className="mt-3.5 flex items-center gap-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-400 transition hover:border-blue-500/50 hover:bg-blue-500/20 disabled:opacity-50"
+                    >
+                      <Plus size={14} />
+                      <span>Add Players</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* State 2: Selected players chips with quick removal and Add More */
+                <div>
+                  <div className="mb-2.5 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                        PLAYERS
+                      </h3>
+                      <p className="text-xs font-semibold text-emerald-400">
+                        {formData.playerIds.length} player
+                        {formData.playerIds.length === 1 ? "" : "s"} added
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Chips Grid */}
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {selectedPlayersList.map((player) => (
+                      <div
+                        key={player.id}
+                        className="flex items-center justify-between rounded-xl border border-[#232730] bg-[#0c0e12] px-3 py-2"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div
+                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white shadow-sm ${getAvatarGradient(player.name)}`}
+                          >
+                            {getInitials(player.name)}
+                          </div>
+                          <span className="truncate text-xs font-semibold text-white">
+                            {player.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {typeof player.playCount === "number" && (
+                            <span className="rounded-full border border-[#232730] bg-[#181d26] px-2 py-0.5 text-[10px] font-medium text-gray-400">
+                              {player.playCount}x
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePlayerChip(player.id)}
+                            className="rounded p-1 text-gray-400 transition hover:bg-gray-800 hover:text-white"
+                            aria-label={`Remove ${player.name}`}
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add More Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsPlayerPickerOpen(true)}
+                    className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/5 py-2 text-xs font-semibold text-blue-400 transition hover:border-blue-500/50 hover:bg-blue-500/15"
+                  >
+                    <Plus size={14} />
+                    <span>+ Add More Players</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </form>
-      </div>
-    </div>
+      </Modal>
+
+      {/* State 3: Player Picker Modal with Search, Tabs, Favorites, and New Player creation */}
+      <SelectPlayersModal
+        isOpen={isPlayerPickerOpen}
+        onClose={() => setIsPlayerPickerOpen(false)}
+        selectedPlayerIds={formData.playerIds}
+        onSave={(newSelectedIds) => {
+          setFormData((prev) => ({ ...prev, playerIds: newSelectedIds }));
+        }}
+        availablePlayers={availablePlayers}
+        onPlayerCreated={(newPlayer) => {
+          setAvailablePlayers((prev) => [...prev, newPlayer]);
+        }}
+      />
+    </>
   );
 }

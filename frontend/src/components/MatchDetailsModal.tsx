@@ -1,10 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, X, FileText, Plus } from "lucide-react";
-import { Button } from "./ui/button";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Calendar,
+  CheckCircle2,
+  Clock,
+  LayoutGrid,
+  Loader2,
+  MoreVertical,
+  Plus,
+  Trash2,
+  Upload,
+  Wallet,
+} from "lucide-react";
+import Modal from "./ui/Modal";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
+import SelectPlayersModal, {
+  PlayerOption,
+  getAvatarGradient,
+  getInitials,
+} from "./SelectPlayersModal";
 import { authFetch } from "@/lib/authFetch";
 import { Match, Player, PaymentStatus } from "@/types/types";
 import { exportPlayerList } from "@/utils/playerExport";
@@ -22,7 +38,7 @@ const IDR_FORMATTER = new Intl.NumberFormat("id-ID", {
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+  const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
   const day = date.getDate();
   const month = date.toLocaleDateString("en-US", { month: "long" });
   const year = date.getFullYear();
@@ -64,42 +80,11 @@ const formatTimeWithDuration = (timeString: string) => {
     const durationHours = durationMillis / (1000 * 60 * 60);
     const roundedDuration = Math.round(durationHours * 10) / 10;
 
-    return `${startTime}-${endTime} (${roundedDuration} hrs)`;
+    return `${startTime} – ${endTime} (${roundedDuration} hrs)`;
   } catch (error) {
     console.error("Error formatting time with duration:", error);
     return timeString;
   }
-};
-
-const deduplicatePlayers = <T extends Player>(playersList: T[]): T[] => {
-  const seenIds = new Set<string>();
-  const seenNames = new Set<string>();
-  const deduplicatedPlayers: T[] = [];
-
-  for (const player of playersList) {
-    const trimmedName = player.name.trim();
-    const normalizedName = trimmedName.toLowerCase();
-
-    if (seenIds.has(player.id) || seenNames.has(normalizedName)) continue;
-
-    seenIds.add(player.id);
-    seenNames.add(normalizedName);
-    deduplicatedPlayers.push({ ...player, name: trimmedName });
-  }
-
-  return deduplicatedPlayers;
-};
-
-const sortPlayersByPaymentStatus = (players: PlayerInMatch[]) => {
-  return [...players].sort((a, b) => {
-    if (a.paymentStatus === "SUDAH_SETOR" && b.paymentStatus === "BELUM_SETOR") return -1;
-    if (a.paymentStatus === "BELUM_SETOR" && b.paymentStatus === "SUDAH_SETOR") return 1;
-    return 0;
-  });
-};
-
-const sortPlayersByPlayCount = (players: PlayerInMatch[]) => {
-  return [...players].sort((a, b) => a.playCount - b.playCount);
 };
 
 interface MatchDetailsModalProps {
@@ -107,6 +92,7 @@ interface MatchDetailsModalProps {
   onClose: () => void;
   match: Match | null;
   onMatchUpdate?: () => void;
+  onEdit?: (match: Match) => void;
 }
 
 export default function MatchDetailsModal({
@@ -114,23 +100,20 @@ export default function MatchDetailsModal({
   onClose,
   match,
   onMatchUpdate,
+  onEdit,
 }: MatchDetailsModalProps) {
   const [players, setPlayers] = useState<PlayerInMatch[]>([]);
-  const [pastPlayers, setPastPlayers] = useState<Player[]>([]);
+  const [allAvailablePlayers, setAllAvailablePlayers] = useState<PlayerOption[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
-  const [isLoadingPastPlayers, setIsLoadingPastPlayers] = useState(false);
-  const [showAddPlayer, setShowAddPlayer] = useState(false);
-  const [newPlayerName, setNewPlayerName] = useState("");
+  const [isSelectPlayersModalOpen, setIsSelectPlayersModalOpen] = useState(false);
   const [playerToRemove, setPlayerToRemove] = useState<{ id: string; name: string } | null>(null);
-  const [existingPlayerSearch, setExistingPlayerSearch] = useState("");
   const [isRemovingPlayer, setIsRemovingPlayer] = useState(false);
+  const [playerMenuOpen, setPlayerMenuOpen] = useState<string | null>(null);
   const [errorModal, setErrorModal] = useState({
     isOpen: false,
     title: "",
     message: "",
   });
-  const [isMarkAllPaidConfirmOpen, setIsMarkAllPaidConfirmOpen] = useState(false);
-  const [isMarkingAllPaid, setIsMarkingAllPaid] = useState(false);
 
   const matchId = match?.id;
   const isCompleted = match?.status?.toUpperCase() === "COMPLETED";
@@ -166,108 +149,66 @@ export default function MatchDetailsModal({
     }
   }, [matchId]);
 
-  const fetchPastPlayers = useCallback(async () => {
-    if (!matchId) return;
-
-    setIsLoadingPastPlayers(true);
-    setPastPlayers([]);
+  const fetchAllPlayers = useCallback(async () => {
     try {
-      const response = await authFetch(`/api/matches/${matchId}/players/past`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch players.");
+      const response = await authFetch("/api/players?latest=true");
+      if (response.ok) {
+        const data = await response.json();
+        setAllAvailablePlayers(data);
       }
-
-      const data = (await response.json()) as Player[];
-      setPastPlayers(deduplicatePlayers(data));
     } catch (error) {
-      console.error("Error fetching players:", error);
-      setPastPlayers([]);
-    } finally {
-      setIsLoadingPastPlayers(false);
+      console.error("Error fetching all players:", error);
     }
-  }, [matchId]);
-
-  useEffect(() => {
-    if (isOpen) {
-      const scrollY = window.scrollY;
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = "100%";
-
-      return () => {
-        const storedScrollY = document.body.style.top;
-        document.body.style.overflow = "";
-        document.body.style.position = "";
-        document.body.style.top = "";
-        document.body.style.width = "";
-        if (storedScrollY) {
-          window.scrollTo(0, Number.parseInt(storedScrollY, 10) * -1);
-        }
-      };
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-    };
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => {
     if (isOpen && matchId) {
       fetchCurrentPlayers();
-      fetchPastPlayers();
+      fetchAllPlayers();
     } else if (!isOpen) {
       setPlayers([]);
-      setPastPlayers([]);
-      setShowAddPlayer(false);
-      setNewPlayerName("");
       setPlayerToRemove(null);
       setIsRemovingPlayer(false);
-      setExistingPlayerSearch("");
+      setIsSelectPlayersModalOpen(false);
+      setPlayerMenuOpen(null);
     }
-  }, [isOpen, matchId, fetchCurrentPlayers, fetchPastPlayers]);
+  }, [isOpen, matchId, fetchCurrentPlayers, fetchAllPlayers]);
 
-  useEffect(() => {
-    if (!showAddPlayer) {
-      setExistingPlayerSearch("");
-    }
-  }, [showAddPlayer]);
-
-  const handleAddPlayer = async (playerId: string) => {
+  const handleSaveSelectedPlayers = async (newSelectedIds: string[]) => {
     if (!matchId) return;
 
+    const currentIds = players.map((p) => p.id);
+    const toAdd = newSelectedIds.filter((id) => !currentIds.includes(id));
+    const toRemove = currentIds.filter((id) => !newSelectedIds.includes(id));
+
     try {
-      const resetResponse = await authFetch(`/api/players/${playerId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "ACTIVE" }),
-      });
-
-      if (!resetResponse.ok) {
-        console.error("Failed to reset player status.");
+      // Add newly selected players
+      for (const playerId of toAdd) {
+        await authFetch(`/api/matches/${matchId}/players`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ playerId }),
+        });
       }
 
-      const response = await authFetch(`/api/matches/${matchId}/players`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ playerId }),
-      });
-
-      if (response.ok) {
-        await fetchCurrentPlayers();
-        await fetchPastPlayers();
-        onMatchUpdate?.();
-        setExistingPlayerSearch("");
+      // Remove deselected players
+      for (const playerId of toRemove) {
+        await authFetch(`/api/matches/${matchId}/players/${playerId}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
       }
-    } catch (error) {
-      console.error("Error adding player:", error);
+
+      await fetchCurrentPlayers();
+      await fetchAllPlayers();
+      onMatchUpdate?.();
+    } catch (err) {
+      console.error("Error updating match players:", err);
+      setErrorModal({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to update match players.",
+      });
     }
   };
 
@@ -296,66 +237,39 @@ export default function MatchDetailsModal({
 
       if (response.ok) {
         await fetchCurrentPlayers();
-        await fetchPastPlayers();
+        await fetchAllPlayers();
         onMatchUpdate?.();
         setPlayerToRemove(null);
       } else {
         console.error("Failed to remove player from match.");
-        window.alert("Failed to remove player. Please try again.");
+        setErrorModal({
+          isOpen: true,
+          title: "Error",
+          message: "Failed to remove player. Please try again.",
+        });
       }
     } catch (error) {
       console.error("Error removing player:", error);
-      window.alert("An unexpected error occurred while removing the player.");
-    } finally {
-      setIsRemovingPlayer(false);
-    }
-  };
-
-  const handleCreateAndAddPlayer = async () => {
-    if (!newPlayerName.trim() || !matchId) return;
-
-    try {
-      const createResponse = await authFetch("/api/players", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: newPlayerName.trim(),
-          status: "ACTIVE",
-        }),
-      });
-
-      if (createResponse.status === 409) {
-        setErrorModal({
-          isOpen: true,
-          title: "Oops!",
-          message: "Player with this name already exists.",
-        });
-        return;
-      }
-
-      if (!createResponse.ok) {
-        throw new Error(`Failed to create player. Status : ${createResponse.status}`);
-      }
-
-      const newPlayer = await createResponse.json();
-      await handleAddPlayer(newPlayer.id);
-      setNewPlayerName("");
-      setShowAddPlayer(false);
-    } catch (error) {
-      console.error("Error creating player:", error);
       setErrorModal({
         isOpen: true,
-        title: "Unable to create player",
-        message: "Please try again.",
+        title: "Error",
+        message: "An unexpected error occurred while removing the player.",
       });
+    } finally {
+      setIsRemovingPlayer(false);
     }
   };
 
   const handleSetPaymentStatus = async (playerId: string, newPaymentStatus: PaymentStatus) => {
     try {
       if (!matchId) return;
+
+      // Optimistic update
+      setPlayers((prev) =>
+        prev.map((p) =>
+          p.id === playerId ? { ...p, paymentStatus: newPaymentStatus } : p
+        )
+      );
 
       const response = await authFetch(`/api/matches/${matchId}/players/${playerId}`, {
         method: "PATCH",
@@ -366,496 +280,309 @@ export default function MatchDetailsModal({
       });
 
       if (response.ok) {
-        await fetchCurrentPlayers();
         onMatchUpdate?.();
+      } else {
+        await fetchCurrentPlayers();
       }
     } catch (error) {
       console.error("Error updating payment status:", error);
-    }
-  };
-
-  const handleRequestMarkAllPaid = useCallback(() => {
-    if (!matchId || players.length === 0) return;
-
-    const unpaidPlayers = players.filter((p) => p.paymentStatus === "BELUM_SETOR");
-    if (unpaidPlayers.length === 0) return;
-
-    setIsMarkAllPaidConfirmOpen(true);
-  }, [matchId, players]);
-
-  const handleConfirmMarkAllPaid = useCallback(async () => {
-    if (!matchId || players.length === 0) return;
-
-    const unpaidPlayers = players.filter((p) => p.paymentStatus === "BELUM_SETOR");
-    if (unpaidPlayers.length === 0) {
-      setIsMarkAllPaidConfirmOpen(false);
-      return;
-    }
-
-    setIsMarkingAllPaid(true);
-    try {
-      await Promise.all(
-        unpaidPlayers.map((player) =>
-          authFetch(`/api/matches/${matchId}/players/${player.id}`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ paymentStatus: "SUDAH_SETOR" }),
-          })
-        )
-      );
-
       await fetchCurrentPlayers();
-      onMatchUpdate?.();
-      setIsMarkAllPaidConfirmOpen(false);
-    } catch (error) {
-      console.error("Error batch updating payment status:", error);
-      window.alert("Failed to update some players.");
-    } finally {
-      setIsMarkingAllPaid(false);
     }
-  }, [matchId, players, fetchCurrentPlayers, onMatchUpdate]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        if (isCompleted) {
-          handleRequestMarkAllPaid();
-        }
-      }
-    };
-
-    if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, isCompleted, handleRequestMarkAllPaid]);
-
-  const availablePastPlayers = useMemo(
-    () => pastPlayers.filter((pastPlayer) => !players.some((player) => player.id === pastPlayer.id)),
-    [pastPlayers, players],
-  );
-
-  const filteredExistingPlayers = useMemo(() => {
-    const searchTerm = existingPlayerSearch.trim().toLowerCase();
-
-    if (!searchTerm) {
-      return availablePastPlayers;
-    }
-
-    const filtered = availablePastPlayers.filter((player) =>
-      player.name.toLowerCase().includes(searchTerm),
-    );
-
-    return filtered.sort((playerA, playerB) => {
-      const nameA = playerA.name.toLowerCase();
-      const nameB = playerB.name.toLowerCase();
-
-      if (nameA === searchTerm && nameB !== searchTerm) return -1;
-      if (nameB === searchTerm && nameA !== searchTerm) return 1;
-
-      const aStartsWith = nameA.startsWith(searchTerm);
-      const bStartsWith = nameB.startsWith(searchTerm);
-      if (aStartsWith && !bStartsWith) return -1;
-      if (bStartsWith && !aStartsWith) return 1;
-
-      return nameA.localeCompare(nameB);
-    });
-  }, [availablePastPlayers, existingPlayerSearch]);
-
-  const isPlayerAlreadyInMatch = useMemo(() => {
-    const searchTerm = existingPlayerSearch.trim().toLowerCase();
-
-    if (!searchTerm) {
-      return false;
-    }
-
-    return players.some((player) => player.name.toLowerCase().includes(searchTerm));
-  }, [existingPlayerSearch, players]);
-
-  const sortedByPayment = useMemo(
-    () => sortPlayersByPaymentStatus(players),
-    [players],
-  );
-
-  const sortedByPlayCount = useMemo(
-    () => sortPlayersByPlayCount(players),
-    [players],
-  );
-
-  // 2v2 court slots: Team A = slots 0-1, Team B = slots 2-3
-  const courtSlots = useMemo(() => {
-    return [
-      sortedByPlayCount[0] ?? null,
-      sortedByPlayCount[1] ?? null,
-      sortedByPlayCount[2] ?? null,
-      sortedByPlayCount[3] ?? null,
-    ];
-  }, [sortedByPlayCount]);
-
-  const extraPlayers = useMemo(() => sortedByPlayCount.slice(4), [sortedByPlayCount]);
-
-  const renderCourtSlot = (slotPlayer: PlayerInMatch | null) => {
-    if (!slotPlayer) {
-      return (
-        <Button
-          variant="ghost"
-          className="court-slot court-slot-empty h-auto w-full"
-          onClick={() => setShowAddPlayer(true)}
-        >
-          <Plus size={16} />
-          Add Player
-        </Button>
-      );
-    }
-
-    return (
-      <div className="court-slot">
-        <div className="court-slot-player">
-          <span className="court-slot-name">{slotPlayer.name}</span>
-          <span className="court-slot-count">{slotPlayer.playCount}x</span>
-        </div>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="remove-player-btn"
-          onClick={() => handleRemovePlayer(slotPlayer.id)}
-          title="Remove player"
-          aria-label={`Remove ${slotPlayer.name} from this match`}
-        >
-          <X size={16} />
-        </Button>
-      </div>
-    );
   };
 
   if (!isOpen || !match) return null;
 
   return (
     <>
-      <div className="modal-overlay">
-        <div className="match-details-modal">
-          <div className="modal-header">
-            <h2>Match Details</h2>
-            <button type="button" className="modal-close" onClick={onClose} aria-label="Close match details">
-              <X />
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={
+          <div className="flex items-center gap-2.5">
+            <Calendar className="text-gray-400" size={20} />
+            <span>Match Details</span>
+          </div>
+        }
+        size="2xl"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-[#232730] bg-[#161a22] px-5 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white"
+            >
+              Close
             </button>
+            {onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(match)}
+                className="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-500"
+              >
+                Edit Match
+              </button>
+            )}
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {/* Top Banner: Venue Title, Date, and Status Badge */}
+          <div className="flex flex-col gap-3 rounded-2xl border border-[#232730] bg-[#0c0e12] p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+                <Calendar size={22} />
+              </div>
+              <div className="min-w-0">
+                <h3 className="truncate text-base font-bold text-white sm:text-lg">
+                  {match.location || match.title}
+                </h3>
+                <p className="mt-0.5 text-xs text-gray-400">
+                  {formatDate(match.date)}
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0">
+              {isCompleted ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+                  <CheckCircle2 size={13} />
+                  COMPLETED
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400">
+                  <Clock size={13} />
+                  UPCOMING
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="match-details-content">
-            <div className="match-info-section">
-              <div className="match-title-with-status">
-                <h3 className="match-details-title">
-                  {match.location} - {formatDate(match.date)}
-                </h3>
-                <span className={`status-badge ${match.status.toLowerCase()}`}>{match.status}</span>
+          {/* 3 Metric Cards: Court No., Time, Court Fee */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {/* Court No */}
+            <div className="flex items-center gap-3 rounded-2xl border border-[#232730] bg-[#0c0e12] p-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#232730] bg-[#161a22] text-gray-400">
+                <LayoutGrid size={18} />
               </div>
-              <div className="match-details-grid">
-                <div className="detail-item">
-                  <span className="detail-label">Court No:</span>
-                  <span className="detail-value">{match.courtNumber}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Time:</span>
-                  <span className="detail-value">{formatTimeWithDuration(match.time)}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="detail-label">Court Fee:</span>
-                  <span className="detail-value fee-value">{formatCurrency(match.fee)}</span>
-                </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  COURT NO.
+                </p>
+                <p className="truncate text-sm font-bold text-white">
+                  {match.courtNumber || "—"}
+                </p>
               </div>
-              {match.description && (
-                <div className="match-description">
-                  <span className="detail-label">Description:</span>
-                  <p>{match.description}</p>
-                </div>
-              )}
             </div>
 
-            <div className="players-section">
-              <div className="players-header">
-                <h3>Players ({players.length})</h3>
-                <div className="flex gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => exportPlayerList(match, players)}
-                    title="Export Players to PDF"
-                  >
-                    <FileText size={18} />
-                    Export Players
-                  </Button>
-                  <Button variant="primary" size="sm" onClick={() => setShowAddPlayer((value) => !value)}>
-                    <span className="text-lg font-bold leading-none">+</span>
-                    Add Player
-                  </Button>
-                </div>
+            {/* Time */}
+            <div className="flex items-center gap-3 rounded-2xl border border-[#232730] bg-[#0c0e12] p-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#232730] bg-[#161a22] text-gray-400">
+                <Clock size={18} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  TIME
+                </p>
+                <p className="truncate text-sm font-bold text-white">
+                  {formatTimeWithDuration(match.time)}
+                </p>
+              </div>
+            </div>
+
+            {/* Court Fee */}
+            <div className="flex items-center gap-3 rounded-2xl border border-[#232730] bg-[#0c0e12] p-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#232730] bg-[#161a22] text-gray-400">
+                <Wallet size={18} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  COURT FEE
+                </p>
+                <p className="truncate text-sm font-bold text-emerald-400">
+                  {formatCurrency(match.fee)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Description (if provided) */}
+          {match.description && (
+            <div className="rounded-2xl border border-[#232730] bg-[#0c0e12] p-3.5">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                DESCRIPTION
+              </p>
+              <p className="mt-1 text-xs text-gray-300 leading-relaxed">
+                {match.description}
+              </p>
+            </div>
+          )}
+
+          {/* Players Section */}
+          <div className="space-y-3 pt-1">
+            {/* Header with Export and Add Players */}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h4 className="text-sm font-bold text-white">
+                  Players ({players.length})
+                </h4>
+                <p className="text-xs text-gray-400">
+                  Players who joined this match
+                </p>
               </div>
 
-              {showAddPlayer && (
-                <div className="add-player-section">
-                  <div className="add-player-options">
-                    <h4>Existing Player</h4>
-                    <div className="existing-player-search">
-                      <input
-                        type="text"
-                        placeholder="Search existing players..."
-                        value={existingPlayerSearch}
-                        onChange={(event) => setExistingPlayerSearch(event.target.value)}
-                        className="form-input"
-                        aria-label="Search existing players"
-                      />
-
-                      {isLoadingPastPlayers ? (
-                        <div className="existing-player-dropdown" role="status">
-                          <div className="existing-player-loading">
-                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                            <span>Loading players...</span>
-                          </div>
-                        </div>
-                      ) : existingPlayerSearch.trim() ? (
-                        filteredExistingPlayers.length > 0 ? (
-                          <div className="existing-player-dropdown" role="listbox">
-                            <ul className="existing-player-options">
-                              {filteredExistingPlayers.map((player) => (
-                                <li key={player.id}>
-                                  <button
-                                    type="button"
-                                    className="existing-player-option"
-                                    onClick={() => handleAddPlayer(player.id)}
-                                    aria-label={`Add ${player.name} to this match`}
-                                  >
-                                    <span className="existing-player-name">{player.name}</span>
-                                    <span className="existing-player-count">
-                                      {player.playCount ?? 0}x
-                                    </span>
-                                    <Plus size={14} className="text-emerald-400" />
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ) : (
-                          <div className="existing-player-dropdown existing-player-empty">
-                            <p className="no-players">
-                              {isPlayerAlreadyInMatch ? "Player is in the match." : "No matching players found."}
-                            </p>
-                          </div>
-                        )
-                      ) : availablePastPlayers.length > 0 ? (
-                        <p className="existing-player-hint">Search player to add to the match</p>
-                      ) : (
-                        <p className="no-players">No players found.</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="or-divider">OR</div>
-                  <div className="new-player">
-                    <h4>Create New Player</h4>
-                    <div className="new-player-form">
-                      <input
-                        type="text"
-                        placeholder="Player name..."
-                        value={newPlayerName}
-                        onChange={(event) => setNewPlayerName(event.target.value)}
-                        className="form-input"
-                      />
-                      <Button
-                        variant="success"
-                        size="sm"
-                        onClick={handleCreateAndAddPlayer}
-                        disabled={!newPlayerName.trim()}
-                      >
-                        Create and Add Player
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {isLoadingPlayers ? (
-                <div className="no-players-message flex flex-col items-center justify-center">
-                  <p>Loading players...</p>
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-500 mt-2" />
-                </div>
-              ) : isCompleted ? (
-                /* Completed: payment status UI */
-                <div className="grid grid-cols-2 gap-4">
-                  {sortedByPayment.length > 0 ? (
-                    sortedByPayment.map((player) => (
-                      <div key={player.id} className="player-card">
-                        <div className="player-header">
-                          <h4 className="player-name">{player.name}</h4>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="remove-player-btn"
-                            onClick={() => handleRemovePlayer(player.id)}
-                            title="Remove player"
-                            aria-label={`Remove ${player.name} from this match`}
-                          >
-                            <X />
-                          </Button>
-                        </div>
-                        <div className="player-status-controls">
-                          <Button
-                            variant="secondary"
-                            className={`payment-btn ${player.paymentStatus === "BELUM_SETOR" ? "belum-setor" : "no-color"}`}
-                            onClick={() => handleSetPaymentStatus(player.id, "BELUM_SETOR")}
-                          >
-                            BELUM SETOR
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            className={`payment-btn ${player.paymentStatus === "SUDAH_SETOR" ? "sudah-setor" : "no-color"}`}
-                            onClick={() => handleSetPaymentStatus(player.id, "SUDAH_SETOR")}
-                          >
-                            SUDAH SETOR
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="no-players-message col-span-2">
-                      <p>No players in this match yet.</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                /* Upcoming: court 2v2 layout with play counts */
-                <div className="court-layout">
-                  <div className="court-header">
-                    <span className="court-header-label">Court</span>
-                    <span className="court-header-number">
-                      {match.courtNumber || "—"}
-                    </span>
-                  </div>
-
-                  <div className="court-grid">
-                    {/* Team A */}
-                    <div className="court-team">
-                      <div className="court-team-label">Team A</div>
-                      {renderCourtSlot(courtSlots[0])}
-                      {renderCourtSlot(courtSlots[1])}
-                    </div>
-
-                    {/* Team B */}
-                    <div className="court-team">
-                      <div className="court-team-label">Team B</div>
-                      {renderCourtSlot(courtSlots[2])}
-                      {renderCourtSlot(courtSlots[3])}
-                    </div>
-                  </div>
-
-                  {extraPlayers.length > 0 && (
-                    <div className="court-extra">
-                      <div className="court-extra-label">
-                        Waiting ({extraPlayers.length})
-                      </div>
-                      {extraPlayers.map((player) => (
-                        <div key={player.id} className="court-slot court-slot-extra">
-                          <div className="court-slot-player">
-                            <span className="court-slot-name">{player.name}</span>
-                            <span className="court-slot-count">{player.playCount}x</span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="remove-player-btn"
-                            onClick={() => handleRemovePlayer(player.id)}
-                            title="Remove player"
-                            aria-label={`Remove ${player.name} from this match`}
-                          >
-                            <X size={16} />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {players.length === 0 && (
-                    <p className="court-empty-hint">
-                      No players in this match yet. Add players to fill the court.
-                    </p>
-                  )}
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => exportPlayerList(match, players)}
+                  className="flex items-center gap-1.5 rounded-xl border border-[#232730] bg-[#161a22] px-3.5 py-1.5 text-xs font-medium text-gray-300 transition hover:border-gray-600 hover:bg-[#202632] hover:text-white"
+                >
+                  <Upload size={14} />
+                  <span>Export Players</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSelectPlayersModalOpen(true)}
+                  className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-500 shadow-sm"
+                >
+                  <Plus size={14} />
+                  <span>+ Add Players</span>
+                </button>
+              </div>
             </div>
+
+            {/* Players Grid */}
+            {isLoadingPlayers ? (
+              <div className="flex flex-col items-center justify-center py-10 text-xs text-gray-400">
+                <Loader2 size={24} className="animate-spin text-blue-500 mb-2" />
+                <span>Loading players...</span>
+              </div>
+            ) : players.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#232730] bg-[#0c0e12] py-8 text-center">
+                <p className="text-sm font-semibold text-white">
+                  No players joined yet
+                </p>
+                <p className="mt-0.5 text-xs text-gray-400">
+                  Click &ldquo;+ Add Players&rdquo; to add players to this match.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                {players.map((player) => {
+                  const isBelumSetor = player.paymentStatus === "BELUM_SETOR";
+                  const isSudahSetor = player.paymentStatus === "SUDAH_SETOR";
+
+                  return (
+                    <div
+                      key={player.id}
+                      className="relative flex items-center justify-between rounded-2xl border border-[#232730] bg-[#0c0e12] p-3 transition hover:border-gray-700"
+                    >
+                      {/* Player Avatar and Info */}
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ${getAvatarGradient(player.name)}`}
+                        >
+                          {getInitials(player.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {player.name}
+                          </p>
+                          {/* Payment Status Buttons */}
+                          <div className="mt-1 flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleSetPaymentStatus(player.id, "BELUM_SETOR")}
+                              className={`rounded-md px-2 py-0.5 text-[9px] font-bold uppercase transition ${
+                                isBelumSetor
+                                  ? "border border-red-500/40 bg-red-500/20 text-red-400"
+                                  : "border border-transparent bg-[#181d26] text-gray-400 hover:text-gray-200"
+                              }`}
+                            >
+                              BELUM SETOR
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSetPaymentStatus(player.id, "SUDAH_SETOR")}
+                              className={`rounded-md px-2 py-0.5 text-[9px] font-bold uppercase transition ${
+                                isSudahSetor
+                                  ? "border border-emerald-500/40 bg-emerald-500/20 text-emerald-400"
+                                  : "border border-transparent bg-[#181d26] text-gray-400 hover:text-gray-200"
+                              }`}
+                            >
+                              SUDAH SETOR
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Dropdown Options */}
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setPlayerMenuOpen(
+                              playerMenuOpen === player.id ? null : player.id
+                            )
+                          }
+                          className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-800 hover:text-white"
+                          aria-label={`Options for ${player.name}`}
+                        >
+                          <MoreVertical size={16} />
+                        </button>
+
+                        {playerMenuOpen === player.id && (
+                          <div className="absolute right-0 top-8 z-30 w-32 rounded-xl border border-[#232730] bg-[#161a22] p-1 shadow-xl">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPlayerMenuOpen(null);
+                                handleRemovePlayer(player.id);
+                              }}
+                              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-500/10"
+                            >
+                              <Trash2 size={13} />
+                              <span>Remove</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      </Modal>
+
+      {/* Select Players Modal for existing matches */}
+      <SelectPlayersModal
+        isOpen={isSelectPlayersModalOpen}
+        onClose={() => setIsSelectPlayersModalOpen(false)}
+        selectedPlayerIds={players.map((p) => p.id)}
+        onSave={handleSaveSelectedPlayers}
+        availablePlayers={allAvailablePlayers}
+        onPlayerCreated={(newPlayer) => {
+          setAllAvailablePlayers((prev) => [...prev, newPlayer]);
+        }}
+      />
 
       <ConfirmModal
         isOpen={Boolean(playerToRemove)}
         onClose={handleCancelRemovePlayer}
         onConfirm={handleConfirmRemovePlayer}
+        title="Remove Player"
         message={
-          playerToRemove ? (
-            <p>
-              Remove <strong>{playerToRemove.name}</strong> from this match?
-            </p>
-          ) : undefined
+          <p>
+            Remove <strong>{playerToRemove?.name ?? "this player"}</strong> from this match?
+          </p>
         }
-        confirmLabel={
-          isRemovingPlayer ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Removing...
-            </span>
-          ) : (
-            "Yes"
-          )
-        }
-        cancelLabel="No"
+        confirmLabel={isRemovingPlayer ? "Removing..." : "Remove"}
+        cancelLabel="Cancel"
         isLoading={isRemovingPlayer}
-        containerClassName="delete-modal"
-        closeButtonClassName="delete-modal-close"
-        contentClassName="delete-modal-content"
-        messageClassName="delete-modal-message"
-        actionsClassName="delete-modal-actions"
-        cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
-        confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
+        confirmVariant="destructive"
       />
-      {isCompleted && (
-        <ConfirmModal
-          isOpen={isMarkAllPaidConfirmOpen}
-          onClose={() => setIsMarkAllPaidConfirmOpen(false)}
-          onConfirm={handleConfirmMarkAllPaid}
-          title="Confirm Batch Update"
-          message={
-            <p>
-              Mark all <strong>{players.filter((p) => p.paymentStatus === "BELUM_SETOR").length}</strong> unpaid players as <strong>SUDAH SETOR</strong>?
-            </p>
-          }
-          confirmLabel={
-            isMarkingAllPaid ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Updating...
-              </span>
-            ) : (
-              "Yes, Mark All Paid"
-            )
-          }
-          cancelLabel="Cancel"
-          isLoading={isMarkingAllPaid}
-          confirmVariant="success"
-          containerClassName="delete-modal"
-          closeButtonClassName="delete-modal-close"
-          contentClassName="delete-modal-content"
-          titleClassName="delete-modal-title"
-          messageClassName="delete-modal-message"
-          actionsClassName="delete-modal-actions"
-          cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
-          confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
-        />
-      )}
+
       <ErrorModal
         isOpen={errorModal.isOpen}
         onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}

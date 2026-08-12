@@ -1,10 +1,8 @@
 "use client";
 
 import { ReactNode } from "react";
-import { X } from "lucide-react";
-import clsx from "clsx";
+import Modal from "./ui/Modal";
 import { Button } from "./ui/button";
-
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -16,17 +14,20 @@ interface ConfirmModalProps {
   isLoading?: boolean;
   confirmLabel?: ReactNode;
   cancelLabel?: ReactNode;
-  confirmVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "primary" | "success" | "warning" | "info" | "premium" | "glass";
-  overlayClassName?: string;
+  confirmVariant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link"
+    | "primary"
+    | "success"
+    | "warning"
+    | "info"
+    | "premium"
+    | "glass";
   containerClassName?: string;
-  closeButtonClassName?: string;
-  contentClassName?: string;
-  iconWrapperClassName?: string;
-  titleClassName?: string;
-  messageClassName?: string;
-  actionsClassName?: string;
-  cancelButtonClassName?: string;
-  confirmButtonClassName?: string;
 }
 
 export default function ConfirmModal({
@@ -40,70 +41,55 @@ export default function ConfirmModal({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   confirmVariant = "destructive",
-  overlayClassName,
-  containerClassName,
-  closeButtonClassName,
-  contentClassName,
-  iconWrapperClassName,
-  titleClassName,
-  messageClassName,
-  actionsClassName,
-  cancelButtonClassName,
-  confirmButtonClassName,
+  containerClassName = "",
 }: ConfirmModalProps) {
-  if (!isOpen) return null;
-
   const handleClose = () => {
     if (isLoading) return;
     onClose();
   };
 
   return (
-    <div className={clsx("modal-overlay", overlayClassName)}>
-      <div className={clsx("modal-container", containerClassName)}>
-        <button
-          type="button"
-          className={clsx("modal-close", closeButtonClassName)}
-          onClick={handleClose}
-          disabled={isLoading}
-          aria-label="Close dialog"
-        >
-          <X />
-        </button>
-        <div className={clsx(contentClassName)}>
-          {icon && (
-            <div className={clsx(iconWrapperClassName)} aria-hidden="true">
-              {icon}
-            </div>
-          )}
-          {title && <h2 className={clsx(titleClassName)}>{title}</h2>}
-          <div className={clsx(messageClassName)}>{message}</div>
-          <div className={clsx(actionsClassName)}>
-            <Button
-              variant="secondary"
-              className={clsx(cancelButtonClassName)}
-              onClick={handleClose}
-              disabled={isLoading}
-            >
-              {cancelLabel}
-            </Button>
-            <Button
-              variant={
-                confirmVariant === "success"
-                  ? "success"
-                  : confirmVariant === "destructive"
-                    ? "destructive"
-                    : "primary"
-              }
-              className={clsx(confirmButtonClassName)}
-              onClick={onConfirm}
-              disabled={isLoading}
-            >
-              {confirmLabel}
-            </Button>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={title}
+      size="md"
+      className={containerClassName}
+      footer={
+        <>
+          <button
+            type="button"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-50"
+            onClick={handleClose}
+            disabled={isLoading}
+          >
+            {cancelLabel}
+          </button>
+          <Button
+            variant={
+              confirmVariant === "success"
+                ? "success"
+                : confirmVariant === "destructive"
+                  ? "destructive"
+                  : "primary"
+            }
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="rounded-lg px-5 py-2 text-sm font-medium transition"
+          >
+            {confirmLabel}
+          </Button>
+        </>
+      }
+    >
+      <div className="flex flex-col items-center py-2 text-center">
+        {icon && (
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/10 text-red-400 border border-red-500/20">
+            {icon}
           </div>
-        </div>
+        )}
+        <div className="text-sm leading-relaxed text-gray-300">{message}</div>
       </div>
-    </div>
+    </Modal>
   );
 }

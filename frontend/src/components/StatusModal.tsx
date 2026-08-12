@@ -1,65 +1,10 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Button } from "./ui/button";
+import Modal from "./ui/Modal";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 
-
-type StatusVariant = "success" | "error";
-
-const variantConfig: Record<StatusVariant, {
-  container: string;
-  content: string;
-  iconWrapper: string;
-  title: string;
-  message: string;
-  icon: ReactNode;
-}> = {
-  success: {
-    container: "success-modal-container",
-    content: "success-modal-content",
-    iconWrapper: "success-icon",
-    title: "success-title",
-    message: "success-message",
-    icon: (
-      <svg
-        width="48"
-        height="48"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22,4 12,14.01 9,11.01"></polyline>
-      </svg>
-    ),
-  },
-  error: {
-    container: "error-modal-container",
-    content: "error-modal-content",
-    iconWrapper: "error-icon",
-    title: "error-title",
-    message: "error-message",
-    icon: (
-      <svg
-        width="48"
-        height="48"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="15" y1="9" x2="9" y2="15"></line>
-        <line x1="9" y1="9" x2="15" y2="15"></line>
-      </svg>
-    ),
-  },
-};
+export type StatusVariant = "success" | "error";
 
 export interface StatusModalProps {
   isOpen: boolean;
@@ -78,23 +23,40 @@ export default function StatusModal({
   variant,
   buttonLabel = "OK",
 }: StatusModalProps) {
-  if (!isOpen) return null;
-
-  const { container, content, iconWrapper, title: titleClass, message: messageClass, icon } =
-    variantConfig[variant];
+  const isSuccess = variant === "success";
 
   return (
-    <div className="modal-overlay">
-      <div className={container}>
-        <div className={content}>
-          <div className={iconWrapper}>{icon}</div>
-          <h2 className={titleClass}>{title}</h2>
-          <p className={messageClass}>{message}</p>
-          <Button variant="primary" onClick={onClose}>
-            {buttonLabel}
-          </Button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="sm"
+      footer={
+        <button
+          type="button"
+          onClick={onClose}
+          className={`w-full rounded-lg py-2.5 text-sm font-semibold text-white shadow-sm transition ${
+            isSuccess
+              ? "bg-emerald-600 hover:bg-emerald-500"
+              : "bg-red-600 hover:bg-red-500"
+          }`}
+        >
+          {buttonLabel}
+        </button>
+      }
+    >
+      <div className="flex flex-col items-center py-2 text-center">
+        <div
+          className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border ${
+            isSuccess
+              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+              : "border-red-500/20 bg-red-500/10 text-red-400"
+          }`}
+        >
+          {isSuccess ? <CheckCircle2 size={30} /> : <AlertCircle size={30} />}
         </div>
+        <h2 className="mb-1.5 text-lg font-bold text-white">{title}</h2>
+        <div className="text-sm text-gray-400">{message}</div>
       </div>
-    </div>
+    </Modal>
   );
 }
