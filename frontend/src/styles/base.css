@@ -135,6 +135,12 @@ body {
         color: #f3f4f6;
         line-height: 1.6;
     }
+
+    /* Clickable elements show a pointer cursor; disabled ones stay default */
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
 }
 
 /* Chart bars */

@@ -260,7 +260,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-xs font-semibold text-white leading-tight">
-                      CapyHub
+                      Admin Capy
                     </p>
                     <p className="truncate text-[10px] text-gray-400">
                       {user?.email || "capybara@gmail.com"}
