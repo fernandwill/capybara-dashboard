@@ -15,7 +15,6 @@ import {
   Plus,
   RotateCcw,
   Sparkles,
-  Users,
   X,
   MapPin,
   ArrowLeft,
@@ -126,6 +125,7 @@ export default function MatchDetailsPage() {
 
   // Courts state
   const [courts, setCourts] = useState<CourtState[]>([]);
+  const [activeMobileCourtIndex, setActiveMobileCourtIndex] = useState(0);
 
   // In-session player play counts
   const [sessionPlayCounts, setSessionPlayCounts] = useState<Record<string, number>>({});
@@ -569,6 +569,9 @@ export default function MatchDetailsPage() {
     ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
     : "bg-blue-500/10 text-blue-400 border-blue-500/20";
 
+  const safeActiveMobileIndex =
+    activeMobileCourtIndex >= courts.length ? 0 : activeMobileCourtIndex;
+
   return (
     <AppLayout>
       <div className="space-y-6 pb-12">
@@ -618,28 +621,11 @@ export default function MatchDetailsPage() {
                   <MapPin size={14} className="text-amber-400" />
                   {match.location || "Badminton Hall"}
                 </span>
-                <span className="text-gray-600">•</span>
-                <span className="rounded-md bg-[#161a22] px-2 py-0.5 text-[11px] font-medium text-gray-300 border border-[#232834]">
-                  {match.courtNumber || "4"} Courts
-                </span>
-                <span className="rounded-md bg-[#161a22] px-2 py-0.5 text-[11px] font-medium text-gray-300 border border-[#232834]">
-                  {players.length} Players Joined
-                </span>
               </div>
             </div>
 
             {/* Header Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              {/* Manage Players Button */}
-              <button
-                type="button"
-                onClick={() => setIsSelectPlayersModalOpen(true)}
-                className="flex items-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] px-3.5 py-2 text-xs font-semibold text-gray-200 transition hover:border-[#2d3444] hover:bg-[#1a202c] hover:text-white"
-              >
-                <Users size={14} />
-                <span>Roster ({players.length})</span>
-              </button>
-
               {/* Export Players Button */}
               <button
                 type="button"
@@ -709,9 +695,42 @@ export default function MatchDetailsPage() {
               </div>
             </div>
 
-            {/* Courts Grid — Unified 2-column layout */}
+            {/* Mobile Court Selector Tabs (Visible on mobile screens < md) */}
+            <div className="flex overflow-x-auto gap-1.5 rounded-xl bg-[#0e1117] p-1.5 border border-[#1a1e26] md:hidden custom-scrollbar">
+              {courts.map((c, idx) => {
+                const courtHasPlayers =
+                  c.teamA.some((s) => s.playerId) ||
+                  c.teamB.some((s) => s.playerId);
+                const isCurrent = safeActiveMobileIndex === idx;
+
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setActiveMobileCourtIndex(idx)}
+                    className={`flex flex-1 min-w-[80px] items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${
+                      isCurrent
+                        ? "bg-emerald-600 text-white shadow-md"
+                        : "bg-[#141820] text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <span>{c.name}</span>
+                    {courtHasPlayers && (
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          isCurrent ? "bg-white" : "bg-emerald-400"
+                        }`}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Courts Grid — On mobile: only active court is shown. On md+: 2-column grid shows all courts */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {courts.map((court, courtIdx) => {
+                const isActiveCourt = safeActiveMobileIndex === courtIdx;
                 const courtHasPlayers =
                   court.teamA.some((s) => s.playerId) ||
                   court.teamB.some((s) => s.playerId);
@@ -720,7 +739,9 @@ export default function MatchDetailsPage() {
                 return (
                   <div
                     key={court.id}
-                    className="flex flex-col justify-between rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 transition-all hover:border-[#28303f] shadow-sm"
+                    className={`flex-col justify-between rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 transition-all hover:border-[#28303f] shadow-sm ${
+                      isActiveCourt ? "flex" : "hidden md:flex"
+                    }`}
                   >
                     {/* Court Title & Status Header */}
                     <div className="mb-3.5 flex items-center justify-between border-b border-[#181d26] pb-3">
@@ -1014,16 +1035,6 @@ export default function MatchDetailsPage() {
                   })
                 )}
               </div>
-
-              {/* Manage Roster Button */}
-              <button
-                type="button"
-                onClick={() => setIsSelectPlayersModalOpen(true)}
-                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] py-2 text-xs font-semibold text-gray-200 transition hover:bg-[#1a202c] hover:text-white"
-              >
-                <span>Manage Match Roster</span>
-                <ChevronRight size={13} />
-              </button>
             </div>
 
             {/* Match History Card */}
@@ -1100,16 +1111,6 @@ export default function MatchDetailsPage() {
               {unassignedPlayers.length === 0 ? (
                 <div className="py-6 text-center text-xs text-gray-400">
                   <p>All joined players are currently assigned.</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSlotPicker(null);
-                      setIsSelectPlayersModalOpen(true);
-                    }}
-                    className="mt-2 text-emerald-400 underline hover:text-emerald-300 font-medium"
-                  >
-                    Add more players to roster
-                  </button>
                 </div>
               ) : (
                 unassignedPlayers.map((player) => {
