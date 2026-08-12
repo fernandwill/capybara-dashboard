@@ -14,37 +14,31 @@ export async function POST(
   try {
     const { id: matchId } = await params;
     const body = await request.json();
-    const { playerId } = body;
+    const { playerId, playerIds } = body;
 
-    // Check if player is already in this match
-    const existingMatchPlayer = await prisma.matchPlayer.findUnique({
-      where: {
-        matchId_playerId: {
-          matchId,
-          playerId,
-        },
-      },
-    });
+    // Accept a single playerId (legacy callers) or a playerIds array (roster save)
+    const idsToAdd =
+      Array.isArray(playerIds) && playerIds.length > 0
+        ? playerIds
+        : playerId
+          ? [playerId]
+          : [];
 
-    if (existingMatchPlayer) {
+    if (idsToAdd.length === 0) {
       return NextResponse.json(
-        { error: "Player is already in this match." },
+        { error: "playerId or playerIds is required." },
         { status: 400 }
       );
     }
 
-    const matchPlayer = await prisma.matchPlayer.create({
-      data: {
-        matchId,
-        playerId,
-      },
-      include: {
-        player: true,
-        match: true,
-      },
+    // Create the missing rows (playCount starts at 0). skipDuplicates makes
+    // this idempotent for players already in the match.
+    const result = await prisma.matchPlayer.createMany({
+      data: idsToAdd.map((playerId) => ({ matchId, playerId })),
+      skipDuplicates: true,
     });
 
-    return NextResponse.json(matchPlayer, { status: 201 });
+    return NextResponse.json({ created: result.count }, { status: 201 });
   } catch (error) {
     console.error('Error adding player to match:', error);
     return NextResponse.json({ error: "Failed to add player to match." }, { status: 500 });

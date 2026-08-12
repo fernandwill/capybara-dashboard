@@ -36,14 +36,28 @@ model Match {
   updatedAt   DateTime      @updatedAt
   players     MatchPlayer[]
   payments    Payment[]
+  rounds      MatchRound[]
 
   @@map("matches")
+}
+
+model MatchRound {
+  id             String   @id @default(cuid())
+  matchId        String
+  courtNumber    Int
+  teamAPlayerIds String[]
+  teamBPlayerIds String[]
+  finishedAt     DateTime @default(now())
+  match          Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@map("match_rounds")
 }
 
 model MatchPlayer {
   id            String   @id @default(cuid())
   matchId       String
   playerId      String
+  playCount     Int      @default(0)
   paymentStatus String   @default("BELUM_SETOR")
   joinedAt      DateTime @default(now())
   match         Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)

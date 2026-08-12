@@ -37,6 +37,11 @@ export async function GET(
           },
         },
         payments: true,
+        rounds: {
+          orderBy: {
+            finishedAt: "desc",
+          },
+        },
       },
     });
 
@@ -92,6 +97,19 @@ export async function PUT(
       ? determineMatchStatus(date, time, status)
       : status;
 
+    // Preserve per-match round counts and payment status when the roster is
+    // re-saved (the update below replaces match_players rows entirely)
+    let existingRows: { playerId: string; playCount: number; paymentStatus: string }[] = [];
+    if (Array.isArray(playerIds) && playerIds.length > 0) {
+      existingRows = await prisma.matchPlayer.findMany({
+        where: { matchId: id, playerId: { in: playerIds } },
+        select: { playerId: true, playCount: true, paymentStatus: true },
+      });
+    }
+    const existingByPlayer = new Map(
+      existingRows.map((row) => [row.playerId, row])
+    );
+
     const match = await prisma.match.update({
       where: { id },
       data: {
@@ -105,11 +123,16 @@ export async function PUT(
         description,
         players: playerIds ? {
           deleteMany: {},
-          create: playerIds.map((playerId: string) => ({
-            player: {
-              connect: { id: playerId }
-            }
-          }))
+          create: playerIds.map((playerId: string) => {
+            const existing = existingByPlayer.get(playerId);
+            return {
+              player: {
+                connect: { id: playerId }
+              },
+              playCount: existing?.playCount ?? 0,
+              paymentStatus: existing?.paymentStatus ?? "BELUM_SETOR",
+            };
+          })
         } : undefined
       },
       include: {
