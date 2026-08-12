@@ -269,6 +269,21 @@
     accent-color: var(--primary-color, #3b82f6);
 }
 
+.player-play-count {
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.dark .player-play-count {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.55);
+}
+
 .loading-players,
 .no-players {
     grid-column: 1 / -1;

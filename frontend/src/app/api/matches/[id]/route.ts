@@ -19,7 +19,21 @@ export async function GET(
       include: {
         players: {
           include: {
-            player: true,
+            player: {
+              include: {
+                _count: {
+                  select: {
+                    matchPlayers: {
+                      where: {
+                        match: {
+                          status: "COMPLETED",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
         payments: true,
@@ -30,7 +44,19 @@ export async function GET(
       return NextResponse.json({ error: "Match not found." }, { status: 404 });
     }
 
-    return NextResponse.json(match);
+    const matchWithPlayCounts = {
+      ...match,
+      players: match.players.map(({ player, ...matchPlayer }) => ({
+        ...matchPlayer,
+        player: {
+          ...player,
+          playCount: player._count?.matchPlayers ?? 0,
+          _count: undefined,
+        },
+      })),
+    };
+
+    return NextResponse.json(matchWithPlayCounts);
   } catch (error) {
     console.error('Error fetching match:', error);
     return NextResponse.json({ error: "Failed to fetch match." }, { status: 500 });

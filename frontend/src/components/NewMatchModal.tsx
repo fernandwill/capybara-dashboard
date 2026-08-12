@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Match } from "@/types/types";
 import { X } from "lucide-react";
 
@@ -35,6 +35,8 @@ interface MatchFormState {
   description: string;
   playerIds: string[];
 }
+
+const COURT_OPTIONS = Array.from({ length: 99 }, (_, index) => String(index + 1));
 
 const INITIAL_FORM_STATE: MatchFormState = {
   title: "",
@@ -110,6 +112,17 @@ export default function NewMatchModal({
       setFormData(INITIAL_FORM_STATE);
     }
   }, [editingMatch]);
+
+  // Legacy court numbers that are not in the 1-99 range still need an option
+  const courtOptions = useMemo(() => {
+    if (
+      formData.courtNumber &&
+      !COURT_OPTIONS.includes(formData.courtNumber)
+    ) {
+      return [formData.courtNumber, ...COURT_OPTIONS];
+    }
+    return COURT_OPTIONS;
+  }, [formData.courtNumber]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -201,16 +214,23 @@ export default function NewMatchModal({
             </div>
             <div className="form-group">
               <label htmlFor="courtNumber">Court #</label>
-              <input
-                type="text"
+              <select
                 id="courtNumber"
                 name="courtNumber"
                 value={formData.courtNumber}
                 onChange={handleChange}
                 required
                 className="form-input"
-                placeholder="Court number..."
-              />
+              >
+                <option value="" disabled>
+                  Select court...
+                </option>
+                {courtOptions.map((court) => (
+                  <option key={court} value={court}>
+                    Court {court}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -296,16 +316,21 @@ export default function NewMatchModal({
                 ) : availablePlayers.length === 0 ? (
                   <div className="no-players">No players found.</div>
                 ) : (
-                  availablePlayers.map((player) => (
-                    <label key={player.id} className="player-checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={formData.playerIds.includes(player.id)}
-                        onChange={() => handlePlayerToggle(player.id)}
-                      />
-                      <span>{player.name}</span>
-                    </label>
-                  ))
+                  [...availablePlayers]
+                    .sort((a, b) => (a.playCount ?? 0) - (b.playCount ?? 0))
+                    .map((player) => (
+                      <label key={player.id} className="player-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.playerIds.includes(player.id)}
+                          onChange={() => handlePlayerToggle(player.id)}
+                        />
+                        <span>{player.name}</span>
+                        <span className="player-play-count">
+                          {player.playCount ?? 0}x
+                        </span>
+                      </label>
+                    ))
                 )}
               </div>
             </div>

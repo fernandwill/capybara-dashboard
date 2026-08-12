@@ -15,8 +15,26 @@ export async function GET() {
       orderBy: {
         name: "asc",
       },
+      include: {
+        _count: {
+          select: {
+            matchPlayers: {
+              where: {
+                match: {
+                  status: "COMPLETED",
+                },
+              },
+            },
+          },
+        },
+      },
     });
-    return NextResponse.json(players);
+    return NextResponse.json(
+      players.map(({ _count, ...player }) => ({
+        ...player,
+        playCount: _count.matchPlayers,
+      }))
+    );
   } catch (error) {
     return handleApiError(error, ApiErrors.serverError('fetch players'));
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, X, FileText } from "lucide-react";
+import { Loader2, X, FileText, Plus } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 import ErrorModal from "./ErrorModal";
 import { authFetch } from "@/lib/authFetch";
@@ -10,6 +10,7 @@ import { exportPlayerList } from "@/utils/playerExport";
 
 type PlayerInMatch = Player & {
   paymentStatus: PaymentStatus;
+  playCount: number;
 };
 
 const IDR_FORMATTER = new Intl.NumberFormat("id-ID", {
@@ -96,6 +97,10 @@ const sortPlayersByPaymentStatus = (players: PlayerInMatch[]) => {
   });
 };
 
+const sortPlayersByPlayCount = (players: PlayerInMatch[]) => {
+  return [...players].sort((a, b) => a.playCount - b.playCount);
+};
+
 interface MatchDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -127,6 +132,7 @@ export default function MatchDetailsModal({
   const [isMarkingAllPaid, setIsMarkingAllPaid] = useState(false);
 
   const matchId = match?.id;
+  const isCompleted = match?.status?.toUpperCase() === "COMPLETED";
 
   const fetchCurrentPlayers = useCallback(async () => {
     if (!matchId) return;
@@ -140,10 +146,16 @@ export default function MatchDetailsModal({
 
       const matchData = await response.json();
       const matchPlayers =
-        matchData.players?.map((matchPlayer: { player: Player; paymentStatus: PaymentStatus }) => ({
-          ...matchPlayer.player,
-          paymentStatus: matchPlayer.paymentStatus,
-        })) ?? [];
+        matchData.players?.map(
+          (matchPlayer: {
+            player: Player & { playCount?: number };
+            paymentStatus: PaymentStatus;
+          }) => ({
+            ...matchPlayer.player,
+            paymentStatus: matchPlayer.paymentStatus,
+            playCount: matchPlayer.player.playCount ?? 0,
+          })
+        ) ?? [];
       setPlayers(matchPlayers);
     } catch (error) {
       console.error("Error fetching match players:", error);
@@ -407,9 +419,10 @@ export default function MatchDetailsModal({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.altKey && e.key.toLowerCase() === "s") {
-        console.log("Alt+S pressed - triggering handleRequestMarkAllPaid");
         e.preventDefault();
-        handleRequestMarkAllPaid();
+        if (isCompleted) {
+          handleRequestMarkAllPaid();
+        }
       }
     };
 
@@ -420,7 +433,7 @@ export default function MatchDetailsModal({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, handleRequestMarkAllPaid]);
+  }, [isOpen, isCompleted, handleRequestMarkAllPaid]);
 
   const availablePastPlayers = useMemo(
     () => pastPlayers.filter((pastPlayer) => !players.some((player) => player.id === pastPlayer.id)),
@@ -464,10 +477,61 @@ export default function MatchDetailsModal({
     return players.some((player) => player.name.toLowerCase().includes(searchTerm));
   }, [existingPlayerSearch, players]);
 
-  const sortedPlayers = useMemo(
+  const sortedByPayment = useMemo(
     () => sortPlayersByPaymentStatus(players),
     [players],
   );
+
+  const sortedByPlayCount = useMemo(
+    () => sortPlayersByPlayCount(players),
+    [players],
+  );
+
+  // 2v2 court slots: Team A = slots 0-1, Team B = slots 2-3
+  const courtSlots = useMemo(() => {
+    return [
+      sortedByPlayCount[0] ?? null,
+      sortedByPlayCount[1] ?? null,
+      sortedByPlayCount[2] ?? null,
+      sortedByPlayCount[3] ?? null,
+    ];
+  }, [sortedByPlayCount]);
+
+  const extraPlayers = useMemo(() => sortedByPlayCount.slice(4), [sortedByPlayCount]);
+
+  const renderCourtSlot = (slotPlayer: PlayerInMatch | null) => {
+    if (!slotPlayer) {
+      return (
+        <button
+          type="button"
+          className="court-slot court-slot-empty"
+          onClick={() => setShowAddPlayer(true)}
+        >
+          <Plus size={16} />
+          Add Player
+        </button>
+      );
+    }
+
+    return (
+      <div className="court-slot">
+        <div className="court-slot-player">
+          <span className="court-slot-name">{slotPlayer.name}</span>
+          <span className="court-slot-count">{slotPlayer.playCount}x</span>
+        </div>
+
+        <button
+          type="button"
+          className="remove-player-btn"
+          onClick={() => handleRemovePlayer(slotPlayer.id)}
+          title="Remove player"
+          aria-label={`Remove ${slotPlayer.name} from this match`}
+        >
+          <X size={16} />
+        </button>
+      </div>
+    );
+  };
 
   if (!isOpen || !match) return null;
 
@@ -565,7 +629,11 @@ export default function MatchDetailsModal({
                                     onClick={() => handleAddPlayer(player.id)}
                                     aria-label={`Add ${player.name} to this match`}
                                   >
-                                    {player.name}
+                                    <span className="existing-player-name">{player.name}</span>
+                                    <span className="existing-player-count">
+                                      {player.playCount ?? 0}x
+                                    </span>
+                                    <Plus size={14} className="text-emerald-400" />
                                   </button>
                                 </li>
                               ))}
@@ -614,10 +682,11 @@ export default function MatchDetailsModal({
                   <p>Loading players...</p>
                   <Loader2 className="h-6 w-6 animate-spin text-blue-500 mt-2" />
                 </div>
-              ) : (
+              ) : isCompleted ? (
+                /* Completed: payment status UI */
                 <div className="grid grid-cols-2 gap-4">
-                  {sortedPlayers.length > 0 ? (
-                    sortedPlayers.map((player) => (
+                  {sortedByPayment.length > 0 ? (
+                    sortedByPayment.map((player) => (
                       <div key={player.id} className="player-card">
                         <div className="player-header">
                           <h4 className="player-name">{player.name}</h4>
@@ -653,6 +722,63 @@ export default function MatchDetailsModal({
                     <div className="no-players-message col-span-2">
                       <p>No players in this match yet.</p>
                     </div>
+                  )}
+                </div>
+              ) : (
+                /* Upcoming: court 2v2 layout with play counts */
+                <div className="court-layout">
+                  <div className="court-header">
+                    <span className="court-header-label">Court</span>
+                    <span className="court-header-number">
+                      {match.courtNumber || "—"}
+                    </span>
+                  </div>
+
+                  <div className="court-grid">
+                    {/* Team A */}
+                    <div className="court-team">
+                      <div className="court-team-label">Team A</div>
+                      {renderCourtSlot(courtSlots[0])}
+                      {renderCourtSlot(courtSlots[1])}
+                    </div>
+
+                    {/* Team B */}
+                    <div className="court-team">
+                      <div className="court-team-label">Team B</div>
+                      {renderCourtSlot(courtSlots[2])}
+                      {renderCourtSlot(courtSlots[3])}
+                    </div>
+                  </div>
+
+                  {extraPlayers.length > 0 && (
+                    <div className="court-extra">
+                      <div className="court-extra-label">
+                        Waiting ({extraPlayers.length})
+                      </div>
+                      {extraPlayers.map((player) => (
+                        <div key={player.id} className="court-slot court-slot-extra">
+                          <div className="court-slot-player">
+                            <span className="court-slot-name">{player.name}</span>
+                            <span className="court-slot-count">{player.playCount}x</span>
+                          </div>
+                          <button
+                            type="button"
+                            className="remove-player-btn"
+                            onClick={() => handleRemovePlayer(player.id)}
+                            title="Remove player"
+                            aria-label={`Remove ${player.name} from this match`}
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {players.length === 0 && (
+                    <p className="court-empty-hint">
+                      No players in this match yet. Add players to fill the court.
+                    </p>
                   )}
                 </div>
               )}
@@ -692,38 +818,40 @@ export default function MatchDetailsModal({
         cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
         confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
       />
-      <ConfirmModal
-        isOpen={isMarkAllPaidConfirmOpen}
-        onClose={() => setIsMarkAllPaidConfirmOpen(false)}
-        onConfirm={handleConfirmMarkAllPaid}
-        title="Confirm Batch Update"
-        message={
-          <p>
-            Mark all <strong>{players.filter((p) => p.paymentStatus === "BELUM_SETOR").length}</strong> unpaid players as <strong>SUDAH SETOR</strong>?
-          </p>
-        }
-        confirmLabel={
-          isMarkingAllPaid ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Updating...
-            </span>
-          ) : (
-            "Yes, Mark All Paid"
-          )
-        }
-        cancelLabel="Cancel"
-        isLoading={isMarkingAllPaid}
-        confirmVariant="success"
-        containerClassName="delete-modal"
-        closeButtonClassName="delete-modal-close"
-        contentClassName="delete-modal-content"
-        titleClassName="delete-modal-title"
-        messageClassName="delete-modal-message"
-        actionsClassName="delete-modal-actions"
-        cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
-        confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
-      />
+      {isCompleted && (
+        <ConfirmModal
+          isOpen={isMarkAllPaidConfirmOpen}
+          onClose={() => setIsMarkAllPaidConfirmOpen(false)}
+          onConfirm={handleConfirmMarkAllPaid}
+          title="Confirm Batch Update"
+          message={
+            <p>
+              Mark all <strong>{players.filter((p) => p.paymentStatus === "BELUM_SETOR").length}</strong> unpaid players as <strong>SUDAH SETOR</strong>?
+            </p>
+          }
+          confirmLabel={
+            isMarkingAllPaid ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Updating...
+              </span>
+            ) : (
+              "Yes, Mark All Paid"
+            )
+          }
+          cancelLabel="Cancel"
+          isLoading={isMarkingAllPaid}
+          confirmVariant="success"
+          containerClassName="delete-modal"
+          closeButtonClassName="delete-modal-close"
+          contentClassName="delete-modal-content"
+          titleClassName="delete-modal-title"
+          messageClassName="delete-modal-message"
+          actionsClassName="delete-modal-actions"
+          cancelButtonClassName="delete-modal-button delete-modal-button-cancel"
+          confirmButtonClassName="delete-modal-button delete-modal-button-confirm"
+        />
+      )}
       <ErrorModal
         isOpen={errorModal.isOpen}
         onClose={() => setErrorModal({ isOpen: false, title: "", message: "" })}

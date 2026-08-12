@@ -27,12 +27,26 @@ export async function GET(
       orderBy: {
         name: "asc",
       },
+      include: {
+        _count: {
+          select: {
+            matchPlayers: {
+              where: {
+                match: {
+                  status: "COMPLETED",
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     return NextResponse.json(
-      players.map((player: {id: string; name: string; email: string | null; phone: string | null; status: string; createdAt: Date; updatedAt: Date}) => ({
+      players.map(({ _count, ...player }) => ({
         ...player,
         name: player.name.trim(),
+        playCount: _count.matchPlayers,
       })),
     );
   } catch (error) {
