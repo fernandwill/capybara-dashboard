@@ -43,6 +43,18 @@ function RealtimeSync() {
     for (const key of keys) {
       void mutate(key);
     }
+
+    // Match-detail pages key on `/api/matches/:id`. Any change to a match,
+    // its roster (match_players), or its payments can affect the open detail
+    // page (status, play counts, round history), so revalidate those keys too.
+    if (tables.some((t) => t === "matches" || t === "match_players" || t === "payments")) {
+      void mutate(
+        (key) =>
+          typeof key === "string" &&
+          key.startsWith("/api/matches/") &&
+          key !== "/api/matches"
+      );
+    }
   });
 
   return null;

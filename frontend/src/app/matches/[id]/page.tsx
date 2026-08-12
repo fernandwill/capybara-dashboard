@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import useSWR from "swr";
 import Link from "next/link";
 import {
   Calendar,
@@ -20,12 +21,11 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
-import SelectPlayersModal, {
-  PlayerOption,
-} from "@/components/SelectPlayersModal";
+import SelectPlayersModal from "@/components/SelectPlayersModal";
 import ErrorModal from "@/components/ErrorModal";
 import SuccessModal from "@/components/SuccessModal";
 import { authFetch } from "@/lib/authFetch";
+import { usePlayers } from "@/hooks/usePlayers";
 import { Match, Player, PaymentStatus, ModalState } from "@/types/types";
 import { exportPlayerList } from "@/utils/playerExport";
 
@@ -52,6 +52,18 @@ interface FinishedGameHistory {
   teamANames: string[];
   teamBNames: string[];
   finishedAt: string;
+}
+
+// Shape returned by GET /api/matches/:id (match + per-match play counts +
+// persisted round history).
+interface MatchDetail extends Match {
+  rounds: Array<{
+    id: string;
+    courtNumber: number;
+    teamAPlayerIds: string[];
+    teamBPlayerIds: string[];
+    finishedAt: string;
+  }>;
 }
 
 const formatDate = (dateString: string) => {
@@ -115,23 +127,78 @@ export default function MatchDetailsPage() {
   const params = useParams();
   const matchId = params?.id as string;
 
-  // Match and player state
-  const [match, setMatch] = useState<Match | null>(null);
-  const [players, setPlayers] = useState<PlayerInMatch[]>([]);
-  const [allAvailablePlayers, setAllAvailablePlayers] = useState<PlayerOption[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Match data — SWR-backed. The detail key lives in the shared cache, so
+  // revisiting a match (or navigating from another page) renders instantly;
+  // realtime revalidates it when the match, roster, or payments change.
+  // keepPreviousData is disabled so navigating between matches shows a loader
+  // instead of flashing the previous match.
+  const {
+    data: matchData,
+    isLoading,
+    error: matchError,
+    mutate: revalidateMatch,
+  } = useSWR<MatchDetail>(
+    matchId ? `/api/matches/${matchId}` : null,
+    { keepPreviousData: false }
+  );
+  const match = matchData ?? null;
+
+  // All available players for the roster picker — shared cache with the
+  // players page and dashboard insights.
+  const { players: allAvailablePlayers, fetchPlayers: refreshPlayers } = usePlayers();
+
+  // Local, interactive-only state
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isSavingRound, setIsSavingRound] = useState(false);
-
-  // Courts state
   const [courts, setCourts] = useState<CourtState[]>([]);
   const [activeMobileCourtIndex, setActiveMobileCourtIndex] = useState(0);
 
-  // In-session player play counts
-  const [sessionPlayCounts, setSessionPlayCounts] = useState<Record<string, number>>({});
+  // In-match players enriched with per-match play counts (server truth).
+  const players = useMemo<PlayerInMatch[]>(() => {
+    return (matchData?.players ?? []).map(
+      (matchPlayer: {
+        player: Player & { playCount?: number };
+        paymentStatus: PaymentStatus;
+      }) => ({
+        ...matchPlayer.player,
+        paymentStatus: matchPlayer.paymentStatus,
+        playCount: matchPlayer.player.playCount ?? 0,
+      })
+    );
+  }, [matchData]);
 
-  // History
-  const [gameHistory, setGameHistory] = useState<FinishedGameHistory[]>([]);
+  // Session play counts start at the per-match server values; the Finish
+  // Court flow revalidates so the incremented counts come back authoritative.
+  const sessionPlayCounts = useMemo<Record<string, number>>(() => {
+    const counts: Record<string, number> = {};
+    players.forEach((p) => {
+      counts[p.id] = p.playCount ?? 0;
+    });
+    return counts;
+  }, [players]);
+
+  // Persisted round history, mapped to display names (survives reloads).
+  const gameHistory = useMemo<FinishedGameHistory[]>(() => {
+    return (matchData?.rounds ?? []).map(
+      (round: {
+        id: string;
+        courtNumber: number;
+        teamAPlayerIds: string[];
+        teamBPlayerIds: string[];
+        finishedAt: string;
+      }) => ({
+        id: round.id,
+        courtName: `Court ${round.courtNumber}`,
+        teamANames: (round.teamAPlayerIds ?? []).map(
+          (pid) => players.find((p) => p.id === pid)?.name || "Player"
+        ),
+        teamBNames: (round.teamBPlayerIds ?? []).map(
+          (pid) => players.find((p) => p.id === pid)?.name || "Player"
+        ),
+        finishedAt: formatTimeHM(round.finishedAt),
+      })
+    );
+  }, [matchData, players]);
 
   // Modals state
   const [isSelectPlayersModalOpen, setIsSelectPlayersModalOpen] = useState(false);
@@ -153,110 +220,40 @@ export default function MatchDetailsPage() {
     message: "",
   });
 
-  // Fetch match details
-  const fetchMatchDetails = useCallback(async () => {
-    if (!matchId) return;
-    try {
-      const res = await authFetch(`/api/matches/${matchId}`);
-      if (!res.ok) {
-        throw new Error("Match not found");
-      }
-      const data = await res.json();
-      setMatch(data);
+  // Initialize the court slots once per match (courts are local interactive
+  // state, so background revalidations must not reset them).
+  const initializedMatchIdRef = useRef<string | null>(null);
 
-      const matchPlayers =
-        data.players?.map(
-          (matchPlayer: {
-            player: Player & { playCount?: number };
-            paymentStatus: PaymentStatus;
-          }) => ({
-            ...matchPlayer.player,
-            paymentStatus: matchPlayer.paymentStatus,
-            playCount: matchPlayer.player.playCount ?? 0,
-          })
-        ) ?? [];
-      setPlayers(matchPlayers);
+  useEffect(() => {
+    if (!matchData) return;
+    if (initializedMatchIdRef.current === matchData.id) return;
+    initializedMatchIdRef.current = matchData.id;
 
-      // Initialize session play counts
-      const counts: Record<string, number> = {};
-      matchPlayers.forEach((p: PlayerInMatch) => {
-        counts[p.id] = p.playCount ?? 0;
+    const courtCount = parseInt(matchData.courtNumber || "4", 10) || 4;
+    const initialCourts: CourtState[] = [];
+    for (let i = 1; i <= Math.max(1, Math.min(courtCount, 8)); i++) {
+      initialCourts.push({
+        id: i,
+        name: `Court ${i}`,
+        status: "EMPTY",
+        teamA: [{ playerId: null }, { playerId: null }],
+        teamB: [{ playerId: null }, { playerId: null }],
       });
-      setSessionPlayCounts(counts);
+    }
+    setCourts(initialCourts);
+    setActiveMobileCourtIndex(0);
+  }, [matchData]);
 
-      // Load persisted round history
-      const matchRounds = data.rounds ?? [];
-      setGameHistory(
-        matchRounds.map(
-          (round: {
-            id: string;
-            courtNumber: number;
-            teamAPlayerIds: string[];
-            teamBPlayerIds: string[];
-            finishedAt: string;
-          }) => ({
-            id: round.id,
-            courtName: `Court ${round.courtNumber}`,
-            teamANames: (round.teamAPlayerIds ?? []).map(
-              (pid) =>
-                matchPlayers.find((p: PlayerInMatch) => p.id === pid)?.name ||
-                "Player"
-            ),
-            teamBNames: (round.teamBPlayerIds ?? []).map(
-              (pid) =>
-                matchPlayers.find((p: PlayerInMatch) => p.id === pid)?.name ||
-                "Player"
-            ),
-            finishedAt: formatTimeHM(round.finishedAt),
-          })
-        )
-      );
-
-      // Initialize courts if not already configured
-      const courtCount = parseInt(data.courtNumber || "4", 10) || 4;
-      setCourts((prev) => {
-        if (prev.length > 0) return prev;
-        const initialCourts: CourtState[] = [];
-        for (let i = 1; i <= Math.max(1, Math.min(courtCount, 8)); i++) {
-          initialCourts.push({
-            id: i,
-            name: `Court ${i}`,
-            status: "EMPTY",
-            teamA: [{ playerId: null }, { playerId: null }],
-            teamB: [{ playerId: null }, { playerId: null }],
-          });
-        }
-        return initialCourts;
-      });
-    } catch (err) {
-      console.error("Error fetching match details:", err);
+  // Surface a first-load failure (e.g. match deleted) as an error modal once.
+  useEffect(() => {
+    if (matchError && !matchData) {
       setErrorModal({
         isOpen: true,
         title: "Error",
         message: "Failed to load match details. Please return to the dashboard.",
       });
-    } finally {
-      setIsLoading(false);
     }
-  }, [matchId]);
-
-  // Fetch all available players for the picker
-  const fetchAllPlayers = useCallback(async () => {
-    try {
-      const res = await authFetch("/api/players");
-      if (res.ok) {
-        const data = await res.json();
-        setAllAvailablePlayers(data);
-      }
-    } catch (err) {
-      console.error("Failed to load players list:", err);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchMatchDetails();
-    fetchAllPlayers();
-  }, [fetchMatchDetails, fetchAllPlayers]);
+  }, [matchError, matchData]);
 
   // Players prioritized by in-session play counts ascending
   const prioritizedPlayers = useMemo(() => {
@@ -419,37 +416,10 @@ export default function MatchDetailsPage() {
       });
 
       if (!res.ok) throw new Error("Failed to save round");
-      const { round } = await res.json();
 
-      // Increment session play count
-      setSessionPlayCounts((prev) => {
-        const next = { ...prev };
-        allPlayedIds.forEach((id) => {
-          next[id] = (next[id] || 0) + 1;
-        });
-        return next;
-      });
-
-      const teamANames = teamAPlayerIds
-        .map((id) => players.find((p) => p.id === id)?.name || "Player")
-        .filter(Boolean);
-      const teamBNames = teamBPlayerIds
-        .map((id) => players.find((p) => p.id === id)?.name || "Player")
-        .filter(Boolean);
-
-      const timeStr = formatTimeHM(new Date().toISOString());
-
-      // Add to game history
-      setGameHistory((prev) => [
-        {
-          id: round.id,
-          courtName: court.name,
-          teamANames,
-          teamBNames,
-          finishedAt: timeStr,
-        },
-        ...prev,
-      ]);
+      // Revalidate so the incremented play counts + round history come back
+      // from the server (authoritative, survives reloads).
+      await revalidateMatch();
 
       // Clear the finished court
       setCourts((prev) => {
@@ -492,8 +462,12 @@ export default function MatchDetailsPage() {
         throw new Error("Failed to update match status");
       }
 
-      const updated = await res.json();
-      setMatch((prev) => (prev ? { ...prev, status: updated.status } : updated));
+      // Optimistically flip the status in the cache; realtime reconciles on
+      // the write (matches table change revalidates this detail key).
+      await revalidateMatch(
+        (current) => (current ? { ...current, status: nextStatus } : current),
+        { revalidate: false }
+      );
 
       setSuccessModal({
         isOpen: true,
@@ -526,7 +500,7 @@ export default function MatchDetailsPage() {
       });
 
       if (!res.ok) throw new Error("Failed to update roster");
-      await fetchMatchDetails();
+      await revalidateMatch();
     } catch (err) {
       console.error(err);
       setErrorModal({
@@ -1163,8 +1137,11 @@ export default function MatchDetailsPage() {
         selectedPlayerIds={players.map((p) => p.id)}
         onSave={handleSaveRoster}
         availablePlayers={allAvailablePlayers}
-        onPlayerCreated={(created) => {
-          setAllAvailablePlayers((prev) => [...prev, created]);
+        onPlayerCreated={() => {
+          // The player is persisted; refresh the shared players cache so the
+          // newly created player shows up in the picker (realtime also covers
+          // this via the players table change).
+          void refreshPlayers();
         }}
       />
 
