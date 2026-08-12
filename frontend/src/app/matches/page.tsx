@@ -6,26 +6,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  Banknote,
   CalendarDays,
-  Clock,
-  Hash,
-  History,
-  MapPin,
-  MoreVertical,
-  Plus,
-  Search,
-  Users,
   ChevronLeft,
   ChevronRight,
+  History,
+  Plus,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMatches } from "@/hooks/useMatches";
+import { usePagination } from "@/hooks/usePagination";
 import { Match, ModalState, SortOption } from "@/types/types";
-import { formatCurrency, formatDurationHours, formatShortDate } from "@/utils/formatters";
 import { sortMatches } from "@/utils/matchUtils";
 import CustomDropdown, { DropdownOption } from "@/components/ui/CustomDropdown";
+import MatchCard from "@/components/match/MatchCard";
 
 const SORT_OPTIONS: DropdownOption<SortOption>[] = [
   { value: "date-latest", label: "Date: Newest First" },
@@ -60,7 +55,6 @@ export default function AllMatchesHistoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("ALL");
   const [sortOption, setSortOption] = useState<SortOption>("date-latest");
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Modals state
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
@@ -118,28 +112,15 @@ export default function AllMatchesHistoryPage() {
   }, [matches, statusFilter, searchQuery, sortOption]);
 
   // Pagination calculation
-  const totalPages = Math.max(1, Math.ceil(filteredMatches.length / MATCHES_PER_PAGE));
-  const currentMatches = useMemo(() => {
-    const startIndex = (currentPage - 1) * MATCHES_PER_PAGE;
-    return filteredMatches.slice(startIndex, startIndex + MATCHES_PER_PAGE);
-  }, [filteredMatches, currentPage]);
-
-  const visiblePageNumbers = useMemo<number[]>(() => {
-    if (totalPages <= 5) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-    let start = Math.max(1, currentPage - 2);
-    let end = start + 4;
-    if (end > totalPages) {
-      end = totalPages;
-      start = Math.max(1, end - 4);
-    }
-    const pages: number[] = [];
-    for (let p = start; p <= end; p++) {
-      pages.push(p);
-    }
-    return pages;
-  }, [totalPages, currentPage]);
+  const {
+    currentPage,
+    goToPage,
+    totalPages,
+    currentItems: currentMatches,
+    visiblePageNumbers,
+    startIndex,
+    endIndex,
+  } = usePagination<Match>(filteredMatches, MATCHES_PER_PAGE);
 
   // Only show skeletons on the very first load; keep showing stale data
   // during background/realtime refetches so the grid never flashes blank.
@@ -148,12 +129,12 @@ export default function AllMatchesHistoryPage() {
   // Reset page to 1 when filters or search change
   const handleFilterChange = (status: FilterStatus) => {
     setStatusFilter(status);
-    setCurrentPage(1);
+    goToPage(1);
   };
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1);
+    goToPage(1);
   };
 
   // Modal Handlers
@@ -440,98 +421,14 @@ export default function AllMatchesHistoryPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {currentMatches.map((match) => {
-                const [day, month] = formatShortDate(match.date).split(" ");
-                const isCompleted = match.status === "COMPLETED";
-
-                return (
-                  <div
-                    key={match.id}
-                    onClick={() => handleMatchClick(match)}
-                    className="group relative flex flex-col justify-between rounded-xl border border-app-border bg-app-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-600 hover:shadow-lg cursor-pointer"
-                  >
-                    {/* Top Row: Date Badge, Status Badge, Row Menu */}
-                    <div>
-                      <div className="mb-4 flex items-start justify-between">
-                        {/* Date Badge */}
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg border border-app-border bg-app-bg">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-app-text-muted">
-                              {month}
-                            </span>
-                            <span className="text-base font-bold text-white leading-none">
-                              {day}
-                            </span>
-                          </div>
-                          <div>
-                            <span
-                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                isCompleted
-                                  ? "border border-app-success/20 bg-app-success-bg text-app-success-text"
-                                  : "border border-blue-500/20 bg-blue-500/10 text-blue-400"
-                              }`}
-                            >
-                              {isCompleted ? "Completed" : "Upcoming"}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Action Menu */}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-app-text-muted hover:bg-gray-700 hover:text-white"
-                          onClick={(e) => openRowMenu(e, match)}
-                          aria-label={`Actions for ${match.title}`}
-                        >
-                          <MoreVertical size={16} />
-                        </Button>
-                      </div>
-
-                      {/* Title & Location */}
-                      <h3 className="line-clamp-1 text-lg font-bold text-white transition group-hover:text-app-primary">
-                        {match.title}
-                      </h3>
-                      <p className="mt-1 flex items-center gap-1.5 line-clamp-1 text-sm text-app-text-secondary">
-                        <MapPin size={14} className="shrink-0 text-app-text-muted" />
-                        <span className="truncate">{match.location}</span>
-                      </p>
-
-                      {/* Meta Information Grid */}
-                      <div className="mt-4 grid grid-cols-2 gap-2.5 rounded-lg border border-app-border/50 bg-app-bg/50 p-3 text-xs text-app-text-secondary">
-                        <div className="flex items-center gap-1.5">
-                          <Clock size={13} className="text-app-text-muted shrink-0" />
-                          <span className="truncate">{match.time}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Hash size={13} className="text-app-text-muted shrink-0" />
-                          <span className="truncate">Court {match.courtNumber}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Users size={13} className="text-app-text-muted shrink-0" />
-                          <span>{match.players?.length || 0} Players</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Banknote size={13} className="text-app-text-muted shrink-0" />
-                          <span className="font-semibold text-app-success-text truncate">
-                            {formatCurrency(match.fee)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card Footer */}
-                    <div className="mt-4 flex items-center justify-between border-t border-app-border/40 pt-3 text-xs">
-                      <span className="text-app-text-muted">
-                        Duration: {formatDurationHours(match.time)}
-                      </span>
-                      <span className="font-medium text-app-primary transition group-hover:underline">
-                        View Details →
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+              {currentMatches.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  onClick={handleMatchClick}
+                  onOpenMenu={openRowMenu}
+                />
+              ))}
             </div>
           )}
 
@@ -540,13 +437,9 @@ export default function AllMatchesHistoryPage() {
             <div className="mt-4 flex flex-col items-center justify-between gap-4 border-t border-app-border pt-6 sm:flex-row">
               <p className="text-xs text-app-text-muted">
                 Showing{" "}
-                <span className="font-medium text-white">
-                  {(currentPage - 1) * MATCHES_PER_PAGE + 1}
-                </span>{" "}
+                <span className="font-medium text-white">{startIndex}</span>{" "}
                 to{" "}
-                <span className="font-medium text-white">
-                  {Math.min(currentPage * MATCHES_PER_PAGE, filteredMatches.length)}
-                </span>{" "}
+                <span className="font-medium text-white">{endIndex}</span>{" "}
                 of <span className="font-medium text-white">{filteredMatches.length}</span> matches
               </p>
 
@@ -555,7 +448,7 @@ export default function AllMatchesHistoryPage() {
                   variant="secondary"
                   size="sm"
                   disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  onClick={() => goToPage(currentPage - 1)}
                 >
                   <ChevronLeft size={14} />
                   <span>Previous</span>
@@ -570,7 +463,7 @@ export default function AllMatchesHistoryPage() {
                       className={`text-xs font-semibold ${
                         currentPage === pageNum ? "" : "text-app-text-secondary hover:text-white"
                       }`}
-                      onClick={() => setCurrentPage(pageNum)}
+                      onClick={() => goToPage(pageNum)}
                     >
                       {pageNum}
                     </Button>
@@ -581,7 +474,7 @@ export default function AllMatchesHistoryPage() {
                   variant="secondary"
                   size="sm"
                   disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() => goToPage(currentPage + 1)}
                 >
                   <span>Next</span>
                   <ChevronRight size={14} />

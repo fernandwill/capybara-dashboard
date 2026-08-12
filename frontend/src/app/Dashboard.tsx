@@ -16,6 +16,7 @@ import { useMatches } from "@/hooks/useMatches";
 import { useMonthlyStats } from "@/hooks/useMonthlyStats";
 import { useCountdown } from "@/hooks/useCountdown";
 import { usePlayers } from "@/hooks/usePlayers";
+import { useDashboardInsights } from "@/hooks/useDashboardInsights";
 import AppLayout from "../components/layout/AppLayout";
 import StatCard from "../components/dashboard/StatCard";
 import MonthlyActivityCard from "../components/dashboard/MonthlyActivityCard";
@@ -24,19 +25,6 @@ import UpcomingMatchBanner from "../components/dashboard/UpcomingMatchBanner";
 import UpcomingMatchesCard from "../components/dashboard/UpcomingMatchesCard";
 import RecentMatchesCard from "../components/dashboard/RecentMatchesCard";
 import MatchRowMenu from "../components/dashboard/MatchRowMenu";
-
-// Constants
-const WEEKDAY_NAMES = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
-
 
 export function Dashboard() {
   const router = useRouter();
@@ -120,120 +108,21 @@ export function Dashboard() {
     });
   }, [matches, selectedYear]);
 
-  // 1. Favorite Badminton Centre (most frequent location in selectedYear)
-  const favoriteCentre = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const m of yearMatchesList) {
-      const loc = m.location?.trim();
-      if (loc) {
-        counts.set(loc, (counts.get(loc) || 0) + 1);
-      }
-    }
-    if (counts.size === 0) return null;
-
-    let bestName = "";
-    let maxCount = 0;
-    counts.forEach((count, loc) => {
-      if (count > maxCount) {
-        maxCount = count;
-        bestName = loc;
-      }
-    });
-
-    return maxCount > 0 ? { name: bestName, count: maxCount } : null;
-  }, [yearMatchesList]);
-
-  // 2. Most Presence (player(s) with highest match attendance in selectedYear)
-  const mostPresence = useMemo(() => {
-    const counts = new Map<string, { player: { id: string; name: string }; count: number }>();
-    for (const m of yearMatchesList) {
-      if (!m.players) continue;
-      for (const mp of m.players) {
-        if (!mp.player) continue;
-        const p = mp.player;
-        const current = counts.get(p.id) || { player: { id: p.id, name: p.name }, count: 0 };
-        current.count += 1;
-        counts.set(p.id, current);
-      }
-    }
-    if (counts.size === 0) return null;
-
-    let maxCount = 0;
-    counts.forEach((item) => {
-      if (item.count > maxCount) {
-        maxCount = item.count;
-      }
-    });
-
-    if (maxCount === 0) return null;
-
-    const topPlayers: { id: string; name: string }[] = [];
-    counts.forEach((item) => {
-      if (item.count === maxCount) {
-        topPlayers.push(item.player);
-      }
-    });
-
-    return { players: topPlayers, count: maxCount };
-  }, [yearMatchesList]);
-
-  // 3. New Blood (number of new players who joined in selectedYear)
-  const newBloodCount = useMemo(() => {
-    return players.filter((p) => {
-      if (!p.createdAt) return false;
-      const createdDate = new Date(p.createdAt);
-      return !isNaN(createdDate.getTime()) && createdDate.getFullYear() === selectedYear;
-    }).length;
-  }, [players, selectedYear]);
-
-  // Insights - Activity
-  const strongestMonth = useMemo(() => {
-    const sorted = [...monthlyData].sort((a, b) => b.hours - a.hours);
-    return sorted[0] && sorted[0].hours > 0 ? sorted[0] : null;
-  }, [monthlyData]);
-
-  const mostActiveDay = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const match of completedMatches) {
-      const date = new Date(match.date);
-      if (isNaN(date.getTime()) || date.getFullYear() !== selectedYear) continue;
-      const name = WEEKDAY_NAMES[date.getDay()];
-      counts.set(name, (counts.get(name) || 0) + 1);
-    }
-
-    let best: string | null = null;
-    let bestCount = 0;
-    counts.forEach((count, name) => {
-      if (count > bestCount) {
-        bestCount = count;
-        best = name;
-      }
-    });
-    return best;
-  }, [completedMatches, selectedYear]);
-
-  const typicalStartHour = useMemo(() => {
-    const counts = new Map<number, number>();
-    for (const match of completedMatches) {
-      const d = new Date(match.date);
-      if (isNaN(d.getTime()) || d.getFullYear() !== selectedYear) continue;
-      const start = match.time.split("-")[0].trim();
-      const hour = parseInt(start.split(":")[0], 10);
-      if (!isNaN(hour)) {
-        counts.set(hour, (counts.get(hour) || 0) + 1);
-      }
-    }
-
-    let best: number | null = null;
-    let bestCount = 0;
-    counts.forEach((count, hour) => {
-      if (count > bestCount) {
-        bestCount = count;
-        best = hour;
-      }
-    });
-    return best;
-  }, [completedMatches, selectedYear]);
+  // All six insight cards are derived in a dedicated hook.
+  const {
+    favoriteCentre,
+    mostPresence,
+    newBloodCount,
+    strongestMonth,
+    mostActiveDay,
+    typicalStartHour,
+  } = useDashboardInsights({
+    completedMatches,
+    yearMatches: yearMatchesList,
+    monthlyData,
+    players,
+    selectedYear,
+  });
 
   // Force dark theme for the whole app (matches the new design)
   useEffect(() => {

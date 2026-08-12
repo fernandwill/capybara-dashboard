@@ -1,0 +1,95 @@
+"use client";
+
+import Image from "next/image";
+import { Pencil, Trash2 } from "lucide-react";
+import type { PlayerRecord } from "./EditPlayerModal";
+
+interface PlayerTableRowProps {
+  player: PlayerRecord;
+  isTopPlayer: boolean;
+  onEdit: (player: PlayerRecord) => void;
+  onDelete: (player: PlayerRecord) => void;
+}
+
+/** Formats an ISO date as "Jan 5, 2025" or "—". */
+function formatDate(isoString?: string | null): string {
+  if (!isoString) return "—";
+  try {
+    const d = new Date(isoString);
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return "—";
+  }
+}
+
+/** Single row in the historical players table. */
+export default function PlayerTableRow({
+  player,
+  isTopPlayer,
+  onEdit,
+  onDelete,
+}: PlayerTableRowProps) {
+  return (
+    <tr className="transition-colors hover:bg-[#12151c]/60 group">
+      {/* Player Column */}
+      <td className="px-5 py-3.5">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/capybara-avatar.png"
+            alt={player.name}
+            width={400}
+            height={383}
+            className="h-9 w-9 shrink-0 rounded-full object-cover border border-[#232730] shadow-sm"
+          />
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-white">{player.name}</span>
+            {isTopPlayer && (
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
+                Most Played
+              </span>
+            )}
+          </div>
+        </div>
+      </td>
+
+      {/* Total Matches */}
+      <td className="px-4 py-3.5 text-center font-medium text-white">
+        {player.totalMatches ?? 0}
+      </td>
+
+      {/* This Year */}
+      <td className="px-4 py-3.5 text-center font-semibold text-emerald-400">
+        {player.thisYearMatches ?? 0}
+      </td>
+
+      {/* Last Played */}
+      <td className="px-4 py-3.5 text-gray-300">{formatDate(player.lastPlayed)}</td>
+
+      {/* Actions (Pencil & Trash icons) */}
+      <td className="px-5 py-3.5 text-right">
+        <div className="flex items-center justify-end gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={() => onEdit(player)}
+            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-[#1c222e] hover:text-white"
+            title="Edit player"
+          >
+            <Pencil size={14} />
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(player)}
+            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-500/10 hover:text-red-400"
+            title="Delete player"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
