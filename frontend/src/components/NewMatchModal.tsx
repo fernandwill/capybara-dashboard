@@ -462,11 +462,6 @@ export default function NewMatchModal({
                           </span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          {typeof player.playCount === "number" && (
-                            <span className="rounded-full border border-[#232730] bg-[#181d26] px-2 py-0.5 text-[10px] font-medium text-gray-400">
-                              {player.playCount}x
-                            </span>
-                          )}
                           <button
                             type="button"
                             onClick={() => handleRemovePlayerChip(player.id)}

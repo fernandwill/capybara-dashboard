@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "./ui/Modal";
 import { Loader2, Plus, Search, Star, User, X } from "lucide-react";
 import { authFetch } from "@/lib/authFetch";
@@ -15,7 +15,7 @@ interface SelectPlayersModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedPlayerIds: string[];
-  onSave: (selectedIds: string[]) => void;
+  onSave: (selectedIds: string[]) => Promise<void> | void;
   availablePlayers: PlayerOption[];
   onPlayerCreated?: (newPlayer: PlayerOption) => void;
 }
@@ -56,6 +56,7 @@ export default function SelectPlayersModal({
   const [tempSelectedIds, setTempSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabType>("all");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Inline player creation state
   const [newPlayerName, setNewPlayerName] = useState("");
@@ -91,14 +92,22 @@ export default function SelectPlayersModal({
     });
   };
 
+  // Track whether the modal is open so the selection is initialized only on
+  // the open transition. Parents may re-render (e.g. background dashboard
+  // refreshes) and pass a new `selectedPlayerIds` array identity while the
+  // modal is open — we must not wipe the user's in-progress selection then.
+  const wasOpenRef = useRef(false);
+
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !wasOpenRef.current) {
       setTempSelectedIds([...selectedPlayerIds]);
       setSearchQuery("");
       setNewPlayerName("");
       setPlayerError("");
       setActiveTab("all");
+      setIsSubmitting(false);
     }
+    wasOpenRef.current = isOpen;
   }, [isOpen, selectedPlayerIds]);
 
   const handleTogglePlayer = (id: string) => {
@@ -172,15 +181,32 @@ export default function SelectPlayersModal({
     return list;
   }, [availablePlayers, activeTab, searchQuery, favoriteIds]);
 
-  const handleApply = () => {
-    onSave(tempSelectedIds);
-    onClose();
+  // Only count players newly checked relative to the initial selection
+  // (players already in the match are pre-selected and shouldn't count as "added").
+  const newlySelectedCount = tempSelectedIds.filter(
+    (id) => !selectedPlayerIds.includes(id)
+  ).length;
+  const removedCount = selectedPlayerIds.filter(
+    (id) => !tempSelectedIds.includes(id)
+  ).length;
+  const hasSelectionChanges = newlySelectedCount > 0 || removedCount > 0;
+
+  const handleApply = async () => {
+    try {
+      setIsSubmitting(true);
+      await onSave(tempSelectedIds);
+      onClose();
+    } catch (error) {
+      console.error("Error applying player selection:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={isSubmitting ? () => {} : onClose}
       title="Select Players"
       subtitle="Search and select players to add to this match."
       size="md"
@@ -188,24 +214,38 @@ export default function SelectPlayersModal({
       footer={
         <div className="flex w-full items-center justify-between">
           <div className="text-xs font-semibold text-emerald-400">
-            {tempSelectedIds.length} player
-            {tempSelectedIds.length === 1 ? "" : "s"} selected
+            {newlySelectedCount} player
+            {newlySelectedCount === 1 ? "" : "s"} selected
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-3.5 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white"
+              disabled={isSubmitting}
+              className="rounded-lg px-3.5 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-40"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleApply}
-              className="rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-medium text-white shadow transition hover:bg-blue-500"
+              disabled={!hasSelectionChanges || isSubmitting}
+              className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-medium text-white shadow transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Add {tempSelectedIds.length} Player
-              {tempSelectedIds.length === 1 ? "" : "s"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={13} className="animate-spin" />
+                  <span>
+                    {removedCount > 0 && newlySelectedCount === 0
+                      ? "Saving Changes..."
+                      : "Adding Players..."}
+                  </span>
+                </>
+              ) : removedCount > 0 && newlySelectedCount === 0 ? (
+                "Save Changes"
+              ) : (
+                `Add ${newlySelectedCount} Player${newlySelectedCount === 1 ? "" : "s"}`
+              )}
             </button>
           </div>
         </div>
@@ -382,11 +422,6 @@ export default function SelectPlayersModal({
                         fill={isFav ? "currentColor" : "none"}
                       />
                     </button>
-                    {typeof player.playCount === "number" && (
-                      <span className="rounded-full bg-[#181d26] px-2.5 py-0.5 text-[11px] font-medium text-gray-400 border border-[#232730]">
-                        {player.playCount}x
-                      </span>
-                    )}
                   </div>
                 </div>
               );
