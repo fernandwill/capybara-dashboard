@@ -31,5 +31,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",],
+    // Exclude /api: every API route already validates the session via
+    // requireAdminUser(), so running getUser() here too doubles Supabase
+    // round-trips on every data request.
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",],
 }

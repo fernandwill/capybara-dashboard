@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Modal from "./ui/Modal";
 import { Loader2, Plus, Search, Star, User, X } from "lucide-react";
 import { authFetch } from "@/lib/authFetch";
@@ -21,29 +22,6 @@ interface SelectPlayersModalProps {
 }
 
 type TabType = "all" | "frequent" | "favorites";
-
-const AVATAR_COLORS = [
-  "bg-gradient-to-tr from-blue-600 to-indigo-500",
-  "bg-gradient-to-tr from-emerald-600 to-teal-500",
-  "bg-gradient-to-tr from-amber-600 to-orange-500",
-  "bg-gradient-to-tr from-purple-600 to-pink-500",
-  "bg-gradient-to-tr from-cyan-600 to-blue-500",
-  "bg-gradient-to-tr from-rose-600 to-red-500",
-];
-
-export function getAvatarGradient(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-export function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-}
 
 export default function SelectPlayersModal({
   isOpen,
@@ -373,8 +351,6 @@ export default function SelectPlayersModal({
             displayedPlayers.map((player) => {
               const isSelected = tempSelectedIds.includes(player.id);
               const isFav = favoriteIds.includes(player.id);
-              const gradient = getAvatarGradient(player.name);
-              const initials = getInitials(player.name);
 
               return (
                 <div
@@ -395,11 +371,13 @@ export default function SelectPlayersModal({
                       onClick={(e) => e.stopPropagation()}
                       className="h-4 w-4 rounded border-gray-600 bg-[#16191f] text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
                     />
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ${gradient}`}
-                    >
-                      {initials}
-                    </div>
+                    <Image
+                      src="/capybara-avatar.png"
+                      alt={player.name}
+                      width={400}
+                      height={383}
+                      className="h-8 w-8 shrink-0 rounded-full object-cover border border-[#232730] shadow-sm"
+                    />
                     <span className="truncate text-xs font-semibold text-white">
                       {player.name}
                     </span>

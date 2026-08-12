@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
 
-// Add interface for match type
-interface MatchData {
-  date: Date;
-  time: string;
+interface MonthlyRow {
+  month: string;
+  count: number;
+  totalHours: number;
 }
 
 export async function GET() {
@@ -15,35 +15,40 @@ export async function GET() {
   }
 
   try {
-    const matches = await prisma.match.findMany({
-      where: { status: 'COMPLETED' },
-      select: {
-        date: true,
-        time: true,
-      }
-    });
+    // Single round-trip: group completed matches by month and sum hours in SQL
+    // instead of transferring every completed match to JS.
+    // NOTE: the time regex uses POSIX classes ([0-9], [[:space:]]) on purpose —
+    // backslash classes (\d, \s) are fragile inside JS template literals.
+    // Month bucketing uses the DB session timezone (UTC in production).
+    const rows = await prisma.$queryRaw<MonthlyRow[]>`
+      SELECT
+        to_char(date, 'YYYY-MM') AS month,
+        COUNT(*)::int AS count,
+        COALESCE(
+          SUM(
+            CASE
+              WHEN time ~ '^[0-9]{2}:[0-9]{2}[[:space:]]*-[[:space:]]*[0-9]{2}:[0-9]{2}$'
+              THEN EXTRACT(EPOCH FROM (
+                trim(split_part(time, '-', 2))::time - trim(split_part(time, '-', 1))::time
+              )) / 3600.0
+              ELSE 0
+            END
+          ),
+          0
+        )::float8 AS "totalHours"
+      FROM matches
+      WHERE status = 'COMPLETED'
+      GROUP BY month
+      ORDER BY month
+    `;
 
-    const monthlyData = matches.reduce((acc: Record<string, {count: number, totalHours: number}>, match: MatchData) => {
-      const date = new Date(match.date);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-
-      if (!acc[monthKey]) {
-        acc[monthKey] = { count: 0, totalHours: 0 };
-      }
-
-      acc[monthKey].count += 1;
-      const [startTime, endTime] = match.time.split('-');
-      const [startHour, startMin] = startTime.split(':').map(Number);
-      const [endHour, endMin] = endTime.split(':').map(Number);
-
-      const startMinutes = startHour * 60 + startMin;
-      const endMinutes = endHour * 60 + endMin;
-      const durationHours = (endMinutes - startMinutes) / 60;
-
-      acc[monthKey].totalHours += durationHours;
-
-      return acc;
-    }, {});
+    const monthlyData = rows.reduce(
+      (acc: Record<string, { count: number; totalHours: number }>, row) => {
+        acc[row.month] = { count: row.count, totalHours: row.totalHours };
+        return acc;
+      },
+      {}
+    );
 
     return NextResponse.json(monthlyData);
   } catch (error) {

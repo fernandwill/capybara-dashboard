@@ -16,6 +16,7 @@ export interface Player {
     name: string;
     status: string;
     playCount?: number;
+    createdAt?: string;
 }
 
 export interface MatchPlayer {

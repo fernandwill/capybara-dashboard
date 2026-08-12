@@ -4,18 +4,17 @@
   "description": "A badminton match tracker and management system",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "dev": "cd frontend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
-    "build": "cd frontend && npm run build && cd .. && cd backend && npm run build",
+    "build": "cd frontend && npm run build",
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
-    "start": "concurrently \"cd backend && npm run start\" \"cd frontend && npm run start\"",
+    "start": "cd frontend && npm run start",
     "start:frontend": "cd frontend && npm run start",
     "start:backend": "cd backend && npm run start"
   },
   "devDependencies": {
-    "@types/node": "^24.3.3",
-    "concurrently": "^8.2.2"
+    "@types/node": "^24.3.3"
   }
 }

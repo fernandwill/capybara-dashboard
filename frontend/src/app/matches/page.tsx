@@ -26,9 +26,16 @@ import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { Match, ModalState, SortOption } from "@/types/types";
 import { formatCurrency, formatDurationHours, formatShortDate } from "@/utils/formatters";
 import { sortMatches } from "@/utils/matchUtils";
+import CustomDropdown, { DropdownOption } from "@/components/ui/CustomDropdown";
+
+const SORT_OPTIONS: DropdownOption<SortOption>[] = [
+  { value: "date-latest", label: "Date: Newest First" },
+  { value: "date-earliest", label: "Date: Oldest First" },
+  { value: "fee-high", label: "Fee: Highest First" },
+  { value: "fee-low", label: "Fee: Lowest First" },
+];
 
 // Modals
-import MatchDetailsModal from "@/components/MatchDetailsModal";
 import NewMatchModal from "@/components/NewMatchModal";
 import DeleteMatchModal from "@/components/DeleteMatchModal";
 import SuccessModal from "@/components/SuccessModal";
@@ -58,8 +65,6 @@ export default function AllMatchesHistoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Modals state
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(null);
@@ -149,6 +154,10 @@ export default function AllMatchesHistoryPage() {
     return pages;
   }, [totalPages, currentPage]);
 
+  // Only show skeletons on the very first load; keep showing stale data
+  // during background/realtime refetches so the grid never flashes blank.
+  const isLoadingFirstPass = isMatchesLoading && matches.length === 0;
+
   // Reset page to 1 when filters or search change
   const handleFilterChange = (status: FilterStatus) => {
     setStatusFilter(status);
@@ -163,11 +172,6 @@ export default function AllMatchesHistoryPage() {
   // Modal Handlers
   const handleMatchClick = (match: Match) => {
     router.push(`/matches/${match.id}`);
-  };
-
-  const handleCloseDetailsModal = () => {
-    setIsDetailsModalOpen(false);
-    setSelectedMatch(null);
   };
 
   const handleNewMatch = () => {
@@ -201,9 +205,6 @@ export default function AllMatchesHistoryPage() {
     try {
       const success = await deleteMatch(matchPendingDeletion.id);
       if (success) {
-        if (selectedMatch?.id === matchPendingDeletion.id) {
-          handleCloseDetailsModal();
-        }
         await fetchMatches();
         handleCloseDeleteModal();
         setSuccessModal({
@@ -250,7 +251,8 @@ export default function AllMatchesHistoryPage() {
 
       setIsModalOpen(false);
       setEditingMatch(null);
-      await fetchMatches();
+      // createMatch/updateMatch already refetch internally; realtime also
+      // fires on the write — no explicit refetch needed here.
 
       setSuccessModal({
         isOpen: true,
@@ -399,21 +401,18 @@ export default function AllMatchesHistoryPage() {
             {/* Sort Select */}
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-app-text-muted">Sort:</span>
-              <select
+              <CustomDropdown<SortOption>
+                options={SORT_OPTIONS}
                 value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as SortOption)}
-                className="rounded-lg border border-app-border bg-app-bg px-3 py-2 text-sm text-app-text-primary focus:border-app-primary focus:outline-none"
-              >
-                <option value="date-latest">Date: Newest First</option>
-                <option value="date-earliest">Date: Oldest First</option>
-                <option value="fee-high">Fee: Highest First</option>
-                <option value="fee-low">Fee: Lowest First</option>
-              </select>
+                onChange={(val) => setSortOption(val)}
+                size="sm"
+                className="w-48"
+              />
             </div>
           </div>
 
           {/* 3x3 Grid of Match Cards */}
-          {isMatchesLoading ? (
+          {isLoadingFirstPass ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 9 }).map((_, idx) => (
                 <div
@@ -618,17 +617,6 @@ export default function AllMatchesHistoryPage() {
       />
 
       {/* Match Modals */}
-      <MatchDetailsModal
-        isOpen={isDetailsModalOpen}
-        onClose={handleCloseDetailsModal}
-        match={selectedMatch}
-        onMatchUpdate={fetchMatches}
-        onEdit={(match) => {
-          handleCloseDetailsModal();
-          handleEditMatch(match);
-        }}
-      />
-
       <NewMatchModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Users, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { signOut } from "@/lib/authService";
 
@@ -18,6 +18,7 @@ export default function Sidebar({ className = "", onLogout }: SidebarProps) {
   const { user, setUser } = useAuth();
 
   const isDashboardActive = pathname === "/" || pathname === "/dashboard";
+  const isMatchesActive = pathname === "/matches" || pathname.startsWith("/matches/");
   const isPlayersActive = pathname === "/players";
 
   const handleSignOut = async () => {
@@ -33,6 +34,27 @@ export default function Sidebar({ className = "", onLogout }: SidebarProps) {
     }
   };
 
+  const navItems = [
+    {
+      href: "/",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      isActive: isDashboardActive,
+    },
+    {
+      href: "/matches",
+      label: "Matches",
+      icon: CalendarDays,
+      isActive: isMatchesActive,
+    },
+    {
+      href: "/players",
+      label: "Historical Players List",
+      icon: Users,
+      isActive: isPlayersActive,
+    },
+  ];
+
   return (
     <aside
       className={`flex h-screen w-64 flex-col justify-between border-r border-[#1a1e26] bg-[#090b0e] px-4 py-5 text-gray-300 ${className}`}
@@ -40,8 +62,11 @@ export default function Sidebar({ className = "", onLogout }: SidebarProps) {
       {/* Brand & Navigation */}
       <div className="space-y-6">
         {/* Brand Header */}
-        <Link href="/" className="flex items-center gap-3 px-2 transition hover:opacity-90">
-          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-gray-700 shadow-sm">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-2 transition hover:opacity-90"
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-700 shadow-sm">
             <Image
               src="/icons/icon.jpg"
               alt="Capybara Logo"
@@ -50,7 +75,7 @@ export default function Sidebar({ className = "", onLogout }: SidebarProps) {
               className="h-full w-full object-cover"
             />
           </div>
-          <span className="flex items-center gap-1.5 text-lg font-bold tracking-tight text-white">
+          <span className="flex items-center gap-1.5 text-lg font-bold tracking-tight text-white truncate">
             Capybara
             <span aria-label="Active" className="text-xs text-emerald-400">
               ✦
@@ -58,39 +83,32 @@ export default function Sidebar({ className = "", onLogout }: SidebarProps) {
           </span>
         </Link>
 
-        {/* Navigation Items (Two menus only) */}
+        {/* Navigation Items */}
         <nav className="space-y-1.5">
-          {/* Dashboard */}
-          <Link
-            href="/"
-            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
-              isDashboardActive
-                ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 font-semibold"
-                : "border border-transparent text-gray-400 hover:bg-[#12151c] hover:text-white"
-            }`}
-          >
-            <LayoutDashboard
-              size={18}
-              className={isDashboardActive ? "text-emerald-400" : "text-gray-400"}
-            />
-            <span>Dashboard</span>
-          </Link>
-
-          {/* Historical Players List */}
-          <Link
-            href="/players"
-            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
-              isPlayersActive
-                ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 font-semibold"
-                : "border border-transparent text-gray-400 hover:bg-[#12151c] hover:text-white"
-            }`}
-          >
-            <Users
-              size={18}
-              className={isPlayersActive ? "text-emerald-400" : "text-gray-400"}
-            />
-            <span>Historical Players List</span>
-          </Link>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all ${
+                  item.isActive
+                    ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 font-semibold"
+                    : "border border-transparent text-gray-400 hover:bg-[#12151c] hover:text-white"
+                }`}
+              >
+                <Icon
+                  size={18}
+                  className={`shrink-0 ${
+                    item.isActive
+                      ? "text-emerald-400"
+                      : "text-gray-400 group-hover:text-white"
+                  }`}
+                />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
       </div>
 
@@ -100,7 +118,7 @@ export default function Sidebar({ className = "", onLogout }: SidebarProps) {
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-700">
               <Image
-                src="/icons/icon.jpg"
+                src="/capybara-avatar.png"
                 alt="Profile"
                 width={32}
                 height={32}

@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
 
-// Add interface for match type
-interface MatchWithTime {
-  time: string;
+interface StatsRow {
+  total: number;
+  upcoming: number;
+  completed: number;
+  hours: number;
 }
 
 export async function GET() {
@@ -14,42 +16,38 @@ export async function GET() {
   }
 
   try {
-    const totalMatches = await prisma.match.count();
-    
-    const upcomingMatches = await prisma.match.count({
-      where: { status: "UPCOMING" }
-    });
-    
-    const completedMatches = await prisma.match.count({
-      where: { status: "COMPLETED" }
-    });
+    // One round-trip instead of four sequential queries:
+    // counts per status + total hours computed in SQL.
+    // NOTE: the time regex uses POSIX classes ([0-9], [[:space:]]) on purpose —
+    // backslash classes (\d, \s) are fragile inside JS template literals.
+    const rows = await prisma.$queryRaw<StatsRow[]>`
+      SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE status = 'UPCOMING')::int AS upcoming,
+        COUNT(*) FILTER (WHERE status = 'COMPLETED')::int AS completed,
+        COALESCE(
+          SUM(
+            CASE
+              WHEN status = 'COMPLETED'
+                AND time ~ '^[0-9]{2}:[0-9]{2}[[:space:]]*-[[:space:]]*[0-9]{2}:[0-9]{2}$'
+              THEN EXTRACT(EPOCH FROM (
+                trim(split_part(time, '-', 2))::time - trim(split_part(time, '-', 1))::time
+              )) / 3600.0
+              ELSE 0
+            END
+          ),
+          0
+        )::float8 AS hours
+      FROM matches
+    `;
 
-    // Calculate total hours for completed matches
-    const completedMatchesWithTime = await prisma.match.findMany({
-      where: { status: "COMPLETED" },
-      select: { time: true }
-    });
-
-    let totalHours = 0;
-    completedMatchesWithTime.forEach((match: MatchWithTime) => {
-      if (match.time && match.time.includes("-")) {
-        const [startTime, endTime] = match.time.split("-");
-        const [startHour, startMin] = startTime.split(":").map(Number);
-        const [endHour, endMin] = endTime.split(":").map(Number);
-
-        const startMinutes = startHour * 60 + startMin;
-        const endMinutes = endHour * 60 + endMin;
-        const durationMinutes = endMinutes - startMinutes;
-
-        totalHours += durationMinutes / 60;
-      }
-    });
+    const row = rows[0] ?? { total: 0, upcoming: 0, completed: 0, hours: 0 };
 
     return NextResponse.json({
-      totalMatches,
-      upcomingMatches,
-      completedMatches,
-      hoursPlayed: totalHours.toFixed(1),
+      totalMatches: row.total,
+      upcomingMatches: row.upcoming,
+      completedMatches: row.completed,
+      hoursPlayed: row.hours.toFixed(1),
     });
   } catch (error) {
     console.error('Error fetching stats:', error);

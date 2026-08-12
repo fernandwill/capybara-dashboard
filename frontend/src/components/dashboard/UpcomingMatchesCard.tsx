@@ -1,7 +1,17 @@
-import { CalendarDays, Check, Clock, Clock3, Hash, MoreVertical, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
+"use client";
+
+import React, { useRef, useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  CalendarDays,
+  Check,
+  ChevronRight,
+  ChevronLeft,
+  Clock,
+  MoreVertical,
+  Plus,
+} from "lucide-react";
 import { Match } from "@/types/types";
-import { formatShortDate } from "@/utils/formatters";
 
 interface UpcomingMatchesCardProps {
   matches: Match[];
@@ -13,107 +23,305 @@ interface UpcomingMatchesCardProps {
   onOpenMenu: (event: React.MouseEvent<HTMLButtonElement>, match: Match) => void;
 }
 
+function getMatchDateParts(dateString: string) {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return { month: "TBD", day: "--", weekday: "---" };
+  }
+  const month = date.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+  const day = String(date.getDate()).padStart(2, "0");
+  const weekday = date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+  return { month, day, weekday };
+}
+
+function formatTimeDuration(timeString: string) {
+  if (!timeString || !timeString.includes("-")) return timeString || "18:00 - 21:00 (3 hrs)";
+  try {
+    const [start, end] = timeString.split("-").map((t) => t.trim());
+    const [startH, startM] = start.split(":").map(Number);
+    const [endH, endM] = end.split(":").map(Number);
+
+    if (isNaN(startH) || isNaN(startM) || isNaN(endH) || isNaN(endM)) return timeString;
+
+    const startDate = new Date();
+    startDate.setHours(startH, startM, 0, 0);
+    const endDate = new Date();
+    endDate.setHours(endH, endM, 0, 0);
+
+    let diff = endDate.getTime() - startDate.getTime();
+    if (diff < 0) diff += 24 * 60 * 60 * 1000;
+
+    const hours = Math.round((diff / (1000 * 60 * 60)) * 10) / 10;
+    return `${start} - ${end} (${hours} hrs)`;
+  } catch {
+    return timeString;
+  }
+}
+
+function getMatchCountdown(match: Match): string {
+  try {
+    const matchDate = new Date(match.date);
+    const timeString = match.time?.split("-")[0]?.trim() || "00:00";
+    const [hours, minutes] = timeString.split(":").map(Number);
+
+    const matchDateTime = new Date(matchDate);
+    matchDateTime.setHours(hours || 0, minutes || 0, 0, 0);
+
+    const now = new Date();
+    const timeDiff = matchDateTime.getTime() - now.getTime();
+
+    if (timeDiff <= 0) {
+      return "Starting soon";
+    }
+
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) {
+      return `In ${days}d ${hoursLeft}h ${minutesLeft}m`;
+    } else if (hoursLeft > 0) {
+      return `In ${hoursLeft}h ${minutesLeft}m`;
+    } else if (minutesLeft > 0) {
+      return `In ${minutesLeft}m`;
+    } else {
+      return "Starting soon";
+    }
+  } catch {
+    return "Upcoming";
+  }
+}
+
 export default function UpcomingMatchesCard({
   matches,
-  closestMatch,
-  countdown,
   isLoading,
   onNewMatch,
   onMatchClick,
   onOpenMenu,
 }: UpcomingMatchesCardProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [matches]);
+
+  const handleScroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 340;
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+      setTimeout(checkScroll, 300);
+    }
+  };
+
   return (
     <section className="rounded-xl border border-app-border bg-app-card p-5 sm:p-6">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="flex items-center gap-2 text-lg font-semibold text-app-text-primary">
-          <CalendarDays size={18} className="text-app-text-muted" />
-          Upcoming Matches
-        </h2>
-        <Button variant="primary" onClick={onNewMatch}>
-          + New Match
-        </Button>
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CalendarDays size={18} className="text-gray-400" />
+          <h2 className="text-base font-bold text-white">Upcoming Matches</h2>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onNewMatch}
+            className="flex items-center gap-1 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-500"
+          >
+            <Plus size={14} />
+            <span>New Match</span>
+          </button>
+        </div>
       </div>
 
+      {/* Content */}
       {isLoading ? (
-        <div className="flex min-h-[250px] animate-pulse items-center justify-center rounded-xl border border-dashed border-app-border/50 text-xs text-app-text-muted">
+        <div className="flex min-h-[200px] animate-pulse items-center justify-center rounded-2xl border border-dashed border-[#232730] bg-[#12151c] text-xs text-gray-500">
           Loading upcoming matches...
         </div>
       ) : matches.length === 0 ? (
-        <div className="dashed-border flex flex-col items-center justify-center py-16 text-center">
-          <div className="relative mb-4">
-            <CalendarDays size={44} strokeWidth={1.5} className="text-app-text-muted" />
-            <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-app-bg">
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-app-success text-xs text-white">
-                <Check size={12} />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#232730] bg-[#12151c] py-10 text-center">
+          <div className="relative mb-3">
+            <CalendarDays size={40} strokeWidth={1.5} className="text-gray-500" />
+            <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#12151c]">
+              <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
+                <Check size={10} />
               </div>
             </div>
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-white">No upcoming matches</h3>
-          <p className="mb-6 max-w-sm text-sm text-app-text-secondary">
-            You&apos;re all caught up.
-            <br />
-            Schedule your next match when you&apos;re ready.
+          <h3 className="text-sm font-semibold text-white">No upcoming matches</h3>
+          <p className="mt-1 text-xs text-gray-400">
+            You&apos;re all caught up. Schedule your next match when you&apos;re ready.
           </p>
-          <Button variant="primary" size="lg" onClick={onNewMatch}>
-            + Schedule a match
-          </Button>
+          <button
+            type="button"
+            onClick={onNewMatch}
+            className="mt-4 flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
+          >
+            <Plus size={14} />
+            <span>Schedule a Match</span>
+          </button>
         </div>
       ) : (
-        <div className="divide-y divide-app-border/50">
-          {matches.map((match) => {
-            const [day, month] = formatShortDate(match.date).split(" ");
-            return (
-              <div
-                key={match.id}
-                className="grid cursor-pointer grid-cols-1 gap-4 py-5 first:pt-0 last:pb-0 sm:grid-cols-[90px_minmax(0,1fr)_auto] sm:items-center"
-                onClick={() => onMatchClick(match)}
-              >
-                <div className="text-center sm:text-left">
-                  <div className="text-xs font-medium uppercase tracking-wider text-app-text-secondary">
-                    {month}
-                  </div>
-                  <div className="text-xl font-bold text-white">{day}</div>
-                </div>
+        <div className="relative group">
+          {/* Scroll Navigation Left Button */}
+          {canScrollLeft && (
+            <button
+              type="button"
+              onClick={() => handleScroll("left")}
+              className="absolute -left-3 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft size={16} />
+            </button>
+          )}
 
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h4 className="truncate font-semibold text-white">{match.title}</h4>
-                    {closestMatch?.id === match.id && countdown && (
-                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-app-border bg-white/[0.04] px-2 py-0.5 text-[10px] text-app-success-text">
-                        <Clock3 size={11} />
-                        {countdown}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-0.5 truncate text-sm text-app-text-secondary">{match.location}</p>
-                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-app-text-secondary">
-                    <span className="flex items-center gap-2">
-                      <Clock size={14} />
-                      {match.time}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <Hash size={14} />
-                      Court {match.courtNumber}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <Users size={14} />
-                      {match.players?.length || 0} Players
-                    </span>
-                  </div>
-                </div>
+          {/* Cards Carousel Container */}
+          <div
+            ref={scrollContainerRef}
+            onScroll={checkScroll}
+            className="flex gap-4 overflow-x-auto pb-1 pt-1 scroll-smooth no-scrollbar"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {matches.map((match) => {
+              const { month, day, weekday } = getMatchDateParts(match.date);
+              const playersCount = match.players?.length || 0;
+              const courtCount = match.courtNumber || "4";
+              const countdownStr = getMatchCountdown(match);
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="justify-self-end text-app-text-muted hover:text-white sm:justify-self-auto"
-                  onClick={(event) => onOpenMenu(event, match)}
-                  aria-label={`Actions for ${match.title}`}
+              return (
+                <div
+                  key={match.id}
+                  onClick={() => onMatchClick(match)}
+                  className="flex w-[290px] sm:w-[310px] shrink-0 cursor-pointer flex-col justify-between rounded-2xl border border-[#232730] bg-[#12151c] p-4 transition-all hover:border-[#384152] hover:shadow-lg group/card"
                 >
-                  <MoreVertical size={16} />
-                </Button>
-              </div>
-            );
-          })}
+                  {/* Card Top: Date Badge (Left) + Match Details (Middle) + Status & Menu (Right) */}
+                  <div className="flex items-start justify-between gap-2.5">
+                    {/* Left: Date Badge */}
+                    <div className="flex flex-col items-center justify-center rounded-xl bg-[#0c0e12] px-2.5 py-1.5 border border-[#1e232d] shrink-0 text-center min-w-[48px]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                        {month}
+                      </span>
+                      <span className="text-xl font-black text-white leading-tight">
+                        {day}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+                        {weekday}
+                      </span>
+                    </div>
+
+                    {/* Middle: Title & Meta */}
+                    <div className="min-w-0 flex-1">
+                      <h4 className="truncate text-xs font-bold text-white transition group-hover/card:text-blue-400">
+                        {match.title}
+                      </h4>
+                      <p className="mt-1 flex items-center gap-1 text-[11px] text-gray-400">
+                        <Clock size={11} className="shrink-0 text-gray-400" />
+                        <span className="truncate">{formatTimeDuration(match.time)}</span>
+                      </p>
+                      <p className="mt-0.5 truncate text-[11px] text-gray-400">
+                        {courtCount} Courts • {playersCount} Players
+                      </p>
+                    </div>
+
+                    {/* Right: UPCOMING badge + 3-dots Menu */}
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-400">
+                        Upcoming
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenMenu(e, match);
+                        }}
+                        className="rounded p-1 text-gray-500 transition hover:bg-[#1a1f29] hover:text-white"
+                        aria-label={`Actions for ${match.title}`}
+                      >
+                        <MoreVertical size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Card Middle: Players Stack */}
+                  <div className="my-3 space-y-1.5 border-t border-[#1e232d] pt-3">
+                    <span className="text-[11px] font-medium text-gray-400">
+                      Players ({playersCount})
+                    </span>
+                    <div className="flex items-center -space-x-1 overflow-hidden py-0.5">
+                      {playersCount === 0 ? (
+                        <span className="text-[11px] text-gray-500 italic">
+                          No players joined yet
+                        </span>
+                      ) : (
+                        <>
+                          {match.players?.slice(0, 11).map((mp) => {
+                            const playerName = mp.player?.name || "Player";
+                            return (
+                              <Image
+                                key={mp.player?.id || Math.random()}
+                                src="/capybara-avatar.png"
+                                alt={playerName}
+                                title={playerName}
+                                width={400}
+                                height={383}
+                                className="h-6 w-6 shrink-0 rounded-full object-cover ring-2 ring-[#12151c] shadow-sm"
+                              />
+                            );
+                          })}
+                          {playersCount > 11 && (
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-800 text-[9px] font-bold text-gray-300 ring-2 ring-[#12151c]">
+                              +{playersCount - 11}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card Footer: Countdown + View Details Button */}
+                  <div className="flex items-center justify-between border-t border-[#1e232d] pt-2.5">
+                    <div className="flex items-center gap-1 text-[11px] font-medium text-emerald-400">
+                      <Clock size={12} className="shrink-0 text-emerald-400" />
+                      <span className="truncate">{countdownStr}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1 rounded-xl border border-[#232730] bg-[#0c0e12] px-2.5 py-1 text-[11px] font-medium text-gray-200 transition group-hover/card:border-gray-600 group-hover/card:bg-[#1a1f29] group-hover/card:text-white">
+                      <span>View Details</span>
+                      <ChevronRight size={12} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Scroll Navigation Right Button */}
+          {canScrollRight && (
+            <button
+              type="button"
+              onClick={() => handleScroll("right")}
+              className="absolute -right-3 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
+              aria-label="Scroll right"
+            >
+              <ChevronRight size={16} />
+            </button>
+          )}
         </div>
       )}
     </section>

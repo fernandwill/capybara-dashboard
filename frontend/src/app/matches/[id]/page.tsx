@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -29,8 +30,6 @@ import NewMatchModal from "@/components/NewMatchModal";
 import DeleteMatchModal from "@/components/DeleteMatchModal";
 import SelectPlayersModal, {
   PlayerOption,
-  getAvatarGradient,
-  getInitials,
 } from "@/components/SelectPlayersModal";
 import ErrorModal from "@/components/ErrorModal";
 import SuccessModal from "@/components/SuccessModal";
@@ -40,7 +39,7 @@ import { exportPlayerList } from "@/utils/playerExport";
 
 interface PlayerInMatch extends Player {
   paymentStatus: PaymentStatus;
-  playCount: number; // rounds played in this match (persisted)
+  playCount: number;
 }
 
 interface CourtSlot {
@@ -144,10 +143,7 @@ export default function MatchDetailsPage() {
   const [courts, setCourts] = useState<CourtState[]>([]);
   const [activeMobileCourtIndex, setActiveMobileCourtIndex] = useState(0);
 
-  // Per-match play counts: every player starts at 0 in this match and gains
-  // +1 each time a court game they played in is finished ("Finish Court").
-  // Persisted server-side on the match_player row so counts survive reloads.
-  // Drives the fair-rotation priority queue and the "Xx played" labels.
+  // In-session player play counts
   const [sessionPlayCounts, setSessionPlayCounts] = useState<Record<string, number>>({});
 
   // Live timer state
@@ -171,9 +167,6 @@ export default function MatchDetailsPage() {
   // Quick Action menu dropdown
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  // Guards against double-firing "Finish Court" while a persist is in flight
-  const finishingRef = useRef(false);
 
   // Edit notes state
   const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -215,57 +208,25 @@ export default function MatchDetailsPage() {
       setMatch(data);
       setNoteContent(data.description || "");
 
-      const matchPlayers: PlayerInMatch[] =
+      const matchPlayers =
         data.players?.map(
           (matchPlayer: {
             player: Player & { playCount?: number };
             paymentStatus: PaymentStatus;
-            playCount?: number;
           }) => ({
             ...matchPlayer.player,
             paymentStatus: matchPlayer.paymentStatus,
-            playCount: matchPlayer.playCount ?? 0,
+            playCount: matchPlayer.player.playCount ?? 0,
           })
         ) ?? [];
       setPlayers(matchPlayers);
 
-      // Restore persisted per-match round counts (survives page reloads)
+      // Initialize session play counts
       const counts: Record<string, number> = {};
-      matchPlayers.forEach((p) => {
+      matchPlayers.forEach((p: PlayerInMatch) => {
         counts[p.id] = p.playCount ?? 0;
       });
       setSessionPlayCounts(counts);
-
-      // Restore the finished-games history from persisted rounds
-      setGameHistory((prev) => {
-        if (prev.length > 0) return prev;
-        const rounds = (data.rounds ?? []).map(
-          (round: {
-            id: string;
-            courtNumber: number;
-            teamAPlayerIds: string[];
-            teamBPlayerIds: string[];
-            finishedAt: string;
-          }) => {
-            const finishedAt = new Date(round.finishedAt);
-            const timeStr = `${String(finishedAt.getHours()).padStart(2, "0")}:${String(
-              finishedAt.getMinutes()
-            ).padStart(2, "0")}`;
-            return {
-              id: round.id,
-              courtName: `Court ${round.courtNumber}`,
-              teamANames: round.teamAPlayerIds.map(
-                (pid) => matchPlayers.find((p) => p.id === pid)?.name || "Player"
-              ),
-              teamBNames: round.teamBPlayerIds.map(
-                (pid) => matchPlayers.find((p) => p.id === pid)?.name || "Player"
-              ),
-              finishedAt: timeStr,
-            };
-          }
-        );
-        return rounds;
-      });
 
       // Initialize courts if not already configured
       const courtCount = parseInt(data.courtNumber || "4", 10) || 4;
@@ -330,7 +291,9 @@ export default function MatchDetailsPage() {
   // Elapsed timer logic
   useEffect(() => {
     if (!match) return;
-    const isOngoing = match.status?.toUpperCase() === "IN PROGRESS" || match.status?.toUpperCase() === "UPCOMING";
+    const isOngoing =
+      match.status?.toUpperCase() === "IN PROGRESS" ||
+      match.status?.toUpperCase() === "UPCOMING";
     if (!isOngoing) return;
 
     const timer = setInterval(() => {
@@ -350,8 +313,8 @@ export default function MatchDetailsPage() {
   // Players prioritized by in-session play counts ascending (fewer plays = higher priority)
   const prioritizedPlayers = useMemo(() => {
     return [...players].sort((a, b) => {
-      const countA = sessionPlayCounts[a.id] ?? 0;
-      const countB = sessionPlayCounts[b.id] ?? 0;
+      const countA = sessionPlayCounts[a.id] ?? a.playCount ?? 0;
+      const countB = sessionPlayCounts[b.id] ?? b.playCount ?? 0;
       if (countA !== countB) return countA - countB;
       return a.name.localeCompare(b.name);
     });
@@ -541,25 +504,15 @@ export default function MatchDetailsPage() {
   };
 
   // Finish Court game
-  const handleFinishCourt = async (courtIndex: number) => {
-    // Prevent double-firing while the round is being persisted
-    if (finishingRef.current) return;
-    finishingRef.current = true;
-
+  const handleFinishCourt = (courtIndex: number) => {
     const court = courts[courtIndex];
-    if (!court) {
-      finishingRef.current = false;
-      return;
-    }
+    if (!court) return;
 
     const teamAPlayerIds = court.teamA.map((s) => s.playerId).filter(Boolean) as string[];
     const teamBPlayerIds = court.teamB.map((s) => s.playerId).filter(Boolean) as string[];
     const allPlayedIds = [...teamAPlayerIds, ...teamBPlayerIds];
 
-    if (allPlayedIds.length === 0) {
-      finishingRef.current = false;
-      return;
-    }
+    if (allPlayedIds.length === 0) return;
 
     // Increment session play count for players on this court
     setSessionPlayCounts((prev) => {
@@ -569,35 +522,6 @@ export default function MatchDetailsPage() {
       });
       return next;
     });
-
-    // Persist the finished game + play counts so they survive a page reload
-    if (match) {
-      try {
-        const res = await authFetch(`/api/matches/${match.id}/rounds`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            courtNumber: court.id,
-            teamAPlayerIds,
-            teamBPlayerIds,
-          }),
-        });
-        // The rounds endpoint saves the round + increments counts in one
-        // atomic transaction, so only a non-OK response means nothing saved.
-        if (!res.ok) {
-          throw new Error("Failed to save round");
-        }
-      } catch (err) {
-        console.error(err);
-        setErrorModal({
-          isOpen: true,
-          title: "Save Failed",
-          message:
-            "Round counts updated on screen but failed to save. Please try again.",
-        });
-      }
-    }
-    finishingRef.current = false;
 
     const teamANames = teamAPlayerIds
       .map((id) => players.find((p) => p.id === id)?.name || "Player")
@@ -833,10 +757,8 @@ export default function MatchDetailsPage() {
                 {formatTimeWithDuration(match.time)}
               </span>
               <span>•</span>
-              <span>{match.courtNumber || "4"} Courts</span>
-              <span>•</span>
-              <span className="rounded bg-[#161b24] px-1.5 py-0.5 text-[11px] font-medium text-gray-300">
-                2v2 Format
+              <span>
+                {match.courtNumber || "4"} Courts • {players.length} Players
               </span>
             </div>
           </div>
@@ -1100,20 +1022,20 @@ export default function MatchDetailsPage() {
                           {court.teamA.map((slot, sIdx) => {
                             const playerObj = players.find((p) => p.id === slot.playerId);
                             if (playerObj) {
-                              const gradient = getAvatarGradient(playerObj.name);
-                              const initials = getInitials(playerObj.name);
-                              const count = sessionPlayCounts[playerObj.id] ?? 0;
+                              const count = sessionPlayCounts[playerObj.id] ?? playerObj.playCount ?? 0;
                               return (
                                 <div
                                   key={sIdx}
                                   className="flex items-center justify-between rounded-xl border border-[#232730] bg-[#12151c] px-2.5 py-1.5"
                                 >
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <div
-                                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${gradient}`}
-                                    >
-                                      {initials}
-                                    </div>
+                                    <Image
+                                      src="/capybara-avatar.png"
+                                      alt={playerObj.name}
+                                      width={400}
+                                      height={383}
+                                      className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
+                                    />
                                     <div className="min-w-0">
                                       <p className="truncate text-xs font-semibold text-white">
                                         {playerObj.name}
@@ -1173,20 +1095,20 @@ export default function MatchDetailsPage() {
                           {court.teamB.map((slot, sIdx) => {
                             const playerObj = players.find((p) => p.id === slot.playerId);
                             if (playerObj) {
-                              const gradient = getAvatarGradient(playerObj.name);
-                              const initials = getInitials(playerObj.name);
-                              const count = sessionPlayCounts[playerObj.id] ?? 0;
+                              const count = sessionPlayCounts[playerObj.id] ?? playerObj.playCount ?? 0;
                               return (
                                 <div
                                   key={sIdx}
                                   className="flex items-center justify-between rounded-xl border border-[#232730] bg-[#12151c] px-2.5 py-1.5"
                                 >
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <div
-                                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${gradient}`}
-                                    >
-                                      {initials}
-                                    </div>
+                                    <Image
+                                      src="/capybara-avatar.png"
+                                      alt={playerObj.name}
+                                      width={400}
+                                      height={383}
+                                      className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
+                                    />
                                     <div className="min-w-0">
                                       <p className="truncate text-xs font-semibold text-white">
                                         {playerObj.name}
@@ -1267,9 +1189,7 @@ export default function MatchDetailsPage() {
                   </div>
                 ) : (
                   prioritizedPlayers.map((player, idx) => {
-                    const gradient = getAvatarGradient(player.name);
-                    const initials = getInitials(player.name);
-                    const count = sessionPlayCounts[player.id] ?? 0;
+                    const count = sessionPlayCounts[player.id] ?? player.playCount ?? 0;
                     const isAssigned = assignedPlayerIds.has(player.id);
 
                     return (
@@ -1279,11 +1199,13 @@ export default function MatchDetailsPage() {
                       >
                         {/* Left: Avatar + Name */}
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div
-                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${gradient}`}
-                          >
-                            {initials}
-                          </div>
+                          <Image
+                            src="/capybara-avatar.png"
+                            alt={player.name}
+                            width={400}
+                            height={383}
+                            className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
+                          />
                           <div className="min-w-0">
                             <p className="truncate text-xs font-semibold text-white">
                               {player.name}
@@ -1363,16 +1285,16 @@ export default function MatchDetailsPage() {
 
             <div className="flex items-center -space-x-2 overflow-hidden py-1">
               {players.slice(0, 8).map((p) => {
-                const gradient = getAvatarGradient(p.name);
-                const initials = getInitials(p.name);
                 return (
-                  <div
+                  <Image
                     key={p.id}
+                    src="/capybara-avatar.png"
+                    alt={p.name}
                     title={p.name}
-                    className={`flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold text-white ring-2 ring-[#0c0e12] shadow ${gradient}`}
-                  >
-                    {initials}
-                  </div>
+                    width={400}
+                    height={383}
+                    className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0c0e12] shadow"
+                  />
                 );
               })}
               {players.length > 8 && (
@@ -1496,9 +1418,7 @@ export default function MatchDetailsPage() {
                 </div>
               ) : (
                 unassignedPlayers.map((player) => {
-                  const gradient = getAvatarGradient(player.name);
-                  const initials = getInitials(player.name);
-                  const count = sessionPlayCounts[player.id] ?? 0;
+                  const count = sessionPlayCounts[player.id] ?? player.playCount ?? 0;
                   return (
                     <button
                       key={player.id}
@@ -1514,11 +1434,13 @@ export default function MatchDetailsPage() {
                       className="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#12151c] px-3 py-2 text-left transition hover:border-blue-500/50 hover:bg-[#161f30]"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div
-                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${gradient}`}
-                        >
-                          {initials}
-                        </div>
+                        <Image
+                          src="/capybara-avatar.png"
+                          alt={player.name}
+                          width={400}
+                          height={383}
+                          className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
+                        />
                         <span className="truncate text-xs font-semibold text-white">
                           {player.name}
                         </span>

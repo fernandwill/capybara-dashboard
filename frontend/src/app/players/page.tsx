@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import {
   Calendar,
   CalendarDays,
@@ -21,7 +22,6 @@ import AppLayout from "@/components/layout/AppLayout";
 import AddPlayerModal from "@/components/players/AddPlayerModal";
 import EditPlayerModal, { PlayerRecord } from "@/components/players/EditPlayerModal";
 import DeletePlayerModal from "@/components/players/DeletePlayerModal";
-import { getAvatarGradient, getInitials } from "@/components/SelectPlayersModal";
 import { authFetch } from "@/lib/authFetch";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
@@ -450,8 +450,6 @@ export default function PlayersPage() {
                       mostPlayedPlayer &&
                       mostPlayedPlayer.id === player.id &&
                       (player.totalMatches ?? 0) > 0;
-                    const gradient = getAvatarGradient(player.name);
-                    const initials = getInitials(player.name);
 
                     return (
                       <tr
@@ -461,11 +459,13 @@ export default function PlayersPage() {
                         {/* Player Column */}
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-3">
-                            <div
-                              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ${gradient}`}
-                            >
-                              {initials}
-                            </div>
+                            <Image
+                              src="/capybara-avatar.png"
+                              alt={player.name}
+                              width={400}
+                              height={383}
+                              className="h-9 w-9 shrink-0 rounded-full object-cover border border-[#232730] shadow-sm"
+                            />
                             <div className="flex items-center gap-2">
                               <span className="font-semibold text-white">
                                 {player.name}

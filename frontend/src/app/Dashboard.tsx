@@ -2,16 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Clock3, TrendingUp, Zap } from "lucide-react";
+import { Clock3, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
-import MatchDetailsModal from "../components/MatchDetailsModal";
 import DeleteMatchModal from "../components/DeleteMatchModal";
 import { signOut } from "@/lib/authService";
-import { Match, ModalState } from "@/types/types";
-import { formatShortDate } from "@/utils/formatters";
+import { authFetch } from "@/lib/authFetch";
+import { Match, ModalState, Player } from "@/types/types";
 import { sortMatches, getClosestUpcomingMatch } from "@/utils/matchUtils";
 import { useStats } from "@/hooks/useStats";
 import { useMatches } from "@/hooks/useMatches";
@@ -22,12 +21,12 @@ import AppLayout from "../components/layout/AppLayout";
 import StatCard from "../components/dashboard/StatCard";
 import MonthlyActivityCard from "../components/dashboard/MonthlyActivityCard";
 import InsightsCard from "../components/dashboard/InsightsCard";
+import UpcomingMatchBanner from "../components/dashboard/UpcomingMatchBanner";
 import UpcomingMatchesCard from "../components/dashboard/UpcomingMatchesCard";
 import RecentMatchesCard from "../components/dashboard/RecentMatchesCard";
 import MatchRowMenu from "../components/dashboard/MatchRowMenu";
 
 // Constants
-const BACKGROUND_REFRESH_INTERVAL_MS = 60 * 1000;
 const WEEKDAY_NAMES = [
   "Sunday",
   "Monday",
@@ -55,6 +54,7 @@ export function Dashboard() {
     isLoading: isMatchesLoading,
   } = useMatches();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [players, setPlayers] = useState<Player[]>([]);
   const {
     monthlyData,
     availableYears,
@@ -63,20 +63,28 @@ export function Dashboard() {
     raw: rawMonthly,
   } = useMonthlyStats(selectedYear);
 
+  const fetchPlayers = useCallback(async () => {
+    try {
+      const res = await authFetch("/api/players");
+      if (res.ok) {
+        const data = await res.json();
+        setPlayers(data);
+      }
+    } catch (err) {
+      console.error("Error fetching players for insights:", err);
+    }
+  }, []);
+
   // UI state
-  const [isYearMenuOpen, setIsYearMenuOpen] = useState(false);
   const [menu, setMenu] = useState<{ match: Match; x: number; y: number } | null>(null);
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Loading states
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isDeletingMatch, setIsDeletingMatch] = useState(false);
   const [isSubmittingMatch, setIsSubmittingMatch] = useState(false);
 
@@ -118,7 +126,81 @@ export function Dashboard() {
   const activeMonths = Object.values(rawMonthly).filter((value) => value.count > 0).length;
   const avgHoursPerMonth = activeMonths > 0 ? allTimeHours / activeMonths : 0;
 
-  // Insights
+  // Matches belonging to the selected year
+  const yearMatchesList = useMemo(() => {
+    return matches.filter((m) => {
+      const d = new Date(m.date);
+      return !isNaN(d.getTime()) && d.getFullYear() === selectedYear;
+    });
+  }, [matches, selectedYear]);
+
+  // 1. Favorite Badminton Centre (most frequent location in selectedYear)
+  const favoriteCentre = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const m of yearMatchesList) {
+      const loc = m.location?.trim();
+      if (loc) {
+        counts.set(loc, (counts.get(loc) || 0) + 1);
+      }
+    }
+    if (counts.size === 0) return null;
+
+    let bestName = "";
+    let maxCount = 0;
+    counts.forEach((count, loc) => {
+      if (count > maxCount) {
+        maxCount = count;
+        bestName = loc;
+      }
+    });
+
+    return maxCount > 0 ? { name: bestName, count: maxCount } : null;
+  }, [yearMatchesList]);
+
+  // 2. Most Presence (player(s) with highest match attendance in selectedYear)
+  const mostPresence = useMemo(() => {
+    const counts = new Map<string, { player: { id: string; name: string }; count: number }>();
+    for (const m of yearMatchesList) {
+      if (!m.players) continue;
+      for (const mp of m.players) {
+        if (!mp.player) continue;
+        const p = mp.player;
+        const current = counts.get(p.id) || { player: { id: p.id, name: p.name }, count: 0 };
+        current.count += 1;
+        counts.set(p.id, current);
+      }
+    }
+    if (counts.size === 0) return null;
+
+    let maxCount = 0;
+    counts.forEach((item) => {
+      if (item.count > maxCount) {
+        maxCount = item.count;
+      }
+    });
+
+    if (maxCount === 0) return null;
+
+    const topPlayers: { id: string; name: string }[] = [];
+    counts.forEach((item) => {
+      if (item.count === maxCount) {
+        topPlayers.push(item.player);
+      }
+    });
+
+    return { players: topPlayers, count: maxCount };
+  }, [yearMatchesList]);
+
+  // 3. New Blood (number of new players who joined in selectedYear)
+  const newBloodCount = useMemo(() => {
+    return players.filter((p) => {
+      if (!p.createdAt) return false;
+      const createdDate = new Date(p.createdAt);
+      return !isNaN(createdDate.getTime()) && createdDate.getFullYear() === selectedYear;
+    }).length;
+  }, [players, selectedYear]);
+
+  // Insights - Activity
   const strongestMonth = useMemo(() => {
     const sorted = [...monthlyData].sort((a, b) => b.hours - a.hours);
     return sorted[0] && sorted[0].hours > 0 ? sorted[0] : null;
@@ -128,7 +210,7 @@ export function Dashboard() {
     const counts = new Map<string, number>();
     for (const match of completedMatches) {
       const date = new Date(match.date);
-      if (isNaN(date.getTime())) continue;
+      if (isNaN(date.getTime()) || date.getFullYear() !== selectedYear) continue;
       const name = WEEKDAY_NAMES[date.getDay()];
       counts.set(name, (counts.get(name) || 0) + 1);
     }
@@ -142,11 +224,13 @@ export function Dashboard() {
       }
     });
     return best;
-  }, [completedMatches]);
+  }, [completedMatches, selectedYear]);
 
   const typicalStartHour = useMemo(() => {
     const counts = new Map<number, number>();
     for (const match of completedMatches) {
+      const d = new Date(match.date);
+      if (isNaN(d.getTime()) || d.getFullYear() !== selectedYear) continue;
       const start = match.time.split("-")[0].trim();
       const hour = parseInt(start.split(":")[0], 10);
       if (!isNaN(hour)) {
@@ -163,7 +247,7 @@ export function Dashboard() {
       }
     });
     return best;
-  }, [completedMatches]);
+  }, [completedMatches, selectedYear]);
 
   // Force dark theme for the whole app (matches the new design)
   useEffect(() => {
@@ -174,24 +258,21 @@ export function Dashboard() {
     void fetchStats();
     void fetchMatches();
     void fetchMonthly();
-  }, [fetchStats, fetchMatches, fetchMonthly]);
+    void fetchPlayers();
+  }, [fetchStats, fetchMatches, fetchMonthly, fetchPlayers]);
 
   // Push-based real-time refresh via Supabase Postgres Changes.
   // Any row change in matches/players/match_players/payments triggers a refetch.
   useRealtimeRefresh(refreshDashboardData);
 
-  // Initial data fetch and read-only refresh interval (safety net)
+  // Initial data fetch on mount. Subsequent updates come purely from the
+  // realtime subscription above — no polling needed.
   useEffect(() => {
     refreshDashboardData();
-
-    const intervalId = setInterval(refreshDashboardData, BACKGROUND_REFRESH_INTERVAL_MS);
-
-    return () => clearInterval(intervalId);
   }, [refreshDashboardData]);
 
   // Logout handler
   const handleLogout = async () => {
-    setIsLoggingOut(true);
     try {
       const { success, error } = await signOut();
       if (!success) {
@@ -210,8 +291,6 @@ export function Dashboard() {
         title: "Logout Failed",
         message: "An unexpected error occurred while signing out.",
       });
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 
@@ -230,11 +309,6 @@ export function Dashboard() {
 
   const handleMatchClick = (match: Match) => {
     router.push(`/matches/${match.id}`);
-  };
-
-  const handleCloseDetailsModal = () => {
-    setIsDetailsModalOpen(false);
-    setSelectedMatch(null);
   };
 
   const handleRequestDeleteMatch = (match: Match) => {
@@ -274,9 +348,6 @@ export function Dashboard() {
       const success = await deleteMatch(matchPendingDeletion.id);
 
       if (success) {
-        if (selectedMatch?.id === matchPendingDeletion.id) {
-          handleCloseDetailsModal();
-        }
         fetchStats();
         handleCloseDeleteModal();
         setSuccessModal({
@@ -369,16 +440,6 @@ export function Dashboard() {
       accent: "blue" as const,
     },
     {
-      label: "Upcoming",
-      value: String(stats.upcomingMatches),
-      trend: closestMatch
-        ? `Next: ${formatShortDate(closestMatch.date)}`
-        : "No matches scheduled",
-      icon: CalendarDays,
-      accent: "purple" as const,
-      showTrendIcon: false,
-    },
-    {
       label: "Avg / Month",
       value: avgHoursPerMonth.toFixed(1),
       suffix: "h",
@@ -407,8 +468,17 @@ export function Dashboard() {
             </p>
           </header>
 
-          {/* Stats */}
-          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Upcoming Match Countdown Banner */}
+          <UpcomingMatchBanner
+            match={closestMatch}
+            countdown={countdown}
+            isLoading={isLoadingFirstPass}
+            onNewMatch={() => setIsModalOpen(true)}
+            onMatchClick={handleMatchClick}
+          />
+
+          {/* Stats (3 Cards) */}
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {statCards.map((stat) => (
               <StatCard
                 key={stat.label}
@@ -418,7 +488,6 @@ export function Dashboard() {
                 trend={stat.trend}
                 icon={stat.icon}
                 accent={stat.accent}
-                showTrendIcon={stat.showTrendIcon}
                 isLoading={showStatsLoading}
               />
             ))}
@@ -439,6 +508,10 @@ export function Dashboard() {
               strongestMonth={strongestMonth}
               mostActiveDay={mostActiveDay}
               typicalStartHour={typicalStartHour}
+              favoriteCentre={favoriteCentre}
+              mostPresence={mostPresence}
+              newBloodCount={newBloodCount}
+              isLoading={isMatchesLoading || isMonthlyLoading}
             />
           </section>
 
@@ -498,17 +571,6 @@ export function Dashboard() {
         onClose={handleCloseErrorModal}
         title={errorModal.title}
         message={errorModal.message}
-      />
-
-      <MatchDetailsModal
-        isOpen={isDetailsModalOpen}
-        onClose={handleCloseDetailsModal}
-        match={selectedMatch}
-        onMatchUpdate={fetchMatches}
-        onEdit={(match) => {
-          handleCloseDetailsModal();
-          handleEditMatch(match);
-        }}
       />
 
       <DeleteMatchModal
