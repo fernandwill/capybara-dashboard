@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMatches } from "@/hooks/useMatches";
+import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import { Match, ModalState, SortOption } from "@/types/types";
 import { formatCurrency, formatDurationHours, formatShortDate } from "@/utils/formatters";
 import { sortMatches } from "@/utils/matchUtils";
@@ -85,6 +86,12 @@ export default function AllMatchesHistoryPage() {
   useEffect(() => {
     void fetchMatches();
   }, [fetchMatches]);
+
+  // Real-time refresh: refetch whenever match/player data changes
+  const refreshFromRealtime = useCallback(() => {
+    void fetchMatches();
+  }, [fetchMatches]);
+  useRealtimeRefresh(refreshFromRealtime);
 
   // Redirect if unauthenticated
   useEffect(() => {
@@ -598,6 +605,11 @@ export default function AllMatchesHistoryPage() {
         isOpen={isDetailsModalOpen}
         onClose={handleCloseDetailsModal}
         match={selectedMatch}
+        onMatchUpdate={fetchMatches}
+        onEdit={(match) => {
+          handleCloseDetailsModal();
+          handleEditMatch(match);
+        }}
       />
 
       <NewMatchModal

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock3, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import NewMatchModal from "../components/NewMatchModal";
@@ -16,6 +16,7 @@ import { useStats } from "@/hooks/useStats";
 import { useMatches } from "@/hooks/useMatches";
 import { useMonthlyStats } from "@/hooks/useMonthlyStats";
 import { useCountdown } from "@/hooks/useCountdown";
+import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import StatCard from "../components/dashboard/StatCard";
 import MonthlyActivityCard from "../components/dashboard/MonthlyActivityCard";
@@ -166,20 +167,24 @@ export function Dashboard() {
     document.documentElement.classList.add("dark");
   }, []);
 
-  // Initial data fetch and read-only refresh interval
-  useEffect(() => {
-    const refreshDashboardData = () => {
-      void fetchStats();
-      void fetchMatches();
-      void fetchMonthly();
-    };
+  const refreshDashboardData = useCallback(() => {
+    void fetchStats();
+    void fetchMatches();
+    void fetchMonthly();
+  }, [fetchStats, fetchMatches, fetchMonthly]);
 
+  // Push-based real-time refresh via Supabase Postgres Changes.
+  // Any row change in matches/players/match_players/payments triggers a refetch.
+  useRealtimeRefresh(refreshDashboardData);
+
+  // Initial data fetch and read-only refresh interval (safety net)
+  useEffect(() => {
     refreshDashboardData();
 
     const intervalId = setInterval(refreshDashboardData, BACKGROUND_REFRESH_INTERVAL_MS);
 
     return () => clearInterval(intervalId);
-  }, [fetchStats, fetchMatches, fetchMonthly]);
+  }, [refreshDashboardData]);
 
   // Logout handler
   const handleLogout = async () => {
@@ -504,6 +509,10 @@ export function Dashboard() {
         onClose={handleCloseDetailsModal}
         match={selectedMatch}
         onMatchUpdate={fetchMatches}
+        onEdit={(match) => {
+          handleCloseDetailsModal();
+          handleEditMatch(match);
+        }}
       />
 
       <DeleteMatchModal

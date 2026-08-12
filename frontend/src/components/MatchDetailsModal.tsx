@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Calendar,
   CheckCircle2,
@@ -22,6 +22,7 @@ import SelectPlayersModal, {
   getInitials,
 } from "./SelectPlayersModal";
 import { authFetch } from "@/lib/authFetch";
+import { supabase } from "@/lib/supabaseClient";
 import { Match, Player, PaymentStatus } from "@/types/types";
 import { exportPlayerList } from "@/utils/playerExport";
 
@@ -118,10 +119,14 @@ export default function MatchDetailsModal({
   const matchId = match?.id;
   const isCompleted = match?.status?.toUpperCase() === "COMPLETED";
 
-  const fetchCurrentPlayers = useCallback(async () => {
+  // Stable identity for the picker: `players.map(...)` would create a new
+  // array every render, which SelectPlayersModal treats as a selection change.
+  const currentPlayerIds = useMemo(() => players.map((p) => p.id), [players]);
+
+  const fetchCurrentPlayers = useCallback(async (options?: { silent?: boolean }) => {
     if (!matchId) return;
 
-    setIsLoadingPlayers(true);
+    if (!options?.silent) setIsLoadingPlayers(true);
     try {
       const response = await authFetch(`/api/matches/${matchId}`);
       if (!response.ok) {
@@ -145,7 +150,7 @@ export default function MatchDetailsModal({
       console.error("Error fetching match players:", error);
       setPlayers([]);
     } finally {
-      setIsLoadingPlayers(false);
+      if (!options?.silent) setIsLoadingPlayers(false);
     }
   }, [matchId]);
 
@@ -174,6 +179,31 @@ export default function MatchDetailsModal({
     }
   }, [isOpen, matchId, fetchCurrentPlayers, fetchAllPlayers]);
 
+  // Live-update the player list when this match's players change remotely
+  useEffect(() => {
+    if (!matchId) return;
+
+    const channel = supabase
+      .channel(`match-players-${matchId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "match_players",
+          filter: `matchId=eq.${matchId}`,
+        },
+        () => {
+          void fetchCurrentPlayers({ silent: true });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [matchId, fetchCurrentPlayers]);
+
   const handleSaveSelectedPlayers = async (newSelectedIds: string[]) => {
     if (!matchId) return;
 
@@ -183,21 +213,25 @@ export default function MatchDetailsModal({
 
     try {
       // Add newly selected players
-      for (const playerId of toAdd) {
-        await authFetch(`/api/matches/${matchId}/players`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId }),
-        });
-      }
+      await Promise.all(
+        toAdd.map((playerId) =>
+          authFetch(`/api/matches/${matchId}/players`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ playerId }),
+          })
+        )
+      );
 
       // Remove deselected players
-      for (const playerId of toRemove) {
-        await authFetch(`/api/matches/${matchId}/players/${playerId}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        });
-      }
+      await Promise.all(
+        toRemove.map((playerId) =>
+          authFetch(`/api/matches/${matchId}/players/${playerId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+          })
+        )
+      );
 
       await fetchCurrentPlayers();
       await fetchAllPlayers();
@@ -209,6 +243,7 @@ export default function MatchDetailsModal({
         title: "Error",
         message: "Failed to update match players.",
       });
+      throw err;
     }
   };
 
@@ -559,7 +594,7 @@ export default function MatchDetailsModal({
       <SelectPlayersModal
         isOpen={isSelectPlayersModalOpen}
         onClose={() => setIsSelectPlayersModalOpen(false)}
-        selectedPlayerIds={players.map((p) => p.id)}
+        selectedPlayerIds={currentPlayerIds}
         onSave={handleSaveSelectedPlayers}
         availablePlayers={allAvailablePlayers}
         onPlayerCreated={(newPlayer) => {
