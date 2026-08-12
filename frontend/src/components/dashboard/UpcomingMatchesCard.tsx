@@ -15,8 +15,6 @@ import { Match } from "@/types/types";
 
 interface UpcomingMatchesCardProps {
   matches: Match[];
-  closestMatch: Match | null;
-  countdown: string;
   isLoading: boolean;
   onNewMatch: () => void;
   onMatchClick: (match: Match) => void;
@@ -35,7 +33,7 @@ function getMatchDateParts(dateString: string) {
 }
 
 function formatTimeDuration(timeString: string) {
-  if (!timeString || !timeString.includes("-")) return timeString || "18:00 - 21:00 (3 hrs)";
+  if (!timeString || !timeString.includes("-")) return "Time not set";
   try {
     const [start, end] = timeString.split("-").map((t) => t.trim());
     const [startH, startM] = start.split(":").map(Number);
@@ -184,7 +182,7 @@ export default function UpcomingMatchesCard({
             <button
               type="button"
               onClick={() => handleScroll("left")}
-              className="absolute -left-3 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
+              className="absolute -left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
               aria-label="Scroll left"
             >
               <ChevronLeft size={16} />
@@ -274,7 +272,7 @@ export default function UpcomingMatchesCard({
                             const playerName = mp.player?.name || "Player";
                             return (
                               <Image
-                                key={mp.player?.id || Math.random()}
+                                key={mp.player?.id}
                                 src="/capybara-avatar.png"
                                 alt={playerName}
                                 title={playerName}
@@ -316,7 +314,7 @@ export default function UpcomingMatchesCard({
             <button
               type="button"
               onClick={() => handleScroll("right")}
-              className="absolute -right-3 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
+              className="absolute -right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
               aria-label="Scroll right"
             >
               <ChevronRight size={16} />

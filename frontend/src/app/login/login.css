@@ -62,6 +62,18 @@
   padding: 1rem;
 }
 
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.login-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #aaa;
+}
+
 .form-input {
   background-color: #222;
   border: 1px solid #444;

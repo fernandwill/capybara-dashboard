@@ -70,6 +70,7 @@ export default function NewMatchModal({
   const [formData, setFormData] = useState<MatchFormState>(INITIAL_FORM_STATE);
   const [availablePlayers, setAvailablePlayers] = useState<PlayerOption[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
+  const [playersError, setPlayersError] = useState<string | null>(null);
   const submittingRef = useRef(false);
 
   // Block closing the modal while a create/update request is in flight
@@ -88,6 +89,7 @@ export default function NewMatchModal({
       // Reset the form and double-submit guard whenever the modal opens
       // (editing data is applied afterwards by the editingMatch effect)
       setFormData(INITIAL_FORM_STATE);
+      setPlayersError(null);
       submittingRef.current = false;
       const fetchPlayers = async () => {
         setIsLoadingPlayers(true);
@@ -100,6 +102,9 @@ export default function NewMatchModal({
           }
         } catch (error) {
           console.error("Error fetching players:", error);
+          setPlayersError(
+            "Couldn't load the player list. Close and reopen this window to try again."
+          );
         } finally {
           setIsLoadingPlayers(false);
         }
@@ -408,6 +413,7 @@ export default function NewMatchModal({
             playerIds={formData.playerIds}
             availablePlayers={availablePlayers}
             isLoadingPlayers={isLoadingPlayers}
+            playersError={playersError}
             editingMatch={editingMatch}
             onChange={(playerIds) =>
               setFormData((prev) => ({ ...prev, playerIds }))

@@ -374,8 +374,6 @@ export function Dashboard() {
           {/* Upcoming Matches */}
           <UpcomingMatchesCard
             matches={upcomingMatches}
-            closestMatch={closestMatch}
-            countdown={countdown}
             isLoading={isLoadingFirstPass}
             onNewMatch={handleNewMatch}
             onMatchClick={handleMatchClick}

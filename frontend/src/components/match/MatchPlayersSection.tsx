@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { Plus, UserPlus, X } from "lucide-react";
+import { AlertTriangle, Plus, UserPlus, X } from "lucide-react";
 import SelectPlayersModal, { PlayerOption } from "../SelectPlayersModal";
 import type { Match } from "@/types/types";
 
@@ -10,6 +10,7 @@ interface MatchPlayersSectionProps {
   playerIds: string[];
   availablePlayers: PlayerOption[];
   isLoadingPlayers: boolean;
+  playersError?: string | null;
   editingMatch?: Match | null;
   onChange: (playerIds: string[]) => void;
   onPlayerCreated: (newPlayer: PlayerOption) => void;
@@ -24,6 +25,7 @@ export default function MatchPlayersSection({
   playerIds,
   availablePlayers,
   isLoadingPlayers,
+  playersError,
   editingMatch,
   onChange,
   onPlayerCreated,
@@ -47,6 +49,13 @@ export default function MatchPlayersSection({
 
   return (
     <div>
+      {playersError && (
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
+          <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+          <span>{playersError}</span>
+        </div>
+      )}
+
       {playerIds.length === 0 ? (
         /* State 1: Clean empty state with Add Players CTA */
         <div>

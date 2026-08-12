@@ -51,22 +51,38 @@ export default function LoginPage() {
       <h1 className="app-title">CapyHub&apos;s Dashboard</h1>
       {error && <div className="error-message">{error}</div>}
       <form className="login-form" onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Magic id..."
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="form-input"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Magic word..."
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="form-input"
-          required
-        />
+        <div className="login-field">
+          <label htmlFor="email" className="login-label">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="form-input"
+            required
+          />
+        </div>
+        <div className="login-field">
+          <label htmlFor="password" className="login-label">
+            Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="form-input"
+            required
+          />
+        </div>
         <Button type="submit" size="lg" className="w-full" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </Button>
