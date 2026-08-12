@@ -219,10 +219,10 @@ frontend/
 
 ```bash
 # Clone the repository
-git clone https://github.com/fernandwill/capybara-dashboard.git
+git clone https://github.com/fernandwill/capyhub.git
 
 # Navigate to frontend
-cd capybara-dashboard/frontend
+cd capyhub/frontend
 
 # Install dependencies
 npm install

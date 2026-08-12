@@ -1,249 +1,79 @@
-# CapyHub Dashboard Frontend
+# CapyHub
 
-<img width="1000" height="1000" alt="capybara-dashboard" src="https://github.com/user-attachments/assets/c5afadbd-b799-41c7-8461-1dc0a48322f6" />
+Badminton match and court management app with real-time updates.
 
-A modern badminton match tracker and management system built with Next.js 16, React 19, and TypeScript.
+CapyHub is a full-stack web app that a real badminton club uses to run its weekly sessions. It tracks players, matches, and payments in one place, and keeps every screen in sync in real time, so coordinators on court can focus on the game instead of the paperwork.
 
-![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)
-![React](https://img.shields.io/badge/React-19.2.3-61DAFB)
+Open source under the MIT license. Contributions from club members and the community are welcome.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![React](https://img.shields.io/badge/React-19-61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [API Reference](#api-reference)
-- [Testing](#testing)
-- [Code Quality](#code-quality)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-
----
-
 ## Features
 
-### Match Management
-- Create, edit, and delete badminton matches
-- Track location, court number, date, time, and fees
-- Automatic status updates (UPCOMING → COMPLETED) based on match end time
-- Search and filter matches by title
-- Sort by date or fee
-- Pagination (6 matches per page) with navigation controls
+- **Real-time sync.** Match, player, and payment changes appear on every screen within about a second, no manual refresh.
+- **2v2 court management.** A randomizer auto-assigns players to courts, and every finished game is recorded into per-player play counts.
+- **Player and payment tracking.** 200+ players, 60+ matches, and 180+ hours of play tracked end-to-end, with payment status in one place.
+- **Analytics dashboard.** Monthly activity charts and live match stats with a light/dark theme.
+- **Automatic status updates.** Match statuses update as matches progress, with a daily Vercel cron as a safety net.
+- **PDF match sheets.** One-click export of printable match sheets so coordinators can tally attendance and games by hand.
 
-### Player Management
-- Add/remove players from matches
-- Track player status (Active/Tentative)
-- Payment status tracking (Belum Setor/Sudah Setor)
-- Two-column layout separating confirmed and tentative players
-- Suggest players from the latest completed match
+## Repository structure
 
-### Statistics & Analytics
-- Dashboard with key metrics (total, upcoming, completed matches)
-- Hours played tracking
-- Monthly statistics with interactive bar charts
-- Multi-year support with dynamic year selection
-- Real-time countdown to next match
+```
+capyhub/
+├── frontend/    # Next.js 16 app (App Router). The production app, deployed on Vercel.
+├── backend/     # Legacy Express + Prisma server. Kept for reference, not used in production.
+└── .env.local   # Shared environment config (never committed).
+```
 
-### PDF Export
-- Export match player lists to PDF
-- Landscape orientation for better printing
-- Standardized format with NO, NAME, and empty tracking columns
-- Automatic filename generation based on match details
+The app lives in `frontend/`. The backend was an early Express API server and is not used by the current deployment; it is kept for reference.
 
-### Security
-- Supabase JWT authentication on all API routes
-- Input validation with schema-based validators
-- Environment-based credential management
-- No hardcoded secrets
-
-### User Experience
-- Dark/Light theme with system preference detection
-- Fully responsive (desktop, tablet, mobile)
-- Loading states and error handling
-- Professional modal-based interactions
-
----
-
-## Tech Stack
+## Tech stack
 
 | Category | Technology |
-|----------|------------|
-| Framework | Next.js 16.1.1 (App Router) |
-| UI Library | React 19.2.3 |
-| Language | TypeScript 5 |
-| Styling | Tailwind CSS 4 |
-| Database | PostgreSQL via Prisma |
-| Auth | Supabase |
-| Components | Radix UI |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| UI | React 19, TypeScript, Tailwind CSS 4, Radix UI |
+| Data | PostgreSQL, Prisma, SWR |
+| Backend services | Supabase (Auth, Realtime) |
 | Charts | Recharts |
-| Icons | Lucide React |
-| PDF Export | jsPDF & jspdf-autotable |
+| PDF | jsPDF |
 | Testing | Vitest |
+| Deployment | Vercel |
 
----
-
-## Architecture
-
-### Design Principles
-
-1. **Modular CSS**: Styles split into 5 focused files instead of one large file
-2. **Custom Hooks**: Data fetching logic extracted into reusable hooks
-3. **Centralized Utilities**: Shared validation, logging, and error handling
-4. **Type Safety**: Shared TypeScript types across components
-
-### Data Flow
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Components                          │
-│  (Dashboard, MatchDetailsModal, NewMatchModal, etc.)    │
-└─────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                   Custom Hooks                          │
-│        (useStats, useMatches, useCountdown)             │
-└─────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                    authFetch                            │
-│        (Adds Bearer token to all requests)              │
-└─────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                   API Routes                            │
-│          (/api/matches, /api/players, etc.)             │
-└─────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────┐
-│                     Prisma                              │
-│               (Database Operations)                     │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Authentication Flow
-
-```
-1. An administrator creates the user in Supabase Authentication
-2. The user signs in through the Supabase-backed login page
-3. Supabase returns a JWT token
-4. The token is stored in localStorage
-5. authFetch adds "Authorization: Bearer <token>" to requests
-6. API routes validate the session and require app_metadata.role = "admin" for admin access
-```
-
----
-
-## Project Structure
-
-```
-frontend/
-├── src/
-│   ├── app/                        # Next.js App Router
-│   │   ├── api/                    # API route handlers
-│   │   │   ├── auth/               # Authentication
-│   │   │   ├── matches/            # Match CRUD + players
-│   │   │   ├── players/            # Player CRUD
-│   │   │   └── stats/              # Statistics
-│   │   ├── globals.css             # CSS imports
-│   │   ├── layout.tsx              # Root layout
-│   │   ├── page.tsx                # Main page
-│   │   └── Dashboard.tsx           # Dashboard component
-│   │
-│   ├── components/                 # React components
-│   │   ├── ui/                     # Shadcn UI primitives
-│   │   ├── ConfirmModal.tsx
-│   │   ├── ErrorModal.tsx
-│   │   ├── MatchDetailsModal.tsx
-│   │   ├── NewMatchModal.tsx
-│   │   └── SuccessModal.tsx
-│   │
-│   ├── hooks/                      # Custom React hooks
-│   │   ├── useCountdown.ts         # Match countdown timer
-│   │   ├── useMatches.ts           # Match data fetching
-│   │   ├── useMonthlyStats.ts      # Monthly chart data
-│   │   └── useStats.ts             # Stats data fetching
-│   │
-│   ├── lib/                        # Core utilities
-│   │   ├── apiAuth.ts              # Supabase auth helper
-│   │   ├── apiError.ts             # Error handling
-│   │   ├── auth.ts                 # Admin authentication
-│   │   ├── authFetch.ts            # Authenticated fetch
-│   │   ├── database.ts             # Prisma client
-│   │   ├── logger.ts               # Logging utility
-│   │   ├── supabaseClient.ts       # Supabase client
-│   │   └── validation.ts           # Input validation
-│   │
-│   ├── styles/                     # Modular CSS
-│   │   ├── base.css                # Variables, reset
-│   │   ├── matches.css             # Match cards
-│   │   ├── modals.css              # All modals
-│   │   ├── players.css             # Player cards
-│   │   └── responsive.css          # Media queries
-│   │
-│   ├── types/                      # TypeScript types
-│   │   └── types.ts                # Shared interfaces
-│   │
-│   └── utils/                      # Utility functions
-│       ├── formatters.ts           # Date, currency
-│       ├── matchUtils.ts           # Sort, filter
-│       ├── matchStatusUtils.ts     # Status logic
-│       └── playerExport.ts         # PDF generation logic
-│
-├── prisma/                         # Database schema
-├── vitest.config.ts                # Test config
-└── package.json
-```
-
----
-
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-- Node.js 18+
-- PostgreSQL database
-- Supabase project (for auth)
+- Node.js 20+
+- A Supabase project (for auth and the database)
+- A PostgreSQL connection string
 
-### Installation
+### Local setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/fernandwill/capybara-dashboard.git
+git clone https://github.com/fernandwill/capyhub.git
+cd capyhub
 
-# Navigate to frontend
-cd capybara-dashboard/frontend
+# Create the shared environment file (see "Environment variables" below)
+touch .env.local
 
-# Install dependencies
+# Install and start the frontend
+cd frontend
 npm install
-
-# Generate Prisma client
 npx prisma generate
-
-# Run database migrations
-npx prisma migrate dev
-
-# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
----
+### Environment variables
 
-## Environment Variables
-
-Create a single `.env.local` at the **repo root** — shared by both the frontend and the backend:
+Create `.env.local` at the repo root. The frontend loads it automatically via `next.config.ts`.
 
 ```env
 # Supabase (Required)
@@ -251,123 +81,40 @@ NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 
 # Database (Required)
-DATABASE_URL="postgresql://user:pass@host:5432/dbname"
+DATABASE_URL="postgresql://user:pass@host:6543/dbname"
 
 # Vercel Cron (Required for automatic status updates in production)
-CRON_SECRET="use-a-random-16-plus-character-string"
-
-# Optional
-FRONTEND_URL="http://localhost:3000"
-PORT=8000
+CRON_SECRET="a-random-16-plus-character-string"
 ```
 
-Both apps load it automatically — the frontend via `next.config.ts`, the backend via `dotenv` — and the backend's `npm run db:*` scripts load it too.
-
----
-
-## API Reference
-
-### Authentication
-
-| Mechanism | Description |
-|----------|-------------|
-| Supabase JWT | Browser auth is handled by Supabase; admin access requires `app_metadata.role = "admin"` |
-
-### Matches
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/matches` | GET | List all matches |
-| `/api/matches` | POST | Create match |
-| `/api/matches/[id]` | GET | Get match by ID |
-| `/api/matches/[id]` | PUT | Update match |
-| `/api/matches/[id]` | DELETE | Delete match |
-| `/api/matches/[id]/players` | GET | List match players |
-| `/api/matches/[id]/players` | POST | Add player to match |
-| `/api/matches/[id]/players/[playerId]` | PUT | Update player status |
-| `/api/matches/[id]/players/[playerId]` | DELETE | Remove player |
-| `/api/matches/auto-update` | GET | Vercel Cron route that batch-updates past matches |
-
-### Players
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/players` | GET | List all players (supports `?latest=true`) |
-| `/api/players` | POST | Create player |
-| `/api/players/[id]` | GET | Get player by ID |
-| `/api/players/[id]` | PUT | Update player |
-| `/api/players/[id]` | DELETE | Delete player |
-
-### Statistics
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/stats` | GET | Dashboard stats |
-| `/api/stats/monthly` | GET | Monthly chart data |
-
----
-
-## Testing
-
-### Run Tests
-
-```bash
-# Watch mode
-npm run test
-
-# Single run
-npm run test:run
-```
-
----
-
-## Code Quality
-
-### Utilities Overview
-
-| Utility | Purpose |
-|---------|---------|
-| `logger.ts` | Dev-only logging; silent in production |
-| `apiError.ts` | Consistent error responses |
-| `validation.ts` | Schema-based input validation |
-
----
+For the full reference (scripts, API endpoints, architecture), see [frontend/README.md](frontend/README.md).
 
 ## Deployment
 
-### Vercel (Recommended)
+Deployed on Vercel with the root directory set to `frontend`. The cron route `/api/matches/auto-update` runs once a day (Vercel Hobby allows `0 17 * * *`) to catch any status updates the real-time triggers missed.
 
-1. Push to GitHub
-2. Import the frontend app in Vercel, or set the project Root Directory to `frontend`
-3. Add environment variables in Vercel dashboard, including `CRON_SECRET`
-4. Deploy
-5. On Vercel Hobby, keep the cron schedule at `0 17 * * *` so `/api/matches/auto-update` runs once per day at 24:00 WIB
+## Testing
 
----
-
-## Scripts Reference
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server (port 3000) |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | ESLint analysis |
-| `npm run test` | Vitest watch mode |
-| `npm run test:run` | Vitest single run |
-
----
+```bash
+cd frontend
+npm run test:run   # single run
+npm run lint       # ESLint
+```
 
 ## Contributing
 
-1. Create a feature branch
-2. Make changes following existing patterns
-3. Add tests for new functionality
-4. Run `npm run lint` and `npm run test:run`
-5. Submit a pull request
+CapyHub is open source and contributions are welcome. It is a real, working app, so the best contributions are ones that make it more useful for the club: new features, bug fixes, better UX, tests, and docs.
 
----
+To contribute:
+
+1. Fork the repository and create a feature branch.
+2. Follow the existing code patterns and keep changes focused.
+3. Add tests for new functionality.
+4. Run `npm run lint` and `npm run test:run` from `frontend/`.
+5. Open a pull request describing the change.
+
+For local development you will need your own Supabase project and a `.env.local` with your own keys (see "Environment variables").
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
