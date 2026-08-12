@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
+import { handleApiError, ApiErrors } from '@/lib/apiError';
 
 interface MonthlyRow {
   month: string;
@@ -52,7 +53,6 @@ export async function GET() {
 
     return NextResponse.json(monthlyData);
   } catch (error) {
-    console.error('Error fetching monthly stats:', error);
-    return NextResponse.json({ error: 'Failed to fetch monthly stats' }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('fetch monthly stats'));
   }
 }

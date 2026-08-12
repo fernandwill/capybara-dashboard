@@ -158,6 +158,16 @@ const schemas = {
         status: { validators: [validators.enum(["ACTIVE", "INACTIVE"])] },
     } as Schema,
 
+    // Partial updates: every validator tolerates undefined, so a PUT with only
+    // a subset of fields still validates what it receives.
+    updatePlayer: {
+        name: { validators: [validators.string, validators.minLength(2)] },
+        email: { validators: [validators.email] },
+        phone: { validators: [validators.string] },
+        notes: { validators: [validators.string] },
+        status: { validators: [validators.enum(["ACTIVE", "INACTIVE"])] },
+    } as Schema,
+
     createMatch: {
         title: { validators: [validators.required, validators.string, validators.minLength(3)] },
         location: { validators: [validators.required, validators.string] },

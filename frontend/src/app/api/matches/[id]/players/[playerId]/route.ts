@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
-import {PaymentStatus} from "@/types/types";
+import { handleApiError, ApiErrors } from '@/lib/apiError';
+import { PaymentStatus } from "@/types/types";
 
 export async function PATCH(
   request: Request,
@@ -40,11 +41,7 @@ export async function PATCH(
 
     return NextResponse.json(matchPlayer);
   } catch (error) {
-    console.error('Error updating match player payment status:', error);
-    return NextResponse.json(
-      { error: "Failed to update payment status." },
-      { status: 500 }
-    );
+    return handleApiError(error, ApiErrors.serverError("update payment status"));
   }
 }
 
@@ -88,7 +85,6 @@ export async function DELETE(
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error removing player from match:', error);
-    return NextResponse.json({ error: "Failed to remove player from match." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError("remove player from match"));
   }
 }

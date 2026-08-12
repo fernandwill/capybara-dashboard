@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
+import { handleApiError, ApiErrors } from '@/lib/apiError';
 
 export async function POST(
   request: Request,
@@ -40,7 +41,6 @@ export async function POST(
 
     return NextResponse.json({ created: result.count }, { status: 201 });
   } catch (error) {
-    console.error('Error adding player to match:', error);
-    return NextResponse.json({ error: "Failed to add player to match." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError("add player to match"));
   }
 }

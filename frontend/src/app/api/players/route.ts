@@ -97,7 +97,9 @@ export async function POST(request: Request) {
     const { name, email, phone, notes, status = "ACTIVE" } = body;
     const trimmedName = name.trim();
 
-    // Check for existing player
+    // Best-effort guard for a friendlier message. The authoritative guard is
+    // the unique index on player.name (set up via migration) — a race between
+    // two concurrent creates is caught below as P2002 instead of a 500.
     const existingPlayer = await prisma.player.findFirst({
       where: {
         name: trimmedName,
@@ -120,6 +122,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json(player, { status: 201 });
   } catch (error) {
+    // Unique constraint on name (P2002) can be hit by a concurrent create that
+    // slipped past the findFirst guard above.
+    if (error && typeof error === "object" && (error as { code?: string }).code === "P2002") {
+      return NextResponse.json({ error: "Player already exists." }, { status: 409 });
+    }
     return handleApiError(error, ApiErrors.serverError('create player'));
   }
 }

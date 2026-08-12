@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
+import { handleApiError, ApiErrors } from '@/lib/apiError';
 
 interface StatsRow {
   total: number;
@@ -50,7 +51,6 @@ export async function GET() {
       hoursPlayed: row.hours.toFixed(1),
     });
   } catch (error) {
-    console.error('Error fetching stats:', error);
-    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('fetch stats'));
   }
 }

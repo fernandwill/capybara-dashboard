@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
 import { determineMatchStatus, updateMatchStatuses } from '@/utils/matchStatusUtils';
+import { handleApiError, ApiErrors } from '@/lib/apiError';
+import { MATCH_INCLUDE } from '@/lib/prismaIncludes';
 
 export async function GET(
   _request: Request,
@@ -17,12 +19,7 @@ export async function GET(
     const match = await prisma.match.findUnique({
       where: { id },
       include: {
-        players: {
-          include: {
-            player: true,
-          },
-        },
-        payments: true,
+        ...MATCH_INCLUDE,
         rounds: {
           orderBy: {
             finishedAt: "desc",
@@ -48,8 +45,7 @@ export async function GET(
 
     return NextResponse.json(matchWithPlayCounts);
   } catch (error) {
-    console.error('Error fetching match:', error);
-    return NextResponse.json({ error: "Failed to fetch match." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('fetch match'));
   }
 }
 
@@ -120,14 +116,7 @@ export async function PUT(
           })
         } : undefined
       },
-      include: {
-        players: {
-          include: {
-            player: true,
-          },
-        },
-        payments: true,
-      },
+      include: MATCH_INCLUDE,
     });
 
     // Auto-update other match statuses
@@ -135,8 +124,7 @@ export async function PUT(
 
     return NextResponse.json(match);
   } catch (error) {
-    console.error('Error updating match:', error);
-    return NextResponse.json({ error: "Failed to update match." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('update match'));
   }
 }
 
@@ -156,7 +144,6 @@ export async function DELETE(
     });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error deleting match:', error);
-    return NextResponse.json({ error: "Failed to delete match." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('delete match'));
   }
 }

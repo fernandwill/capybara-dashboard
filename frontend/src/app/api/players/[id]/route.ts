@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/apiAuth';
+import { validate, validationErrorResponse, schemas } from '@/lib/validation';
+import { handleApiError, ApiErrors } from '@/lib/apiError';
 
 export async function GET(
   _request: Request,
@@ -23,8 +25,7 @@ export async function GET(
 
     return NextResponse.json(player);
   } catch (error) {
-    console.error('Error fetching player:', error);
-    return NextResponse.json({ error: "Failed to fetch player." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('fetch player'));
   }
 }
 
@@ -40,10 +41,31 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+
+    // Validate input (partial update — every field optional, still type-checked)
+    const validation = validate(body, schemas.updatePlayer);
+    if (!validation.success) {
+      return validationErrorResponse(validation.errors!);
+    }
+
     const { name, email, phone, notes, status } = body;
 
+    // Reject renaming to a name already used by another player
+    if (typeof name === "string" && name.trim()) {
+      const existingPlayer = await prisma.player.findFirst({
+        where: {
+          name: name.trim(),
+          NOT: { id },
+        },
+      });
+
+      if (existingPlayer) {
+        return NextResponse.json({ error: "Player already exists." }, { status: 409 });
+      }
+    }
+
     const data: Record<string, unknown> = {};
-    if (name !== undefined) data.name = name;
+    if (name !== undefined) data.name = name.trim();
     if (email !== undefined) data.email = email;
     if (phone !== undefined) data.phone = phone;
     if (notes !== undefined) {
@@ -58,8 +80,7 @@ export async function PUT(
 
     return NextResponse.json(player);
   } catch (error) {
-    console.error('Error updating player:', error);
-    return NextResponse.json({ error: "Failed to update player." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('update player'));
   }
 }
 
@@ -74,12 +95,31 @@ export async function DELETE(
 
   try {
     const { id } = await params;
+
+    // Deleting a player cascades to their payment history and match
+    // participation — refuse when any exist so records are never silently
+    // destroyed.
+    const [paymentCount, participationCount] = await Promise.all([
+      prisma.payment.count({ where: { playerId: id } }),
+      prisma.matchPlayer.count({ where: { playerId: id } }),
+    ]);
+
+    if (paymentCount > 0 || participationCount > 0) {
+      const reason =
+        paymentCount > 0
+          ? "payment records"
+          : "match history";
+      return NextResponse.json(
+        { error: `This player has ${reason} and cannot be deleted.` },
+        { status: 409 }
+      );
+    }
+
     await prisma.player.delete({
       where: { id },
     });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error deleting player:', error);
-    return NextResponse.json({ error: "Failed to delete player." }, { status: 500 });
+    return handleApiError(error, ApiErrors.serverError('delete player'));
   }
 }

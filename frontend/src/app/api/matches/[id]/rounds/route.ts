@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/database";
 import { requireAdminUser } from "@/lib/apiAuth";
+import { handleApiError, ApiErrors } from "@/lib/apiError";
 
 export async function POST(
   request: Request,
@@ -57,10 +58,6 @@ export async function POST(
 
     return NextResponse.json({ round, updated }, { status: 201 });
   } catch (error) {
-    console.error("Error saving round:", error);
-    return NextResponse.json(
-      { error: "Failed to save round." },
-      { status: 500 }
-    );
+    return handleApiError(error, ApiErrors.serverError("save round"));
   }
 }

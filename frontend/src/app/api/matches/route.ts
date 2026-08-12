@@ -4,6 +4,7 @@ import { requireAdminUser } from '@/lib/apiAuth';
 import { determineMatchStatus, updateMatchStatuses } from '@/utils/matchStatusUtils';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
 import { handleApiError, ApiErrors } from '@/lib/apiError';
+import { MATCH_INCLUDE } from '@/lib/prismaIncludes';
 
 export async function GET() {
   const auth = await requireAdminUser();
@@ -16,14 +17,7 @@ export async function GET() {
     await updateMatchStatuses();
 
     const matches = await prisma.match.findMany({
-      include: {
-        players: {
-          include: {
-            player: true,
-          },
-        },
-        payments: true,
-      },
+      include: MATCH_INCLUDE,
       orderBy: {
         date: "asc",
       },
@@ -82,14 +76,7 @@ export async function POST(request: NextRequest) {
           }))
         }
       },
-      include: {
-        players: {
-          include: {
-            player: true,
-          },
-        },
-        payments: true,
-      },
+      include: MATCH_INCLUDE,
     });
 
     return NextResponse.json(match, { status: 201 });

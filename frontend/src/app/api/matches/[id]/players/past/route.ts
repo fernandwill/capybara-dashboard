@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/database";
 import { requireAdminUser } from '@/lib/apiAuth';
+import { handleApiError, ApiErrors } from "@/lib/apiError";
 
 export async function GET(
   _request: Request,
@@ -50,10 +51,6 @@ export async function GET(
       })),
     );
   } catch (error) {
-    console.error("Error fetching players from database:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch players." },
-      { status: 500 }
-    );
+    return handleApiError(error, ApiErrors.serverError("fetch players"));
   }
 }

@@ -97,6 +97,9 @@ export default function DeletePlayerModal({
             <p className="mt-1 text-gray-300">
               Are you sure you want to delete <span className="font-bold text-white">{player?.name}</span>? This will remove their record from the historical player database.
             </p>
+            <p className="mt-1 text-[11px] text-gray-400">
+              Players with match or payment history cannot be deleted.
+            </p>
           </div>
         </div>
 
