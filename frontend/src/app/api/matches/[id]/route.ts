@@ -19,21 +19,7 @@ export async function GET(
       include: {
         players: {
           include: {
-            player: {
-              include: {
-                _count: {
-                  select: {
-                    matchPlayers: {
-                      where: {
-                        match: {
-                          status: "COMPLETED",
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            player: true,
           },
         },
         payments: true,
@@ -55,8 +41,7 @@ export async function GET(
         ...matchPlayer,
         player: {
           ...player,
-          playCount: player._count?.matchPlayers ?? 0,
-          _count: undefined,
+          playCount: matchPlayer.playCount ?? 0,
         },
       })),
     };

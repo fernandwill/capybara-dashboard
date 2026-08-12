@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   Calendar,
@@ -12,22 +12,15 @@ import {
   Crown,
   History,
   Loader2,
-  MoreVertical,
-  Pencil,
-  Play,
   Plus,
   RotateCcw,
   Sparkles,
-  Timer,
-  Trash2,
-  User,
   Users,
-  Wallet,
   X,
+  MapPin,
+  ArrowLeft,
 } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
-import NewMatchModal from "@/components/NewMatchModal";
-import DeleteMatchModal from "@/components/DeleteMatchModal";
 import SelectPlayersModal, {
   PlayerOption,
 } from "@/components/SelectPlayersModal";
@@ -54,14 +47,6 @@ interface CourtState {
   teamB: [CourtSlot, CourtSlot];
 }
 
-interface ActivityEvent {
-  id: string;
-  title: string;
-  description: string;
-  time: string;
-  timestamp: number;
-}
-
 interface FinishedGameHistory {
   id: string;
   courtName: string;
@@ -69,14 +54,6 @@ interface FinishedGameHistory {
   teamBNames: string[];
   finishedAt: string;
 }
-
-const IDR_FORMATTER = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-  minimumFractionDigits: 0,
-});
-
-const formatCurrency = (amount: number) => IDR_FORMATTER.format(amount);
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -86,6 +63,14 @@ const formatDate = (dateString: string) => {
   const month = date.toLocaleDateString("en-US", { month: "long" });
   const year = date.getFullYear();
   return `${weekday}, ${day} ${month} ${year}`;
+};
+
+const formatTimeHM = (isoString: string) => {
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return "";
+  return `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes()
+  ).padStart(2, "0")}`;
 };
 
 const formatTimeWithDuration = (timeString: string) => {
@@ -129,7 +114,6 @@ const formatTimeWithDuration = (timeString: string) => {
 
 export default function MatchDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const matchId = params?.id as string;
 
   // Match and player state
@@ -138,40 +122,24 @@ export default function MatchDetailsPage() {
   const [allAvailablePlayers, setAllAvailablePlayers] = useState<PlayerOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isSavingRound, setIsSavingRound] = useState(false);
 
   // Courts state
   const [courts, setCourts] = useState<CourtState[]>([]);
-  const [activeMobileCourtIndex, setActiveMobileCourtIndex] = useState(0);
 
   // In-session player play counts
   const [sessionPlayCounts, setSessionPlayCounts] = useState<Record<string, number>>({});
 
-  // Live timer state
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-
-  // Activity logs & History
-  const [activities, setActivities] = useState<ActivityEvent[]>([]);
+  // History
   const [gameHistory, setGameHistory] = useState<FinishedGameHistory[]>([]);
 
   // Modals state
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isSelectPlayersModalOpen, setIsSelectPlayersModalOpen] = useState(false);
   const [slotPicker, setSlotPicker] = useState<{
     courtIndex: number;
     team: "teamA" | "teamB";
     slotIndex: number;
   } | null>(null);
-
-  // Quick Action menu dropdown
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // Edit notes state
-  const [isEditingNotes, setIsEditingNotes] = useState(false);
-  const [noteContent, setNoteContent] = useState("");
-  const [isSavingNotes, setIsSavingNotes] = useState(false);
 
   // Toast / Feedback modals
   const [successModal, setSuccessModal] = useState<ModalState>({
@@ -185,17 +153,6 @@ export default function MatchDetailsPage() {
     message: "",
   });
 
-  // Close 3-dots menu on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   // Fetch match details
   const fetchMatchDetails = useCallback(async () => {
     if (!matchId) return;
@@ -206,7 +163,6 @@ export default function MatchDetailsPage() {
       }
       const data = await res.json();
       setMatch(data);
-      setNoteContent(data.description || "");
 
       const matchPlayers =
         data.players?.map(
@@ -228,6 +184,34 @@ export default function MatchDetailsPage() {
       });
       setSessionPlayCounts(counts);
 
+      // Load persisted round history
+      const matchRounds = data.rounds ?? [];
+      setGameHistory(
+        matchRounds.map(
+          (round: {
+            id: string;
+            courtNumber: number;
+            teamAPlayerIds: string[];
+            teamBPlayerIds: string[];
+            finishedAt: string;
+          }) => ({
+            id: round.id,
+            courtName: `Court ${round.courtNumber}`,
+            teamANames: (round.teamAPlayerIds ?? []).map(
+              (pid) =>
+                matchPlayers.find((p: PlayerInMatch) => p.id === pid)?.name ||
+                "Player"
+            ),
+            teamBNames: (round.teamBPlayerIds ?? []).map(
+              (pid) =>
+                matchPlayers.find((p: PlayerInMatch) => p.id === pid)?.name ||
+                "Player"
+            ),
+            finishedAt: formatTimeHM(round.finishedAt),
+          })
+        )
+      );
+
       // Initialize courts if not already configured
       const courtCount = parseInt(data.courtNumber || "4", 10) || 4;
       setCourts((prev) => {
@@ -243,20 +227,6 @@ export default function MatchDetailsPage() {
           });
         }
         return initialCourts;
-      });
-
-      // Initial activity
-      setActivities((prev) => {
-        if (prev.length > 0) return prev;
-        return [
-          {
-            id: "act-init",
-            title: "Match initialized",
-            description: `Scheduled at ${data.location || data.title}`,
-            time: "Start",
-            timestamp: Date.now(),
-          },
-        ];
       });
     } catch (err) {
       console.error("Error fetching match details:", err);
@@ -288,29 +258,7 @@ export default function MatchDetailsPage() {
     fetchAllPlayers();
   }, [fetchMatchDetails, fetchAllPlayers]);
 
-  // Elapsed timer logic
-  useEffect(() => {
-    if (!match) return;
-    const isOngoing =
-      match.status?.toUpperCase() === "IN PROGRESS" ||
-      match.status?.toUpperCase() === "UPCOMING";
-    if (!isOngoing) return;
-
-    const timer = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [match]);
-
-  const formattedElapsedTime = useMemo(() => {
-    const hours = Math.floor(elapsedSeconds / 3600);
-    const minutes = Math.floor((elapsedSeconds % 3600) / 60);
-    const seconds = elapsedSeconds % 60;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  }, [elapsedSeconds]);
-
-  // Players prioritized by in-session play counts ascending (fewer plays = higher priority)
+  // Players prioritized by in-session play counts ascending
   const prioritizedPlayers = useMemo(() => {
     return [...players].sort((a, b) => {
       const countA = sessionPlayCounts[a.id] ?? a.playCount ?? 0;
@@ -342,7 +290,6 @@ export default function MatchDetailsPage() {
     slotIndex: number,
     playerId: string
   ) => {
-    const playerObj = players.find((p) => p.id === playerId);
     setCourts((prev) => {
       const next = [...prev];
       const court = { ...next[courtIndex] };
@@ -350,29 +297,14 @@ export default function MatchDetailsPage() {
       teamSlots[slotIndex] = { playerId };
       court[team] = teamSlots;
 
-      // Update court status
       const hasAnyPlayer =
-        court.teamA.some((s) => s.playerId) || court.teamB.some((s) => s.playerId);
+        court.teamA.some((s) => s.playerId) ||
+        court.teamB.some((s) => s.playerId);
       court.status = hasAnyPlayer ? "IN PROGRESS" : "EMPTY";
 
       next[courtIndex] = court;
       return next;
     });
-
-    if (playerObj) {
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      setActivities((prev) => [
-        {
-          id: `act-${Date.now()}`,
-          title: `Court ${courtIndex + 1} updated`,
-          description: `${playerObj.name} assigned to ${team === "teamA" ? "Team A" : "Team B"}`,
-          time: timeStr,
-          timestamp: Date.now(),
-        },
-        ...prev,
-      ]);
-    }
 
     setSlotPicker(null);
   };
@@ -383,9 +315,6 @@ export default function MatchDetailsPage() {
     team: "teamA" | "teamB",
     slotIndex: number
   ) => {
-    const currentSlot = courts[courtIndex]?.[team]?.[slotIndex];
-    const removedPlayer = players.find((p) => p.id === currentSlot?.playerId);
-
     setCourts((prev) => {
       const next = [...prev];
       const court = { ...next[courtIndex] };
@@ -394,27 +323,13 @@ export default function MatchDetailsPage() {
       court[team] = teamSlots;
 
       const hasAnyPlayer =
-        court.teamA.some((s) => s.playerId) || court.teamB.some((s) => s.playerId);
+        court.teamA.some((s) => s.playerId) ||
+        court.teamB.some((s) => s.playerId);
       court.status = hasAnyPlayer ? "IN PROGRESS" : "EMPTY";
 
       next[courtIndex] = court;
       return next;
     });
-
-    if (removedPlayer) {
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      setActivities((prev) => [
-        {
-          id: `act-${Date.now()}`,
-          title: `Court ${courtIndex + 1} updated`,
-          description: `${removedPlayer.name} removed`,
-          time: timeStr,
-          timestamp: Date.now(),
-        },
-        ...prev,
-      ]);
-    }
   };
 
   // Auto assign players to empty slots based on priority
@@ -424,12 +339,12 @@ export default function MatchDetailsPage() {
       setErrorModal({
         isOpen: true,
         title: "No Available Players",
-        message: "All joined players are already assigned to courts or no players in match.",
+        message:
+          "All joined players are already assigned to courts or no players in match.",
       });
       return;
     }
 
-    let assignedCount = 0;
     setCourts((prev) => {
       const next = prev.map((c) => ({
         ...c,
@@ -444,7 +359,6 @@ export default function MatchDetailsPage() {
           if (!court.teamA[s].playerId && available.length > 0) {
             const p = available.shift()!;
             court.teamA[s].playerId = p.id;
-            assignedCount++;
           }
         }
         // Team B
@@ -452,30 +366,17 @@ export default function MatchDetailsPage() {
           if (!court.teamB[s].playerId && available.length > 0) {
             const p = available.shift()!;
             court.teamB[s].playerId = p.id;
-            assignedCount++;
           }
         }
 
         const hasAny =
-          court.teamA.some((s) => s.playerId) || court.teamB.some((s) => s.playerId);
+          court.teamA.some((s) => s.playerId) ||
+          court.teamB.some((s) => s.playerId);
         court.status = hasAny ? "IN PROGRESS" : "EMPTY";
       }
 
       return next;
     });
-
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    setActivities((prev) => [
-      {
-        id: `act-${Date.now()}`,
-        title: "Auto-assigned courts",
-        description: `Filled ${assignedCount} player slot${assignedCount === 1 ? "" : "s"} based on priority queue`,
-        time: timeStr,
-        timestamp: Date.now(),
-      },
-      ...prev,
-    ]);
   };
 
   // Reset all courts
@@ -488,86 +389,89 @@ export default function MatchDetailsPage() {
         teamB: [{ playerId: null }, { playerId: null }],
       }))
     );
-
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    setActivities((prev) => [
-      {
-        id: `act-${Date.now()}`,
-        title: "Courts reset",
-        description: "All courts cleared and players returned to queue",
-        time: timeStr,
-        timestamp: Date.now(),
-      },
-      ...prev,
-    ]);
   };
 
   // Finish Court game
-  const handleFinishCourt = (courtIndex: number) => {
+  const handleFinishCourt = async (courtIndex: number) => {
     const court = courts[courtIndex];
-    if (!court) return;
+    if (!court || !match) return;
 
-    const teamAPlayerIds = court.teamA.map((s) => s.playerId).filter(Boolean) as string[];
-    const teamBPlayerIds = court.teamB.map((s) => s.playerId).filter(Boolean) as string[];
+    const teamAPlayerIds = court.teamA
+      .map((s) => s.playerId)
+      .filter(Boolean) as string[];
+    const teamBPlayerIds = court.teamB
+      .map((s) => s.playerId)
+      .filter(Boolean) as string[];
     const allPlayedIds = [...teamAPlayerIds, ...teamBPlayerIds];
 
     if (allPlayedIds.length === 0) return;
 
-    // Increment session play count for players on this court
-    setSessionPlayCounts((prev) => {
-      const next = { ...prev };
-      allPlayedIds.forEach((id) => {
-        next[id] = (next[id] || 0) + 1;
+    setIsSavingRound(true);
+    try {
+      const res = await authFetch(`/api/matches/${match.id}/rounds`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courtNumber: court.id,
+          teamAPlayerIds,
+          teamBPlayerIds,
+        }),
       });
-      return next;
-    });
 
-    const teamANames = teamAPlayerIds
-      .map((id) => players.find((p) => p.id === id)?.name || "Player")
-      .filter(Boolean);
-    const teamBNames = teamBPlayerIds
-      .map((id) => players.find((p) => p.id === id)?.name || "Player")
-      .filter(Boolean);
+      if (!res.ok) throw new Error("Failed to save round");
+      const { round } = await res.json();
 
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      // Increment session play count
+      setSessionPlayCounts((prev) => {
+        const next = { ...prev };
+        allPlayedIds.forEach((id) => {
+          next[id] = (next[id] || 0) + 1;
+        });
+        return next;
+      });
 
-    // Add to game history
-    setGameHistory((prev) => [
-      {
-        id: `hist-${Date.now()}`,
-        courtName: court.name,
-        teamANames,
-        teamBNames,
-        finishedAt: timeStr,
-      },
-      ...prev,
-    ]);
+      const teamANames = teamAPlayerIds
+        .map((id) => players.find((p) => p.id === id)?.name || "Player")
+        .filter(Boolean);
+      const teamBNames = teamBPlayerIds
+        .map((id) => players.find((p) => p.id === id)?.name || "Player")
+        .filter(Boolean);
 
-    // Add to activity
-    setActivities((prev) => [
-      {
-        id: `act-${Date.now()}`,
-        title: `${court.name} game finished`,
-        description: `${teamANames.join(", ")} vs ${teamBNames.join(", ")}`,
-        time: timeStr,
-        timestamp: Date.now(),
-      },
-      ...prev,
-    ]);
+      const timeStr = formatTimeHM(new Date().toISOString());
 
-    // Clear the finished court for next rotation
-    setCourts((prev) => {
-      const next = [...prev];
-      next[courtIndex] = {
-        ...next[courtIndex],
-        status: "EMPTY",
-        teamA: [{ playerId: null }, { playerId: null }],
-        teamB: [{ playerId: null }, { playerId: null }],
-      };
-      return next;
-    });
+      // Add to game history
+      setGameHistory((prev) => [
+        {
+          id: round.id,
+          courtName: court.name,
+          teamANames,
+          teamBNames,
+          finishedAt: timeStr,
+        },
+        ...prev,
+      ]);
+
+      // Clear the finished court
+      setCourts((prev) => {
+        const next = [...prev];
+        next[courtIndex] = {
+          ...next[courtIndex],
+          status: "EMPTY",
+          teamA: [{ playerId: null }, { playerId: null }],
+          teamB: [{ playerId: null }, { playerId: null }],
+        };
+        return next;
+      });
+    } catch (err) {
+      console.error("Failed to save round:", err);
+      setErrorModal({
+        isOpen: true,
+        title: "Save Failed",
+        message: "Could not save this round. Please try again.",
+      });
+    } finally {
+      setIsSavingRound(false);
+    }
   };
 
   // Toggle Finish Match status
@@ -591,19 +495,6 @@ export default function MatchDetailsPage() {
       const updated = await res.json();
       setMatch((prev) => (prev ? { ...prev, status: updated.status } : updated));
 
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      setActivities((prev) => [
-        {
-          id: `act-${Date.now()}`,
-          title: nextStatus === "COMPLETED" ? "Match marked Completed" : "Match reopened",
-          description: `Status updated by admin`,
-          time: timeStr,
-          timestamp: Date.now(),
-        },
-        ...prev,
-      ]);
-
       setSuccessModal({
         isOpen: true,
         title: "Match Updated",
@@ -621,27 +512,6 @@ export default function MatchDetailsPage() {
       });
     } finally {
       setIsUpdatingStatus(false);
-    }
-  };
-
-  // Save notes
-  const handleSaveNotes = async () => {
-    if (!match) return;
-    setIsSavingNotes(true);
-    try {
-      const res = await authFetch(`/api/matches/${match.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: noteContent.trim() }),
-      });
-      if (res.ok) {
-        setMatch((prev) => (prev ? { ...prev, description: noteContent.trim() } : prev));
-        setIsEditingNotes(false);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSavingNotes(false);
     }
   };
 
@@ -667,26 +537,6 @@ export default function MatchDetailsPage() {
     }
   };
 
-  // Delete match
-  const handleConfirmDelete = async () => {
-    if (!match) return;
-    setIsDeleting(true);
-    try {
-      const res = await authFetch(`/api/matches/${match.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
-      router.push("/");
-    } catch (err) {
-      console.error(err);
-      setErrorModal({
-        isOpen: true,
-        title: "Delete Failed",
-        message: "Failed to delete this match.",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
   if (isLoading) {
     return (
       <AppLayout>
@@ -703,10 +553,10 @@ export default function MatchDetailsPage() {
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <p className="text-lg font-semibold text-white">Match not found</p>
           <Link
-            href="/"
+            href="/matches"
             className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-500"
           >
-            Back to Dashboard
+            Back to Matches
           </Link>
         </div>
       </AppLayout>
@@ -722,332 +572,230 @@ export default function MatchDetailsPage() {
   return (
     <AppLayout>
       <div className="space-y-6 pb-12">
-        {/* Breadcrumbs */}
+        {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-gray-400">
-          <Link href="/" className="transition hover:text-white">
-            Matches
+          <Link
+            href="/matches"
+            className="flex items-center gap-1 transition hover:text-white"
+          >
+            <ArrowLeft size={13} />
+            <span>Matches</span>
           </Link>
-          <ChevronRight size={13} />
+          <ChevronRight size={13} className="text-gray-600" />
           <span className="truncate font-medium text-gray-300">
-            {match.title} - {formatDate(match.date)}
+            {match.title}
           </span>
         </div>
 
-        {/* Match Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1.5 min-w-0">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                {match.title}
-              </h1>
-              <span
-                className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${statusPillBg}`}
-              >
-                {statusDisplay}
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">
-              <span className="flex items-center gap-1.5">
-                <Calendar size={13} className="text-gray-400" />
-                {formatDate(match.date)}
-              </span>
-              <span>•</span>
-              <span className="flex items-center gap-1.5">
-                <Clock size={13} className="text-gray-400" />
-                {formatTimeWithDuration(match.time)}
-              </span>
-              <span>•</span>
-              <span>
-                {match.courtNumber || "4"} Courts • {players.length} Players
-              </span>
-            </div>
-          </div>
+        {/* Match Header Hero Card */}
+        <div className="rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-5 shadow-lg">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            {/* Title & Metadata */}
+            <div className="space-y-2 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  {match.title}
+                </h1>
+                <span
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${statusPillBg}`}
+                >
+                  {statusDisplay}
+                </span>
+              </div>
 
-          {/* Header Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
-            {/* 3-dots Menu */}
-            <div className="relative" ref={menuRef}>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400">
+                <span className="flex items-center gap-1.5">
+                  <Calendar size={14} className="text-emerald-400" />
+                  {formatDate(match.date)}
+                </span>
+                <span className="text-gray-600">•</span>
+                <span className="flex items-center gap-1.5">
+                  <Clock size={14} className="text-blue-400" />
+                  {formatTimeWithDuration(match.time)}
+                </span>
+                <span className="text-gray-600">•</span>
+                <span className="flex items-center gap-1.5">
+                  <MapPin size={14} className="text-amber-400" />
+                  {match.location || "Badminton Hall"}
+                </span>
+                <span className="text-gray-600">•</span>
+                <span className="rounded-md bg-[#161a22] px-2 py-0.5 text-[11px] font-medium text-gray-300 border border-[#232834]">
+                  {match.courtNumber || "4"} Courts
+                </span>
+                <span className="rounded-md bg-[#161a22] px-2 py-0.5 text-[11px] font-medium text-gray-300 border border-[#232834]">
+                  {players.length} Players Joined
+                </span>
+              </div>
+            </div>
+
+            {/* Header Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              {/* Manage Players Button */}
               <button
                 type="button"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#232730] bg-[#12151c] text-gray-300 transition hover:bg-[#1a1f29] hover:text-white"
-                title="More actions"
+                onClick={() => setIsSelectPlayersModalOpen(true)}
+                className="flex items-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] px-3.5 py-2 text-xs font-semibold text-gray-200 transition hover:border-[#2d3444] hover:bg-[#1a202c] hover:text-white"
               >
-                <MoreVertical size={16} />
+                <Users size={14} />
+                <span>Roster ({players.length})</span>
               </button>
-              {isMenuOpen && (
-                <div className="absolute right-0 top-11 z-30 w-48 rounded-xl border border-[#232730] bg-[#0c0e12] p-1 shadow-2xl">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsEditModalOpen(true);
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-300 transition hover:bg-[#161a22] hover:text-white"
-                  >
-                    <Pencil size={13} />
-                    <span>Edit Match</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      exportPlayerList(match, players);
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-300 transition hover:bg-[#161a22] hover:text-white"
-                  >
-                    <Users size={13} />
-                    <span>Export Players</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      handleResetAllCourts();
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-300 transition hover:bg-[#161a22] hover:text-white"
-                  >
-                    <RotateCcw size={13} />
-                    <span>Reset All Courts</span>
-                  </button>
-                  <div className="my-1 border-t border-[#1e222b]" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsDeleteModalOpen(true);
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
-                  >
-                    <Trash2 size={13} />
-                    <span>Delete Match</span>
-                  </button>
-                </div>
-              )}
-            </div>
 
-            {/* Edit Match Button */}
-            <button
-              type="button"
-              onClick={() => setIsEditModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-[#232730] bg-[#12151c] px-3.5 py-2 text-xs font-medium text-gray-200 transition hover:bg-[#1a1f29] hover:text-white"
-              aria-label="Edit Match"
-            >
-              <Pencil size={13} />
-              <span className="hidden sm:inline">Edit Match</span>
-            </button>
+              {/* Export Players Button */}
+              <button
+                type="button"
+                onClick={() => exportPlayerList(match, players)}
+                className="flex items-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] px-3.5 py-2 text-xs font-semibold text-gray-200 transition hover:border-[#2d3444] hover:bg-[#1a202c] hover:text-white"
+                aria-label="Export Players"
+              >
+                <span>Export</span>
+              </button>
 
-            {/* Finish Match Button */}
-            <button
-              type="button"
-              disabled={isUpdatingStatus}
-              onClick={handleToggleMatchStatus}
-              aria-label={isMatchCompleted ? "Reopen Match" : "Finish Match"}
-              className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium text-white shadow-sm transition disabled:opacity-50 ${
-                isMatchCompleted
-                  ? "bg-gray-700 hover:bg-gray-600"
-                  : "bg-blue-600 hover:bg-blue-500"
-              }`}
-            >
-              {isUpdatingStatus ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : isMatchCompleted ? (
-                <RotateCcw size={14} />
-              ) : (
-                <CheckCircle2 size={14} />
-              )}
-              <span className="hidden sm:inline">{isMatchCompleted ? "Reopen Match" : "Finish Match"}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Top 5 Info Cards */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {/* 1. Court Fee */}
-          <div className="flex items-center gap-3 rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Wallet size={18} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-gray-400">Court Fee</p>
-              <p className="truncate text-sm font-bold text-white">
-                {formatCurrency(match.fee)}
-              </p>
-            </div>
-          </div>
-
-          {/* 2. Status */}
-          <div className="flex items-center gap-3 rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <Play size={18} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-gray-400">Status</p>
-              <p className="truncate text-sm font-bold text-white">{statusDisplay}</p>
-            </div>
-          </div>
-
-          {/* 3. Created By */}
-          <div className="flex items-center gap-3 rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <User size={18} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-gray-400">Created By</p>
-              <p className="truncate text-sm font-bold text-white">Capybara</p>
-              <p className="text-[10px] text-gray-500">{formatDate(match.createdAt)}</p>
-            </div>
-          </div>
-
-          {/* 4. Started At */}
-          <div className="flex items-center gap-3 rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              <Clock size={18} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-gray-400">Started At</p>
-              <p className="truncate text-sm font-bold text-white">
-                {match.time?.split("-")[0]?.trim() || "18:00"}
-              </p>
-              <p className="text-[10px] text-gray-500">{formatDate(match.date)}</p>
-            </div>
-          </div>
-
-          {/* 5. Elapsed Time */}
-          <div className="col-span-2 sm:col-span-1 flex items-center gap-3 rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <Timer size={18} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-gray-400">Elapsed Time</p>
-              <p className="truncate text-sm font-mono font-bold text-white">
-                {formattedElapsedTime}
-              </p>
+              {/* Finish Match Button */}
+              <button
+                type="button"
+                disabled={isUpdatingStatus}
+                onClick={handleToggleMatchStatus}
+                aria-label={isMatchCompleted ? "Reopen Match" : "Finish Match"}
+                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-md transition disabled:opacity-50 ${
+                  isMatchCompleted
+                    ? "border border-gray-700 bg-gray-800 hover:bg-gray-700"
+                    : "border border-emerald-500/40 bg-emerald-600 hover:bg-emerald-500 text-white"
+                }`}
+              >
+                {isUpdatingStatus ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : isMatchCompleted ? (
+                  <RotateCcw size={14} />
+                ) : (
+                  <CheckCircle2 size={14} />
+                )}
+                <span>
+                  {isMatchCompleted ? "Reopen Match" : "Finish Match"}
+                </span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid: Courts Management (Left) + Priority/Activity (Right) */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
-          {/* Left Column: Court Management */}
-          <div className="space-y-4 xl:col-span-8">
-            {/* Court Management Header */}
-            <div className="flex flex-col gap-3 rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Unified 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Left Column: Court Management & Courts Grid (8 Columns) */}
+          <div className="space-y-4 lg:col-span-8">
+            {/* Court Management Header Bar */}
+            <div className="flex flex-col gap-3 rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-base font-bold text-white">Court Management</h2>
                 <p className="text-xs text-gray-400">
-                  Assign players to courts. Players will be prioritized based on play count (lower is prioritized).
+                  Assign players to court slots (2v2). Lower play count is prioritized.
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto shrink-0">
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={handleAutoAssign}
-                  className="flex items-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-400 transition hover:bg-blue-500/20"
+                  className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-400 transition hover:bg-emerald-500/20"
                 >
                   <Sparkles size={13} />
-                  <span>Auto Assign Players</span>
+                  <span>Auto Assign</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleResetAllCourts}
-                  className="flex items-center gap-1.5 rounded-xl border border-[#232730] bg-[#12151c] px-3 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-[#1a1f29] hover:text-white"
+                  className="flex items-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] px-3 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-[#1a202c] hover:text-white"
                 >
                   <RotateCcw size={13} />
-                  <span>Reset All Courts</span>
+                  <span>Reset</span>
                 </button>
               </div>
             </div>
 
-            {/* Mobile Court Selector Tabs */}
-            <div className="flex overflow-x-auto gap-1 rounded-xl bg-[#0c0e12] p-1 border border-[#1a1f28] xl:hidden">
-              {courts.map((c, idx) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setActiveMobileCourtIndex(idx)}
-                  className={`flex-1 min-w-[80px] rounded-lg py-1.5 text-xs font-medium transition ${
-                    activeMobileCourtIndex === idx
-                      ? "bg-blue-600 text-white shadow"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {c.name}
-                </button>
-              ))}
-            </div>
-
-            {/* Courts Grid */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+            {/* Courts Grid — Unified 2-column layout */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {courts.map((court, courtIdx) => {
-                // Show only the active court below xl (mobile tabs drive it);
-                // CSS classes handle the breakpoint — no window reads in render.
-                const isActiveCourt = activeMobileCourtIndex === courtIdx;
-
                 const courtHasPlayers =
-                  court.teamA.some((s) => s.playerId) || court.teamB.some((s) => s.playerId);
+                  court.teamA.some((s) => s.playerId) ||
+                  court.teamB.some((s) => s.playerId);
                 const courtStatus = courtHasPlayers ? "IN PROGRESS" : "EMPTY";
 
                 return (
                   <div
                     key={court.id}
-                    className={`flex-col justify-between rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4 transition-all hover:border-[#28303f] ${
-                      isActiveCourt ? "flex" : "hidden xl:flex"
-                    }`}
+                    className="flex flex-col justify-between rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 transition-all hover:border-[#28303f] shadow-sm"
                   >
-                    {/* Court Title & Status */}
-                    <div className="mb-4 flex items-center justify-between">
+                    {/* Court Title & Status Header */}
+                    <div className="mb-3.5 flex items-center justify-between border-b border-[#181d26] pb-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-white text-sm">{court.name}</span>
+                        <span className="font-bold text-white text-sm">
+                          {court.name}
+                        </span>
                         <span
                           className={`rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
                             courtStatus === "IN PROGRESS"
                               ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                              : "bg-gray-800 text-gray-400"
+                              : "bg-[#141820] text-gray-400 border border-[#232834]"
                           }`}
                         >
                           {courtStatus}
                         </span>
                       </div>
-                      <span className="text-[11px] font-medium text-gray-500">2v2</span>
+                      <span className="rounded bg-[#141820] px-1.5 py-0.5 text-[10px] font-semibold text-gray-400">
+                        2v2
+                      </span>
                     </div>
 
-                    {/* Teams Slots */}
+                    {/* Team Slots */}
                     <div className="space-y-3">
                       {/* Team A */}
                       <div className="space-y-1.5">
-                        <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
-                          Team A
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                            Team A
+                          </span>
+                        </div>
                         <div className="space-y-1.5">
                           {court.teamA.map((slot, sIdx) => {
-                            const playerObj = players.find((p) => p.id === slot.playerId);
+                            const playerObj = players.find(
+                              (p) => p.id === slot.playerId
+                            );
                             if (playerObj) {
-                              const count = sessionPlayCounts[playerObj.id] ?? playerObj.playCount ?? 0;
+                              const count =
+                                sessionPlayCounts[playerObj.id] ??
+                                playerObj.playCount ??
+                                0;
                               return (
                                 <div
                                   key={sIdx}
-                                  className="flex items-center justify-between rounded-xl border border-[#232730] bg-[#12151c] px-2.5 py-1.5"
+                                  className="flex items-center justify-between rounded-xl border border-[#232834] bg-[#12151c] px-2.5 py-1.5"
                                 >
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <Image
-                                      src="/capybara-avatar.png"
-                                      alt={playerObj.name}
-                                      width={400}
-                                      height={383}
-                                      className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
-                                    />
+                                    <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-gray-700">
+                                      <Image
+                                        src="/capybara-avatar.png"
+                                        alt={playerObj.name}
+                                        width={28}
+                                        height={28}
+                                        className="h-full w-full object-cover"
+                                      />
+                                    </div>
                                     <div className="min-w-0">
                                       <p className="truncate text-xs font-semibold text-white">
                                         {playerObj.name}
                                       </p>
-                                      <p className="text-[10px] text-gray-400">{count}x played</p>
+                                      <p className="text-[10px] text-gray-400">
+                                        {count}x played
+                                      </p>
                                     </div>
                                   </div>
                                   <button
                                     type="button"
-                                    onClick={() => handleRemoveFromSlot(courtIdx, "teamA", sIdx)}
-                                    className="rounded p-1 text-gray-500 transition hover:bg-gray-800 hover:text-red-400"
+                                    onClick={() =>
+                                      handleRemoveFromSlot(
+                                        courtIdx,
+                                        "teamA",
+                                        sIdx
+                                      )
+                                    }
+                                    className="rounded p-1 text-gray-400 transition hover:bg-rose-500/10 hover:text-rose-400"
                                     title="Remove player"
                                   >
                                     <X size={13} />
@@ -1067,7 +815,7 @@ export default function MatchDetailsPage() {
                                     slotIndex: sIdx,
                                   })
                                 }
-                                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#232730] bg-[#0e1117]/60 py-2 text-xs font-medium text-gray-400 transition hover:border-blue-500/60 hover:bg-blue-500/5 hover:text-blue-400"
+                                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#282d38] bg-[#12151c]/60 py-2 text-xs font-medium text-gray-400 transition hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-emerald-300"
                               >
                                 <Plus size={13} />
                                 <span>Add player</span>
@@ -1077,50 +825,67 @@ export default function MatchDetailsPage() {
                         </div>
                       </div>
 
-                      {/* VS Separator */}
-                      <div className="relative flex items-center justify-center py-1">
+                      {/* VS Divider */}
+                      <div className="relative flex items-center justify-center py-0.5">
                         <div className="absolute inset-0 flex items-center">
                           <div className="w-full border-t border-[#1a1f28]" />
                         </div>
-                        <span className="relative bg-[#0c0e12] px-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                        <span className="relative rounded-full bg-[#141820] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-400 border border-[#222734]">
                           VS
                         </span>
                       </div>
 
                       {/* Team B */}
                       <div className="space-y-1.5">
-                        <span className="text-[11px] font-semibold text-blue-400 uppercase tracking-wider">
-                          Team B
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider">
+                            Team B
+                          </span>
+                        </div>
                         <div className="space-y-1.5">
                           {court.teamB.map((slot, sIdx) => {
-                            const playerObj = players.find((p) => p.id === slot.playerId);
+                            const playerObj = players.find(
+                              (p) => p.id === slot.playerId
+                            );
                             if (playerObj) {
-                              const count = sessionPlayCounts[playerObj.id] ?? playerObj.playCount ?? 0;
+                              const count =
+                                sessionPlayCounts[playerObj.id] ??
+                                playerObj.playCount ??
+                                0;
                               return (
                                 <div
                                   key={sIdx}
-                                  className="flex items-center justify-between rounded-xl border border-[#232730] bg-[#12151c] px-2.5 py-1.5"
+                                  className="flex items-center justify-between rounded-xl border border-[#232834] bg-[#12151c] px-2.5 py-1.5"
                                 >
                                   <div className="flex items-center gap-2 min-w-0">
-                                    <Image
-                                      src="/capybara-avatar.png"
-                                      alt={playerObj.name}
-                                      width={400}
-                                      height={383}
-                                      className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
-                                    />
+                                    <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-gray-700">
+                                      <Image
+                                        src="/capybara-avatar.png"
+                                        alt={playerObj.name}
+                                        width={28}
+                                        height={28}
+                                        className="h-full w-full object-cover"
+                                      />
+                                    </div>
                                     <div className="min-w-0">
                                       <p className="truncate text-xs font-semibold text-white">
                                         {playerObj.name}
                                       </p>
-                                      <p className="text-[10px] text-gray-400">{count}x played</p>
+                                      <p className="text-[10px] text-gray-400">
+                                        {count}x played
+                                      </p>
                                     </div>
                                   </div>
                                   <button
                                     type="button"
-                                    onClick={() => handleRemoveFromSlot(courtIdx, "teamB", sIdx)}
-                                    className="rounded p-1 text-gray-500 transition hover:bg-gray-800 hover:text-red-400"
+                                    onClick={() =>
+                                      handleRemoveFromSlot(
+                                        courtIdx,
+                                        "teamB",
+                                        sIdx
+                                      )
+                                    }
+                                    className="rounded p-1 text-gray-400 transition hover:bg-rose-500/10 hover:text-rose-400"
                                     title="Remove player"
                                   >
                                     <X size={13} />
@@ -1140,7 +905,7 @@ export default function MatchDetailsPage() {
                                     slotIndex: sIdx,
                                   })
                                 }
-                                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#232730] bg-[#0e1117]/60 py-2 text-xs font-medium text-gray-400 transition hover:border-blue-500/60 hover:bg-blue-500/5 hover:text-blue-400"
+                                className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#282d38] bg-[#12151c]/60 py-2 text-xs font-medium text-gray-400 transition hover:border-blue-500/50 hover:bg-blue-500/5 hover:text-blue-300"
                               >
                                 <Plus size={13} />
                                 <span>Add player</span>
@@ -1152,15 +917,15 @@ export default function MatchDetailsPage() {
                     </div>
 
                     {/* Finish Court Button */}
-                    <div className="mt-4 pt-3 border-t border-[#1a1f28]">
+                    <div className="mt-4 pt-3 border-t border-[#181d26]">
                       <button
                         type="button"
-                        disabled={!courtHasPlayers}
+                        disabled={!courtHasPlayers || isSavingRound}
                         onClick={() => handleFinishCourt(courtIdx)}
-                        className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-medium transition ${
+                        className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition shadow-sm ${
                           courtHasPlayers
                             ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            : "border border-transparent bg-[#12151c] text-gray-600 cursor-not-allowed"
+                            : "border border-transparent bg-[#141820] text-gray-600 cursor-not-allowed"
                         }`}
                       >
                         <CheckCircle2 size={13} />
@@ -1173,40 +938,52 @@ export default function MatchDetailsPage() {
             </div>
           </div>
 
-          {/* Right Column: Player Priority & Activity Feed */}
-          <div className="space-y-4 xl:col-span-4">
+          {/* Right Column: Player Priority & Match History (4 Columns) */}
+          <div className="space-y-4 lg:col-span-4">
             {/* Player Priority Card */}
-            <div className="rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4">
-              <div className="mb-3">
-                <h3 className="text-sm font-bold text-white">Player Priority (by play count)</h3>
-                <p className="text-xs text-gray-400">Players with fewer plays are prioritized.</p>
+            <div className="rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-white">
+                    Player Priority
+                  </h3>
+                  <p className="text-[11px] text-gray-400">
+                    Fewer plays = higher priority
+                  </p>
+                </div>
+                <span className="rounded-md border border-[#232834] bg-[#141820] px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                  {unassignedPlayers.length} in queue
+                </span>
               </div>
 
               {/* Priority list */}
-              <div className="max-h-[340px] space-y-1.5 overflow-y-auto pr-1">
+              <div className="max-h-72 space-y-1.5 overflow-y-auto pr-1 custom-scrollbar">
                 {prioritizedPlayers.length === 0 ? (
                   <div className="py-8 text-center text-xs text-gray-500">
                     No players joined yet. Click below to add players.
                   </div>
                 ) : (
                   prioritizedPlayers.map((player, idx) => {
-                    const count = sessionPlayCounts[player.id] ?? player.playCount ?? 0;
+                    const count =
+                      sessionPlayCounts[player.id] ?? player.playCount ?? 0;
                     const isAssigned = assignedPlayerIds.has(player.id);
 
                     return (
                       <div
                         key={player.id}
-                        className="flex items-center justify-between rounded-xl border border-transparent bg-[#12151c] px-3 py-2 transition hover:border-[#232730]"
+                        className="flex items-center justify-between rounded-xl border border-[#1d222d] bg-[#12151c] px-3 py-2 transition hover:border-[#28303f]"
                       >
                         {/* Left: Avatar + Name */}
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <Image
-                            src="/capybara-avatar.png"
-                            alt={player.name}
-                            width={400}
-                            height={383}
-                            className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
-                          />
+                          <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-gray-700">
+                            <Image
+                              src="/capybara-avatar.png"
+                              alt={player.name}
+                              width={28}
+                              height={28}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
                           <div className="min-w-0">
                             <p className="truncate text-xs font-semibold text-white">
                               {player.name}
@@ -1219,10 +996,18 @@ export default function MatchDetailsPage() {
 
                         {/* Right: Rank Crown / Number */}
                         <div className="flex items-center gap-1.5 shrink-0">
-                          {idx === 0 && <Crown size={14} className="text-amber-400" />}
-                          {idx === 1 && <Crown size={14} className="text-gray-300" />}
-                          {idx === 2 && <Crown size={14} className="text-amber-600" />}
-                          <span className="text-xs font-bold text-gray-400">{idx + 1}</span>
+                          {idx === 0 && (
+                            <Crown size={14} className="text-amber-400" />
+                          )}
+                          {idx === 1 && (
+                            <Crown size={14} className="text-gray-300" />
+                          )}
+                          {idx === 2 && (
+                            <Crown size={14} className="text-amber-600" />
+                          )}
+                          <span className="text-xs font-bold text-gray-400">
+                            {idx + 1}
+                          </span>
                         </div>
                       </div>
                     );
@@ -1230,38 +1015,58 @@ export default function MatchDetailsPage() {
                 )}
               </div>
 
-              {/* View All Players button */}
+              {/* Manage Roster Button */}
               <button
                 type="button"
                 onClick={() => setIsSelectPlayersModalOpen(true)}
-                className="mt-3.5 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#232730] bg-[#12151c] py-2 text-xs font-medium text-gray-300 transition hover:bg-[#1a1f29] hover:text-white"
+                className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] py-2 text-xs font-semibold text-gray-200 transition hover:bg-[#1a202c] hover:text-white"
               >
-                <span>View All Players</span>
+                <span>Manage Match Roster</span>
                 <ChevronRight size={13} />
               </button>
             </div>
 
-            {/* Activity Feed Card */}
-            <div className="rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4">
+            {/* Match History Card */}
+            <div className="rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 shadow-sm">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white">Activity</h3>
-                <span className="text-[11px] font-medium text-gray-500">Live</span>
+                <h3 className="flex items-center gap-2 text-sm font-bold text-white">
+                  <History size={15} className="text-gray-400" />
+                  <span>Match History</span>
+                </h3>
+                <span className="rounded-md border border-[#232834] bg-[#141820] px-2 py-0.5 text-[10px] font-medium text-gray-400">
+                  {gameHistory.length} round
+                  {gameHistory.length === 1 ? "" : "s"}
+                </span>
               </div>
 
-              <div className="max-h-[240px] space-y-2.5 overflow-y-auto pr-1">
-                {activities.length === 0 ? (
-                  <p className="py-6 text-center text-xs text-gray-500">No activity yet.</p>
+              <div className="max-h-64 space-y-2 overflow-y-auto pr-1 custom-scrollbar">
+                {gameHistory.length === 0 ? (
+                  <p className="py-6 text-center text-xs text-gray-500">
+                    No rounds recorded for this match yet.
+                  </p>
                 ) : (
-                  activities.slice(0, 10).map((act) => (
+                  gameHistory.map((g) => (
                     <div
-                      key={act.id}
-                      className="flex items-start justify-between gap-2 border-b border-[#181d26] pb-2 last:border-0"
+                      key={g.id}
+                      className="rounded-xl border border-[#1d222d] bg-[#12151c] p-2.5 text-xs text-gray-300"
                     >
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-white">{act.title}</p>
-                        <p className="truncate text-[11px] text-gray-400">{act.description}</p>
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="font-semibold text-emerald-400">
+                          {g.courtName}
+                        </span>
+                        <span className="text-[10px] font-medium text-gray-500">
+                          {g.finishedAt}
+                        </span>
                       </div>
-                      <span className="shrink-0 text-[10px] text-gray-500">{act.time}</span>
+                      <div className="text-[11px] text-gray-400">
+                        <span className="text-gray-200">
+                          {g.teamANames.join(" & ")}
+                        </span>{" "}
+                        <span className="text-gray-500 font-bold">vs</span>{" "}
+                        <span className="text-gray-200">
+                          {g.teamBNames.join(" & ")}
+                        </span>
+                      </div>
                     </div>
                   ))
                 )}
@@ -1269,128 +1074,17 @@ export default function MatchDetailsPage() {
             </div>
           </div>
         </div>
-
-        {/* Bottom Summary Cards: Selected Players (Left) + Match Notes (Middle) + Match History (Right) */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {/* 1. Selected Players Stack */}
-          <div
-            onClick={() => setIsSelectPlayersModalOpen(true)}
-            className="flex cursor-pointer flex-col justify-between rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4 transition hover:border-[#28303f]"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-white">
-                Selected Players ({players.length})
-              </h3>
-              <ChevronRight size={14} className="text-gray-500" />
-            </div>
-
-            <div className="flex items-center -space-x-2 overflow-hidden py-1">
-              {players.slice(0, 8).map((p) => {
-                return (
-                  <Image
-                    key={p.id}
-                    src="/capybara-avatar.png"
-                    alt={p.name}
-                    title={p.name}
-                    width={400}
-                    height={383}
-                    className="h-8 w-8 rounded-full object-cover ring-2 ring-[#0c0e12] shadow"
-                  />
-                );
-              })}
-              {players.length > 8 && (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-[10px] font-bold text-gray-300 ring-2 ring-[#0c0e12]">
-                  +{players.length - 8}
-                </div>
-              )}
-            </div>
-            <p className="mt-2 text-[11px] text-gray-500">Tap to manage match roster</p>
-          </div>
-
-          {/* 2. Match Notes */}
-          <div className="flex flex-col justify-between rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-white">Match Notes</h3>
-              <button
-                type="button"
-                onClick={() => setIsEditingNotes(!isEditingNotes)}
-                className="rounded p-1 text-gray-400 hover:text-white"
-                title="Edit notes"
-              >
-                <Pencil size={13} />
-              </button>
-            </div>
-
-            {isEditingNotes ? (
-              <div className="space-y-2">
-                <textarea
-                  value={noteContent}
-                  onChange={(e) => setNoteContent(e.target.value)}
-                  placeholder="Add notes for this match..."
-                  rows={2}
-                  className="w-full rounded-xl border border-[#232730] bg-[#12151c] p-2 text-xs text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
-                />
-                <div className="flex justify-end gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingNotes(false)}
-                    className="rounded-lg px-2.5 py-1 text-xs text-gray-400 hover:text-white"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isSavingNotes}
-                    onClick={handleSaveNotes}
-                    className="rounded-lg bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-500"
-                  >
-                    {isSavingNotes ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <p className="text-xs text-gray-300 line-clamp-3">
-                {match.description?.trim() || "No notes for this match yet."}
-              </p>
-            )}
-            <p className="mt-2 text-[11px] text-gray-500">Visible to administrators</p>
-          </div>
-
-          {/* 3. Match History */}
-          <div className="flex flex-col justify-between rounded-2xl border border-[#1a1f28] bg-[#0c0e12] p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <History size={15} className="text-gray-400" />
-              <h3 className="text-sm font-bold text-white">Match History</h3>
-            </div>
-
-            <div className="max-h-[100px] space-y-1.5 overflow-y-auto">
-              {gameHistory.length === 0 ? (
-                <p className="py-2 text-xs text-gray-500">No history for this match yet.</p>
-              ) : (
-                gameHistory.map((g) => (
-                  <div key={g.id} className="text-[11px] text-gray-300">
-                    <span className="font-semibold text-emerald-400">{g.courtName}:</span>{" "}
-                    {g.teamANames.join(" & ")} vs {g.teamBNames.join(" & ")} ({g.finishedAt})
-                  </div>
-                ))
-              )}
-            </div>
-            <p className="mt-2 text-[11px] text-gray-500">
-              {gameHistory.length} round{gameHistory.length === 1 ? "" : "s"} completed
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Slot Player Selector Dropdown / Modal */}
       {slotPicker && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-[#232730] bg-[#0c0e12] p-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-sm rounded-2xl border border-[#232834] bg-[#0e1117] p-4 shadow-2xl">
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <h4 className="text-sm font-bold text-white">Select Player</h4>
                 <p className="text-xs text-gray-400">
-                  Choose from available unassigned players
+                  Choose from unassigned players in queue
                 </p>
               </div>
               <button
@@ -1402,7 +1096,7 @@ export default function MatchDetailsPage() {
               </button>
             </div>
 
-            <div className="max-h-64 space-y-1 overflow-y-auto pr-1">
+            <div className="max-h-64 space-y-1 overflow-y-auto pr-1 custom-scrollbar">
               {unassignedPlayers.length === 0 ? (
                 <div className="py-6 text-center text-xs text-gray-400">
                   <p>All joined players are currently assigned.</p>
@@ -1412,14 +1106,15 @@ export default function MatchDetailsPage() {
                       setSlotPicker(null);
                       setIsSelectPlayersModalOpen(true);
                     }}
-                    className="mt-2 text-blue-400 underline hover:text-blue-300"
+                    className="mt-2 text-emerald-400 underline hover:text-emerald-300 font-medium"
                   >
-                    Add more players to match
+                    Add more players to roster
                   </button>
                 </div>
               ) : (
                 unassignedPlayers.map((player) => {
-                  const count = sessionPlayCounts[player.id] ?? player.playCount ?? 0;
+                  const count =
+                    sessionPlayCounts[player.id] ?? player.playCount ?? 0;
                   return (
                     <button
                       key={player.id}
@@ -1432,21 +1127,23 @@ export default function MatchDetailsPage() {
                           player.id
                         )
                       }
-                      className="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#12151c] px-3 py-2 text-left transition hover:border-blue-500/50 hover:bg-[#161f30]"
+                      className="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#12151c] px-3 py-2 text-left transition hover:border-emerald-500/50 hover:bg-[#16202e]"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <Image
-                          src="/capybara-avatar.png"
-                          alt={player.name}
-                          width={400}
-                          height={383}
-                          className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700"
-                        />
+                        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-gray-700">
+                          <Image
+                            src="/capybara-avatar.png"
+                            alt={player.name}
+                            width={28}
+                            height={28}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
                         <span className="truncate text-xs font-semibold text-white">
                           {player.name}
                         </span>
                       </div>
-                      <span className="text-[10px] font-medium text-emerald-400">
+                      <span className="text-[10px] font-semibold text-emerald-400">
                         {count}x played
                       </span>
                     </button>
@@ -1470,48 +1167,12 @@ export default function MatchDetailsPage() {
         }}
       />
 
-      {/* Edit Match Modal */}
-      {isEditModalOpen && (
-        <NewMatchModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          editingMatch={match}
-          onSubmit={async (matchData) => {
-            try {
-              const res = await authFetch(`/api/matches/${match.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(matchData),
-              });
-              if (res.ok) {
-                await fetchMatchDetails();
-                setIsEditModalOpen(false);
-                setSuccessModal({
-                  isOpen: true,
-                  title: "Success",
-                  message: "Match details updated successfully.",
-                });
-              }
-            } catch (err) {
-              console.error(err);
-            }
-          }}
-        />
-      )}
-
-      {/* Delete Match Modal */}
-      <DeleteMatchModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        matchTitle={match.title}
-        isLoading={isDeleting}
-      />
-
       {/* Feedback Modals */}
       <SuccessModal
         isOpen={successModal.isOpen}
-        onClose={() => setSuccessModal({ isOpen: false, title: "", message: "" })}
+        onClose={() =>
+          setSuccessModal({ isOpen: false, title: "", message: "" })
+        }
         title={successModal.title}
         message={successModal.message}
       />
