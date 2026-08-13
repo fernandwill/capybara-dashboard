@@ -85,8 +85,8 @@ export async function PUT(
       : status;
 
     // Preserve per-match round counts and payment status when the roster is
-    // re-saved. The read + replace (deleteMany/create) run in one transaction
-    // so two concurrent roster saves can't overwrite each other's play counts.
+    // re-saved. Explicitly deleting old match_players before inserting new ones
+    // in the same transaction avoids nested deleteMany/create unique-constraint collisions in Prisma.
     const match = await prisma.$transaction(async (tx) => {
       let existingRows: { playerId: string; playCount: number; paymentStatus: string }[] = [];
       if (Array.isArray(playerIds) && playerIds.length > 0) {
@@ -99,30 +99,41 @@ export async function PUT(
         existingRows.map((row) => [row.playerId, row])
       );
 
-      return tx.match.update({
-        where: { id },
-        data: {
-          title,
-          location,
-          courtNumber,
-          date: date ? new Date(date) : undefined,
-          time,
-          fee,
-          status: finalStatus,
-          description,
-          players: playerIds ? {
-            deleteMany: {},
-            create: playerIds.map((playerId: string) => {
+      if (Array.isArray(playerIds)) {
+        await tx.matchPlayer.deleteMany({
+          where: { matchId: id },
+        });
+
+        if (playerIds.length > 0) {
+          await tx.matchPlayer.createMany({
+            data: playerIds.map((playerId: string) => {
               const existing = existingByPlayer.get(playerId);
               return {
-                player: {
-                  connect: { id: playerId }
-                },
+                matchId: id,
+                playerId,
                 playCount: existing?.playCount ?? 0,
                 paymentStatus: existing?.paymentStatus ?? "BELUM_SETOR",
               };
-            })
-          } : undefined
+            }),
+          });
+        }
+      }
+
+      const parsedDate = date ? new Date(date) : undefined;
+      const validDate = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : undefined;
+      const parsedFee = fee !== undefined ? (Number.isNaN(Number(fee)) ? 0 : Number(fee)) : undefined;
+
+      return tx.match.update({
+        where: { id },
+        data: {
+          title: title !== undefined ? String(title).trim() : undefined,
+          location: location !== undefined ? String(location).trim() : undefined,
+          courtNumber: courtNumber !== undefined ? (String(courtNumber).trim() || null) : undefined,
+          date: validDate,
+          time: time !== undefined ? time : undefined,
+          fee: parsedFee,
+          status: finalStatus,
+          description: description !== undefined ? (String(description).trim() || null) : undefined,
         },
         include: MATCH_INCLUDE,
       });
