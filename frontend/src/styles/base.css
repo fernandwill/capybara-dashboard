@@ -197,11 +197,17 @@ body {
         --sidebar-ring: oklch(0.556 0 0);
     }
 
+    html {
+        -webkit-text-size-adjust: 100%;
+        touch-action: manipulation;
+    }
+
     body {
         font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         background-color: var(--app-bg);
         color: var(--app-text-primary);
         line-height: 1.6;
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* Clickable elements show a pointer cursor; disabled ones stay default */

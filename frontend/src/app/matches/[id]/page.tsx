@@ -413,7 +413,7 @@ export default function MatchDetailsPage() {
                     key={c.id}
                     type="button"
                     onClick={() => setActiveMobileCourtIndex(idx)}
-                    className={`flex flex-1 min-w-[85px] min-h-[38px] items-center justify-center gap-1.5 rounded-lg py-2 px-2.5 text-xs font-semibold transition active:scale-[0.98] ${
+                    className={`flex flex-1 min-w-[85px] min-h-[42px] items-center justify-center gap-1.5 rounded-lg py-2 px-2.5 text-xs font-semibold transition active:scale-[0.98] ${
                       isCurrent
                         ? "bg-app-primary text-white shadow-md font-bold"
                         : "bg-app-input text-app-text-muted hover:text-app-text-primary"

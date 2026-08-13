@@ -153,7 +153,7 @@ export default function Modal({
       }}
     >
       <div
-        className={`relative flex max-h-[90vh] w-full ${maxWidthClass} flex-col rounded-t-3xl sm:rounded-2xl border-t sm:border border-app-border bg-app-card p-5 sm:p-6 pb-8 sm:pb-6 shadow-2xl text-app-text-primary transition-all animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 ${className}`}
+        className={`relative flex max-h-[85dvh] w-full ${maxWidthClass} flex-col rounded-t-3xl sm:rounded-2xl border-t sm:border border-app-border bg-app-card p-5 sm:p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:pb-6 shadow-2xl text-app-text-primary transition-all animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 ${className}`}
       >
         {/* Mobile Drag Indicator */}
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-app-border sm:hidden" />

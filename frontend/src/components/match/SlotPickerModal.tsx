@@ -40,7 +40,7 @@ export default function SlotPickerModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-sm rounded-t-3xl sm:rounded-2xl border-t sm:border border-app-border bg-app-bg p-5 sm:p-4 shadow-2xl pb-8 sm:pb-4 max-h-[80vh] flex flex-col animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
+      <div className="w-full max-w-sm rounded-t-3xl sm:rounded-2xl border-t sm:border border-app-border bg-app-bg p-5 sm:p-4 shadow-2xl pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:pb-4 max-h-[80dvh] flex flex-col animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
         {/* Mobile drag handle indicator */}
         <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-app-border sm:hidden" />
 
