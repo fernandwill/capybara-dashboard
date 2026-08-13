@@ -3,8 +3,6 @@
 .copilot
 *.md
 
-backend/dist/
-backend/dist-ssr/
 *.tsbuildinfo
 
 # environment files (never commit secrets)
