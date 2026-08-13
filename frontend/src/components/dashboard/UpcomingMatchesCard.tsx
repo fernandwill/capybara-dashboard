@@ -135,16 +135,18 @@ export default function UpcomingMatchesCard({
           <h2 className="text-base font-bold text-app-text-primary">Upcoming Matches</h2>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onNewMatch}
-            className="flex items-center gap-1 rounded-xl bg-app-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-app-primary-hover"
-          >
-            <IconPlus size={14} />
-            <span>New Match</span>
-          </button>
-        </div>
+        {matches.length > 0 && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onNewMatch}
+              className="flex items-center gap-1 rounded-xl bg-app-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-app-primary-hover"
+            >
+              <IconPlus size={14} />
+              <span>New Match</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
