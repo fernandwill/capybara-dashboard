@@ -25,21 +25,20 @@ Open source under the MIT license. Contributions from club members and the commu
 ```
 capyhub/
 ├── frontend/    # Next.js 16 app (App Router). The production app, deployed on Vercel.
-├── backend/     # Legacy Express + Prisma server. Kept for reference, not used in production.
 └── .env.local   # Shared environment config (never committed).
 ```
 
-The app lives in `frontend/`. The backend was an early Express API server and is not used by the current deployment; it is kept for reference.
+The app lives entirely in `frontend/` — it implements its own API routes, auth, and Prisma access, and is what Vercel deploys.
 
 ## Tech stack
 
 | Category | Technology |
 |---|---|
 | Framework | Next.js 16 (App Router) |
-| UI | React 19, TypeScript, Tailwind CSS 4, Radix UI |
+| UI | React 19, TypeScript, Tailwind CSS 4 |
 | Data | PostgreSQL, Prisma, SWR |
 | Backend services | Supabase (Auth, Realtime) |
-| Charts | Recharts |
+| Charts | Custom SVG (in-app) |
 | PDF | jsPDF |
 | Testing | Vitest |
 | Deployment | Vercel |

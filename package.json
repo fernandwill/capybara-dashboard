@@ -6,13 +6,10 @@
   "scripts": {
     "dev": "cd frontend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev",
     "build": "cd frontend && npm run build",
     "build:frontend": "cd frontend && npm run build",
-    "build:backend": "cd backend && npm run build",
     "start": "cd frontend && npm run start",
-    "start:frontend": "cd frontend && npm run start",
-    "start:backend": "cd backend && npm run start"
+    "start:frontend": "cd frontend && npm run start"
   },
   "devDependencies": {
     "@types/node": "^24.3.3"

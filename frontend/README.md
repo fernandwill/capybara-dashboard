@@ -81,8 +81,8 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 | Styling | Tailwind CSS 4 |
 | Database | PostgreSQL via Prisma |
 | Auth | Supabase |
-| Components | Radix UI |
-| Charts | Recharts |
+| Components | Hand-rolled UI primitives |
+| Charts | Custom SVG |
 | Icons | Tabler Icons |
 | PDF Export | jsPDF & jspdf-autotable |
 | Testing | Vitest |
@@ -93,7 +93,7 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 
 ### Design Principles
 
-1. **Modular CSS**: Styles split into 5 focused files instead of one large file
+1. **Modular CSS**: Styles split into focused files (`base.css`, `login.css`) instead of one large file
 2. **Custom Hooks**: Data fetching logic extracted into reusable hooks
 3. **Centralized Utilities**: Shared validation, logging, and error handling
 4. **Type Safety**: Shared TypeScript types across components
@@ -150,55 +150,55 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 frontend/
 ├── src/
 │   ├── app/                        # Next.js App Router
-│   │   ├── api/                    # API route handlers
-│   │   │   ├── auth/               # Authentication
-│   │   │   ├── matches/            # Match CRUD + players
-│   │   │   ├── players/            # Player CRUD
-│   │   │   └── stats/              # Statistics
+│   │   ├── api/                    # API route handlers (auth, matches, players, stats)
+│   │   ├── dashboard/              # Dashboard pages
+│   │   ├── login/                  # Auth pages
+│   │   ├── matches/                # Match list + detail pages
+│   │   ├── players/                # Player management page
 │   │   ├── globals.css             # CSS imports
 │   │   ├── layout.tsx              # Root layout
 │   │   ├── page.tsx                # Main page
 │   │   └── Dashboard.tsx           # Dashboard component
 │   │
 │   ├── components/                 # React components
-│   │   ├── ui/                     # Shadcn UI primitives
-│   │   ├── ConfirmModal.tsx
-│   │   ├── ErrorModal.tsx
+│   │   ├── ui/                     # Hand-rolled primitives (Button, Modal, CustomDropdown)
+│   │   ├── dashboard/              # Dashboard cards + charts
+│   │   ├── layout/                 # App shell, navigation
+│   │   ├── match/                  # Match cards, court management
+│   │   ├── players/                # Player table, modals
 │   │   ├── MatchDetailsModal.tsx
 │   │   ├── NewMatchModal.tsx
-│   │   └── SuccessModal.tsx
+│   │   ├── SelectPlayersModal.tsx
+│   │   └── ...                     # Confirm/Status/Success/Error modals
 │   │
 │   ├── hooks/                      # Custom React hooks
-│   │   ├── useCountdown.ts         # Match countdown timer
-│   │   ├── useMatches.ts           # Match data fetching
-│   │   ├── useMonthlyStats.ts      # Monthly chart data
-│   │   └── useStats.ts             # Stats data fetching
+│   │   ├── use-matches.ts          # Match data fetching
+│   │   ├── use-players.ts          # Player data fetching
+│   │   ├── use-stats.ts            # Stats data fetching
+│   │   ├── use-countdown.ts        # Match countdown timer
+│   │   ├── use-court-manager.ts    # Court assignment logic
+│   │   └── ...                     # Pagination, insights, realtime refresh
 │   │
 │   ├── lib/                        # Core utilities
-│   │   ├── apiAuth.ts              # Supabase auth helper
-│   │   ├── apiError.ts             # Error handling
-│   │   ├── auth.ts                 # Admin authentication
-│   │   ├── authFetch.ts            # Authenticated fetch
+│   │   ├── auth-fetch.ts           # Authenticated fetch
+│   │   ├── supabase-client.ts      # Supabase browser client
+│   │   ├── supabase-server.ts      # Supabase server client
 │   │   ├── database.ts             # Prisma client
-│   │   ├── logger.ts               # Logging utility
-│   │   ├── supabaseClient.ts       # Supabase client
-│   │   └── validation.ts           # Input validation
+│   │   ├── validation.ts           # Input validation
+│   │   └── ...                     # Logging, error handling, rate limiting
 │   │
 │   ├── styles/                     # Modular CSS
 │   │   ├── base.css                # Variables, reset
-│   │   ├── matches.css             # Match cards
-│   │   ├── modals.css              # All modals
-│   │   ├── players.css             # Player cards
-│   │   └── responsive.css          # Media queries
+│   │   └── (login.css lives next to the login page)
 │   │
 │   ├── types/                      # TypeScript types
-│   │   └── types.ts                # Shared interfaces
+│   │   └── types.ts, match-types.ts
 │   │
 │   └── utils/                      # Utility functions
-│       ├── formatters.ts           # Date, currency
-│       ├── matchUtils.ts           # Sort, filter
-│       ├── matchStatusUtils.ts     # Status logic
-│       └── playerExport.ts         # PDF generation logic
+│       ├── formatters.ts           # Date, time formatting
+│       ├── match-utils.ts          # Countdown, filtering
+│       ├── match-status-utils.ts   # Status logic
+│       └── player-export.ts        # PDF generation logic
 │
 ├── prisma/                         # Database schema
 ├── vitest.config.ts                # Test config
@@ -243,7 +243,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Environment Variables
 
-Create a single `.env.local` at the **repo root** — shared by both the frontend and the backend:
+Create a single `.env.local` at the **repo root**:
 
 ```env
 # Supabase (Required)
@@ -255,13 +255,9 @@ DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 
 # Vercel Cron (Required for automatic status updates in production)
 CRON_SECRET="use-a-random-16-plus-character-string"
-
-# Optional
-FRONTEND_URL="http://localhost:3000"
-PORT=8000
 ```
 
-Both apps load it automatically — the frontend via `next.config.ts`, the backend via `dotenv` — and the backend's `npm run db:*` scripts load it too.
+The frontend loads it automatically via `next.config.ts`.
 
 ---
 
