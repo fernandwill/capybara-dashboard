@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Modal from "./ui/Modal";
-import { Loader2, Plus, Search, Star, User, X } from "lucide-react";
+import { IconLoader, IconPlus, IconSearch, IconStar, IconUser, IconX } from "@tabler/icons-react";
 import { authFetch } from "@/lib/authFetch";
 
 export interface PlayerOption {
@@ -212,7 +212,7 @@ export default function SelectPlayersModal({
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={13} className="animate-spin" />
+                  <IconLoader size={13} className="animate-spin" />
                   <span>
                     {removedCount > 0 && newlySelectedCount === 0
                       ? "Saving Changes..."
@@ -232,7 +232,7 @@ export default function SelectPlayersModal({
       <div className="space-y-3.5">
         {/* Search Bar */}
         <div className="relative">
-          <Search
+          <IconSearch
             size={15}
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
           />
@@ -249,7 +249,7 @@ export default function SelectPlayersModal({
               onClick={() => setSearchQuery("")}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text-primary"
             >
-              <X size={13} />
+              <IconX size={13} />
             </button>
           )}
         </div>
@@ -320,9 +320,9 @@ export default function SelectPlayersModal({
               className="flex shrink-0 items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isCreatingPlayer ? (
-                <Loader2 size={13} className="animate-spin" />
+                <IconLoader size={13} className="animate-spin" />
               ) : (
-                <Plus size={13} />
+                <IconPlus size={13} />
               )}
               <span>Add</span>
             </button>
@@ -336,7 +336,7 @@ export default function SelectPlayersModal({
         <div className="max-h-[300px] space-y-1 overflow-y-auto pr-1">
           {displayedPlayers.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center text-xs text-app-text-muted">
-              <User size={24} className="mb-2 text-app-text-muted" />
+              <IconUser size={24} className="mb-2 text-app-text-muted" />
               {searchQuery ? (
                 <p>
                   No players matching &ldquo;{searchQuery}&rdquo;. Add them above!
@@ -395,7 +395,7 @@ export default function SelectPlayersModal({
                       }`}
                       title={isFav ? "Remove favorite" : "Add to favorites"}
                     >
-                      <Star
+                      <IconStar
                         size={14}
                         fill={isFav ? "currentColor" : "none"}
                       />

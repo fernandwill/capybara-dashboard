@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { X } from "lucide-react";
+import { IconX } from "@tabler/icons-react";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 
@@ -181,7 +181,7 @@ export default function Modal({
                 aria-label="Close dialog"
                 className="shrink-0 rounded-lg p-1.5 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
               >
-                <X size={18} />
+                <IconX size={18} />
               </button>
             )}
           </div>

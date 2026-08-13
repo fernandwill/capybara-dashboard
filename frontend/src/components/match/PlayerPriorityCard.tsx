@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Crown } from "lucide-react";
+import { IconCrown } from "@tabler/icons-react";
 import type { PlayerInMatch } from "@/components/match/types";
 
 interface PlayerPriorityCardProps {
@@ -71,9 +71,9 @@ export default function PlayerPriorityCard({
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0">
-                  {idx === 0 && <Crown size={14} className="text-amber-400" />}
-                  {idx === 1 && <Crown size={14} className="text-app-text-secondary" />}
-                  {idx === 2 && <Crown size={14} className="text-amber-600" />}
+                  {idx === 0 && <IconCrown size={14} className="text-amber-400" />}
+                  {idx === 1 && <IconCrown size={14} className="text-app-text-secondary" />}
+                  {idx === 2 && <IconCrown size={14} className="text-amber-600" />}
                   <span className="text-xs font-bold text-app-text-muted">
                     {idx + 1}
                   </span>

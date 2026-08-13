@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { AlertTriangle, Plus, UserPlus, X } from "lucide-react";
+import { IconAlertTriangle, IconPlus, IconUserPlus, IconX } from "@tabler/icons-react";
 import SelectPlayersModal, { PlayerOption } from "../SelectPlayersModal";
 import type { Match } from "@/types/types";
 
@@ -51,7 +51,7 @@ export default function MatchPlayersSection({
     <div>
       {playersError && (
         <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
-          <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+          <IconAlertTriangle size={14} className="mt-0.5 shrink-0" />
           <span>{playersError}</span>
         </div>
       )}
@@ -68,7 +68,7 @@ export default function MatchPlayersSection({
 
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-app-border bg-app-input/60 p-6 text-center">
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
-              <UserPlus size={20} />
+              <IconUserPlus size={20} />
             </div>
             <p className="text-sm font-semibold text-app-text-primary">
               No players added yet
@@ -82,7 +82,7 @@ export default function MatchPlayersSection({
               onClick={() => setIsPlayerPickerOpen(true)}
               className="mt-3.5 flex items-center gap-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-400 transition hover:border-blue-500/50 hover:bg-blue-500/20 disabled:opacity-50"
             >
-              <Plus size={14} />
+              <IconPlus size={14} />
               <span>Add Players</span>
             </button>
           </div>
@@ -127,7 +127,7 @@ export default function MatchPlayersSection({
                     className="rounded p-1 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
                     aria-label={`Remove ${player.name}`}
                   >
-                    <X size={14} />
+                    <IconX size={14} />
                   </button>
                 </div>
               </div>
@@ -140,7 +140,7 @@ export default function MatchPlayersSection({
             onClick={() => setIsPlayerPickerOpen(true)}
             className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/5 py-2 text-xs font-semibold text-blue-400 transition hover:border-blue-500/50 hover:bg-blue-500/15"
           >
-            <Plus size={14} />
+            <IconPlus size={14} />
             <span>+ Add More Players</span>
           </button>
         </div>

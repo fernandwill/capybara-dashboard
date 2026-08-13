@@ -5,7 +5,7 @@ import { Match } from "@/types/types";
 import Modal from "./ui/Modal";
 import MatchPlayersSection from "./match/MatchPlayersSection";
 import { PlayerOption } from "./SelectPlayersModal";
-import { Calendar, Clock, Loader2, Minus, Plus } from "lucide-react";
+import { IconCalendar, IconClock, IconLoader, IconMinus, IconPlus } from "@tabler/icons-react";
 
 interface MatchData {
   title: string;
@@ -204,7 +204,7 @@ export default function NewMatchModal({
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" />
+                  <IconLoader size={15} className="animate-spin" />
                   {editingMatch ? "Updating..." : "Creating..."}
                 </>
               ) : editingMatch ? (
@@ -275,7 +275,7 @@ export default function NewMatchModal({
                     className="px-3 py-2 text-app-text-muted hover:text-app-text-primary transition-colors"
                     aria-label="Decrease court number"
                   >
-                    <Minus size={14} />
+                    <IconMinus size={14} />
                   </button>
                   <input
                     type="number"
@@ -300,7 +300,7 @@ export default function NewMatchModal({
                     className="px-3 py-2 text-app-text-muted hover:text-app-text-primary transition-colors"
                     aria-label="Increase court number"
                   >
-                    <Plus size={14} />
+                    <IconPlus size={14} />
                   </button>
                 </div>
               </div>
@@ -313,7 +313,7 @@ export default function NewMatchModal({
                   Date
                 </label>
                 <div className="relative">
-                  <Calendar
+                  <IconCalendar
                     size={15}
                     className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
                   />
@@ -333,7 +333,7 @@ export default function NewMatchModal({
                   Start Time
                 </label>
                 <div className="relative">
-                  <Clock
+                  <IconClock
                     size={15}
                     className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
                   />
@@ -357,7 +357,7 @@ export default function NewMatchModal({
                   End Time
                 </label>
                 <div className="relative">
-                  <Clock
+                  <IconClock
                     size={15}
                     className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
                   />

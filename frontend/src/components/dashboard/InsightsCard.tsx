@@ -3,13 +3,13 @@
 import React from "react";
 import Image from "next/image";
 import {
-  CalendarClock,
-  Crown,
-  MapPin,
-  Sparkles,
-  Star,
-  UserPlus,
-} from "lucide-react";
+  IconCalendarClock,
+  IconCrown,
+  IconMapPin,
+  IconSparkles,
+  IconStar,
+  IconUserPlus,
+} from "@tabler/icons-react";
 import { MonthlyPoint } from "@/hooks/useMonthlyStats";
 
 export interface TopPlayerPresence {
@@ -83,7 +83,7 @@ export default function InsightsCard({
       {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Sparkles size={18} className="text-amber-400" />
+          <IconSparkles size={18} className="text-amber-400" />
           <h2 className="text-base font-bold text-app-text-primary">{selectedYear} Insights</h2>
         </div>
         <span className="rounded-full border border-app-border bg-app-input px-2.5 py-0.5 text-[11px] font-semibold text-app-text-secondary">
@@ -96,7 +96,7 @@ export default function InsightsCard({
         <div className="rounded-xl border border-app-border bg-app-input p-3.5 transition hover:border-app-border-hover">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400">
-              <MapPin size={17} />
+              <IconMapPin size={17} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
@@ -125,7 +125,7 @@ export default function InsightsCard({
         <div className="rounded-xl border border-app-border bg-app-input p-3.5 transition hover:border-app-border-hover">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
-              <Crown size={17} />
+              <IconCrown size={17} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
@@ -183,7 +183,7 @@ export default function InsightsCard({
         <div className="rounded-xl border border-app-border bg-app-input p-3.5 transition hover:border-app-border-hover">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-400">
-              <UserPlus size={17} />
+              <IconUserPlus size={17} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
@@ -216,7 +216,7 @@ export default function InsightsCard({
         {(strongestMonth || mostActiveDay) && (
           <div className="mt-auto rounded-xl border border-app-border bg-app-bg p-3">
             <div className="flex items-center gap-2 text-[11px] font-bold text-app-text-secondary">
-              <CalendarClock size={13} className="text-emerald-400 shrink-0" />
+              <IconCalendarClock size={13} className="text-emerald-400 shrink-0" />
               <span>Activity Rhythm</span>
             </div>
             <div className="mt-1.5 space-y-1 text-xs text-app-text-muted">
@@ -238,7 +238,7 @@ export default function InsightsCard({
 
         {!hasData && (
           <div className="rounded-xl border border-dashed border-app-border p-6 text-center">
-            <Star size={20} className="mx-auto text-app-text-muted" />
+            <IconStar size={20} className="mx-auto text-app-text-muted" />
             <h3 className="mt-3 text-sm font-medium text-app-text-primary">No insights yet</h3>
             <p className="mt-1 text-xs text-app-text-muted">
               Play some matches in {selectedYear} to unlock insights.

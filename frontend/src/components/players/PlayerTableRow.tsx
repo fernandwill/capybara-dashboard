@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Pencil, Trash2 } from "lucide-react";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
 import type { PlayerRecord } from "./EditPlayerModal";
 
 interface PlayerTableRowProps {
@@ -78,7 +78,7 @@ export default function PlayerTableRow({
             className="rounded-lg p-1.5 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
             title="Edit player"
           >
-            <Pencil size={14} />
+            <IconPencil size={14} />
           </button>
           <button
             type="button"
@@ -86,7 +86,7 @@ export default function PlayerTableRow({
             className="rounded-lg p-1.5 text-app-text-muted transition hover:bg-red-500/10 hover:text-red-400"
             title="Delete player"
           >
-            <Trash2 size={14} />
+            <IconTrash size={14} />
           </button>
         </div>
       </td>

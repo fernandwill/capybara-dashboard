@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { IconEye, IconPencil, IconTrash } from "@tabler/icons-react";
 import { Match } from "@/types/types";
 
 interface MatchRowMenuProps {
@@ -36,7 +36,7 @@ export default function MatchRowMenu({
             onDetails(match);
           }}
         >
-          <Eye size={14} className="text-app-text-muted" />
+          <IconEye size={14} className="text-app-text-muted" />
           <span>View Details</span>
         </button>
         <button
@@ -47,7 +47,7 @@ export default function MatchRowMenu({
             onEdit(match);
           }}
         >
-          <Pencil size={14} className="text-app-text-muted" />
+          <IconPencil size={14} className="text-app-text-muted" />
           <span>Edit Match</span>
         </button>
         <div className="my-1 border-t border-app-border/60" />
@@ -59,7 +59,7 @@ export default function MatchRowMenu({
             onDelete(match);
           }}
         >
-          <Trash2 size={14} className="text-rose-400" />
+          <IconTrash size={14} className="text-rose-400" />
           <span>Delete</span>
         </button>
       </div>

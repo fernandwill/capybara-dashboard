@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { IconChevronDown, IconCheck } from "@tabler/icons-react";
 
 export interface DropdownOption<T extends string | number = string> {
   value: T;
@@ -139,7 +139,7 @@ export default function CustomDropdown<T extends string | number = string>({
           )}
         </div>
 
-        <ChevronDown
+        <IconChevronDown
           size={size === "sm" ? 13 : 15}
           className={`shrink-0 text-app-text-muted transition-transform duration-200 ${
             isOpen ? "rotate-180 text-blue-400" : ""
@@ -200,7 +200,7 @@ export default function CustomDropdown<T extends string | number = string>({
                 </div>
 
                 {isSelected && (
-                  <Check
+                  <IconCheck
                     size={size === "sm" ? 13 : 15}
                     className="shrink-0 text-blue-400 ml-2"
                   />

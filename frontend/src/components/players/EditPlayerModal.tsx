@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Modal from "../ui/Modal";
-import { Loader2 } from "lucide-react";
+import { IconLoader } from "@tabler/icons-react";
 import { authFetch } from "@/lib/authFetch";
 
 export interface PlayerRecord {
@@ -128,7 +128,7 @@ export default function EditPlayerModal({
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
+                <IconLoader size={14} className="animate-spin" />
                 <span>Saving Changes...</span>
               </>
             ) : (

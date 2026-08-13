@@ -1,6 +1,6 @@
 "use client";
 
-import { RotateCcw, Sparkles } from "lucide-react";
+import { IconRotate, IconSparkles } from "@tabler/icons-react";
 
 interface CourtManagementHeaderProps {
   onAutoAssign: () => void;
@@ -26,7 +26,7 @@ export default function CourtManagementHeader({
           onClick={onAutoAssign}
           className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-400 transition hover:bg-emerald-500/20"
         >
-          <Sparkles size={13} />
+          <IconSparkles size={13} />
           <span>Auto Assign</span>
         </button>
         <button
@@ -34,7 +34,7 @@ export default function CourtManagementHeader({
           onClick={onResetAll}
           className="flex items-center gap-1.5 rounded-xl border border-app-border bg-app-input px-3 py-1.5 text-xs font-medium text-app-text-secondary transition hover:bg-app-hover hover:text-app-text-primary"
         >
-          <RotateCcw size={13} />
+          <IconRotate size={13} />
           <span>Reset</span>
         </button>
       </div>

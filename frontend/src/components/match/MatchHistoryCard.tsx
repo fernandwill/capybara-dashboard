@@ -1,6 +1,6 @@
 "use client";
 
-import { History } from "lucide-react";
+import { IconHistory } from "@tabler/icons-react";
 import type { FinishedGameHistory } from "@/components/match/types";
 
 interface MatchHistoryCardProps {
@@ -22,7 +22,7 @@ export default function MatchHistoryCard({ history }: MatchHistoryCardProps) {
     <div className="rounded-2xl border border-app-border bg-app-bg p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-sm font-bold text-app-text-primary">
-          <History size={15} className="text-app-text-muted" />
+          <IconHistory size={15} className="text-app-text-muted" />
           <span>Match History</span>
         </h3>
         <span className="rounded-md border border-app-border bg-app-input px-2 py-0.5 text-[10px] font-medium text-app-text-muted">

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { CheckCircle2, Plus, X } from "lucide-react";
+import { IconCircleCheck, IconPlus, IconX } from "@tabler/icons-react";
 import type { CourtState } from "@/hooks/useCourtManager";
 import type { PlayerInMatch } from "@/components/match/types";
 
@@ -97,7 +97,7 @@ export default function CourtCard({
                     className="rounded p-1 text-app-text-muted transition hover:bg-rose-500/10 hover:text-rose-400"
                     title="Remove player"
                   >
-                    <X size={13} />
+                    <IconX size={13} />
                   </button>
                 </div>
               );
@@ -110,7 +110,7 @@ export default function CourtCard({
                 onClick={() => onOpenSlotPicker(courtIndex, team, sIdx)}
                 className={`flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-app-border bg-app-input/60 py-2 text-xs font-medium text-app-text-muted transition ${emptyHoverClass}`}
               >
-                <Plus size={13} />
+                <IconPlus size={13} />
                 <span>Add player</span>
               </button>
             );
@@ -174,7 +174,7 @@ export default function CourtCard({
               : "border border-transparent bg-app-input text-app-text-muted cursor-not-allowed"
           }`}
         >
-          <CheckCircle2 size={13} />
+          <IconCircleCheck size={13} />
           <span>Finish {court.name}</span>
         </button>
       </div>

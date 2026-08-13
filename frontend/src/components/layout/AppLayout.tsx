@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { IconDeviceDesktop, IconMoon, IconSun } from "@tabler/icons-react";
 import { useTheme } from "next-themes";
 import FloatingNav from "./FloatingNav";
 import CustomDropdown from "@/components/ui/CustomDropdown";
@@ -68,11 +68,11 @@ export default function AppLayout({
             aria-label={`Theme: ${themeLabel}`}
           >
             {current === "system" ? (
-              <Monitor size={14} />
+              <IconDeviceDesktop size={14} />
             ) : current === "light" ? (
-              <Sun size={14} />
+              <IconSun size={14} />
             ) : (
-              <Moon size={14} />
+              <IconMoon size={14} />
             )}
           </button>
         </div>

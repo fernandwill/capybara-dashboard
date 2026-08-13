@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import Modal from "./ui/Modal";
-import { CheckCircle2, AlertCircle } from "lucide-react";
+import { IconCircleCheck, IconAlertCircle } from "@tabler/icons-react";
 
 export type StatusVariant = "success" | "error";
 
@@ -52,7 +52,7 @@ export default function StatusModal({
               : "border-red-500/20 bg-red-500/10 text-red-400"
           }`}
         >
-          {isSuccess ? <CheckCircle2 size={30} /> : <AlertCircle size={30} />}
+          {isSuccess ? <IconCircleCheck size={30} /> : <IconAlertCircle size={30} />}
         </div>
         <h2 className="mb-1.5 text-lg font-bold text-app-text-primary">{title}</h2>
         <div className="text-sm text-app-text-muted">{message}</div>

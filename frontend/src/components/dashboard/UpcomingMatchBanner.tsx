@@ -2,12 +2,12 @@
 
 import React from "react";
 import {
-  CalendarDays,
-  Clock,
-  MapPin,
-  ChevronRight,
-  Plus,
-} from "lucide-react";
+  IconCalendarEvent,
+  IconClock,
+  IconMapPin,
+  IconChevronRight,
+  IconPlus,
+} from "@tabler/icons-react";
 import { Match } from "@/types/types";
 import { formatDate } from "@/utils/formatters";
 
@@ -47,7 +47,7 @@ export default function UpcomingMatchBanner({
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3.5">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-input text-app-text-muted">
-              <CalendarDays size={20} />
+              <IconCalendarEvent size={20} />
             </div>
             <div>
               <h3 className="text-sm font-bold text-app-text-primary">No upcoming matches scheduled</h3>
@@ -61,7 +61,7 @@ export default function UpcomingMatchBanner({
             onClick={onNewMatch}
             className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-500 shrink-0"
           >
-            <Plus size={15} />
+            <IconPlus size={15} />
             <span>Schedule a Match</span>
           </button>
         </div>
@@ -108,18 +108,18 @@ export default function UpcomingMatchBanner({
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
             <div className="flex items-center gap-1.5 text-gray-300">
-              <CalendarDays size={14} className="text-blue-400 shrink-0" />
+              <IconCalendarEvent size={14} className="text-blue-400 shrink-0" />
               <span>{formatDate(match.date)}</span>
             </div>
 
             <div className="flex items-center gap-1.5 text-gray-300">
-              <Clock size={14} className="text-emerald-400 shrink-0" />
+              <IconClock size={14} className="text-emerald-400 shrink-0" />
               <span>{match.time}</span>
             </div>
 
             {match.location && (
               <div className="flex items-center gap-1.5 text-gray-300">
-                <MapPin size={14} className="text-amber-400 shrink-0" />
+                <IconMapPin size={14} className="text-amber-400 shrink-0" />
                 <span className="truncate max-w-[200px] sm:max-w-xs">{match.location}</span>
               </div>
             )}
@@ -143,7 +143,7 @@ export default function UpcomingMatchBanner({
 
           <div className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition group-hover:bg-blue-500 group-hover:shadow-md">
             <span>View Match Details</span>
-            <ChevronRight size={14} className="transition group-hover:translate-x-0.5" />
+            <IconChevronRight size={14} className="transition group-hover:translate-x-0.5" />
           </div>
         </div>
       </div>

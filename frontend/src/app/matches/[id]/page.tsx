@@ -5,15 +5,15 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import {
-  ArrowLeft,
-  Calendar,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Loader2,
-  MapPin,
-  RotateCcw,
-} from "lucide-react";
+  IconArrowLeft,
+  IconCalendar,
+  IconCircleCheck,
+  IconChevronRight,
+  IconClock,
+  IconLoader,
+  IconMapPin,
+  IconRotate,
+} from "@tabler/icons-react";
 import AppLayout from "@/components/layout/AppLayout";
 import SelectPlayersModal from "@/components/SelectPlayersModal";
 import ErrorModal from "@/components/ErrorModal";
@@ -268,7 +268,7 @@ export default function MatchDetailsPage() {
     return (
       <AppLayout>
         <div className="flex h-96 items-center justify-center">
-          <Loader2 size={32} className="animate-spin text-emerald-400" />
+          <IconLoader size={32} className="animate-spin text-emerald-400" />
         </div>
       </AppLayout>
     );
@@ -313,10 +313,10 @@ export default function MatchDetailsPage() {
             href="/matches"
             className="flex items-center gap-1 transition hover:text-app-text-primary"
           >
-            <ArrowLeft size={13} />
+            <IconArrowLeft size={13} />
             <span>Matches</span>
           </Link>
-          <ChevronRight size={13} className="text-app-text-muted" />
+          <IconChevronRight size={13} className="text-app-text-muted" />
           <span className="truncate font-medium text-app-text-secondary">
             {match.title}
           </span>
@@ -339,17 +339,17 @@ export default function MatchDetailsPage() {
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-app-text-muted">
                 <span className="flex items-center gap-1.5">
-                  <Calendar size={14} className="text-emerald-400" />
+                  <IconCalendar size={14} className="text-emerald-400" />
                   {formatDate(match.date)}
                 </span>
                 <span className="text-app-text-muted">•</span>
                 <span className="flex items-center gap-1.5">
-                  <Clock size={14} className="text-blue-400" />
+                  <IconClock size={14} className="text-blue-400" />
                   {formatTimeWithDuration(match.time)}
                 </span>
                 <span className="text-app-text-muted">•</span>
                 <span className="flex items-center gap-1.5">
-                  <MapPin size={14} className="text-amber-400" />
+                  <IconMapPin size={14} className="text-amber-400" />
                   {match.location || "Badminton Hall"}
                 </span>
               </div>
@@ -377,11 +377,11 @@ export default function MatchDetailsPage() {
                 }`}
               >
                 {isUpdatingStatus ? (
-                  <Loader2 size={14} className="animate-spin" />
+                  <IconLoader size={14} className="animate-spin" />
                 ) : isMatchCompleted ? (
-                  <RotateCcw size={14} />
+                  <IconRotate size={14} />
                 ) : (
-                  <CheckCircle2 size={14} />
+                  <IconCircleCheck size={14} />
                 )}
                 <span>{isMatchCompleted ? "Reopen Match" : "Finish Match"}</span>
               </button>

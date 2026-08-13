@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Modal from "../ui/Modal";
-import { Loader2, Plus } from "lucide-react";
+import { IconLoader, IconPlus } from "@tabler/icons-react";
 import { authFetch } from "@/lib/authFetch";
 
 interface AddPlayerModalProps {
@@ -115,12 +115,12 @@ export default function AddPlayerModal({
           >
             {isSubmitting ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
+                <IconLoader size={14} className="animate-spin" />
                 <span>Adding Player...</span>
               </>
             ) : (
               <>
-                <Plus size={14} />
+                <IconPlus size={14} />
                 <span>Add Player</span>
               </>
             )}

@@ -6,13 +6,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  CalendarDays,
-  Users,
-  LogOut,
-  ChevronDown,
-  Sparkles,
-} from "lucide-react";
+  IconLayoutDashboard,
+  IconCalendarEvent,
+  IconUsers,
+  IconLogout,
+  IconChevronDown,
+  IconSparkles,
+} from "@tabler/icons-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { signOut } from "@/lib/authService";
 
@@ -114,21 +114,21 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
     {
       href: "/",
       label: "Dashboard",
-      icon: LayoutDashboard,
+      icon: IconLayoutDashboard,
       description: "Overview & Analytics",
       isActive: isDashboardActive,
     },
     {
       href: "/matches",
       label: "Matches",
-      icon: CalendarDays,
+      icon: IconCalendarEvent,
       description: "All Match Records",
       isActive: isMatchesActive,
     },
     {
       href: "/players",
       label: "Historical Players List",
-      icon: Users,
+      icon: IconUsers,
       description: "Player Directory & Stats",
       isActive: isPlayersActive,
     },
@@ -163,7 +163,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
           CapyHub
           <span className="text-xs text-emerald-400">✦</span>
         </span>
-        <ChevronDown
+        <IconChevronDown
           size={14}
           className={`text-app-text-muted transition-transform duration-200 ${
             isOpen ? "rotate-180 text-emerald-400" : "group-hover:text-app-text-primary"
@@ -195,7 +195,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
               <div className="mb-2.5 flex items-center justify-between px-2 pt-1">
                 <div className="flex items-center gap-2">
                   <div className="flex h-6 w-6 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-                    <Sparkles size={13} />
+                    <IconSparkles size={13} />
                   </div>
                   <span className="text-xs font-semibold uppercase tracking-wider text-app-text-muted">
                     Navigation
@@ -275,7 +275,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
                   title="Sign out"
                   aria-label="Sign out"
                 >
-                  <LogOut size={14} />
+                  <IconLogout size={14} />
                 </button>
               </div>
             </div>

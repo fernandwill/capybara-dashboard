@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Filter, Loader2, Plus, Search, User, X } from "lucide-react";
+import { IconChevronLeft, IconChevronRight, IconFilter, IconLoader, IconPlus, IconSearch, IconUser, IconX } from "@tabler/icons-react";
 import AppLayout from "@/components/layout/AppLayout";
 import AddPlayerModal from "@/components/players/AddPlayerModal";
 import EditPlayerModal, { PlayerRecord } from "@/components/players/EditPlayerModal";
@@ -106,7 +106,7 @@ export default function PlayersPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Search Box */}
             <div className="relative min-w-[220px]">
-              <Search
+              <IconSearch
                 size={14}
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
               />
@@ -126,7 +126,7 @@ export default function PlayersPage() {
                   onClick={() => setSearchQuery("")}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text-primary"
                 >
-                  <X size={13} />
+                  <IconX size={13} />
                 </button>
               )}
             </div>
@@ -142,7 +142,7 @@ export default function PlayersPage() {
                     : "border-app-border bg-app-input text-app-text-secondary hover:border-app-border-hover hover:text-app-text-primary"
                 }`}
               >
-                <Filter size={13} className="text-emerald-400" />
+                <IconFilter size={13} className="text-emerald-400" />
                 <span>Sort</span>
               </button>
 
@@ -209,7 +209,7 @@ export default function PlayersPage() {
               onClick={() => setIsAddModalOpen(true)}
               className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-blue-500"
             >
-              <Plus size={14} />
+              <IconPlus size={14} />
               <span>Add Player</span>
             </button>
           </div>
@@ -236,7 +236,7 @@ export default function PlayersPage() {
                   <tr>
                     <td colSpan={5} className="py-16 text-center text-app-text-muted">
                       <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                        <IconLoader className="h-6 w-6 animate-spin text-blue-500" />
                         <span>Loading historical players...</span>
                       </div>
                     </td>
@@ -245,7 +245,7 @@ export default function PlayersPage() {
                   <tr>
                     <td colSpan={5} className="py-16 text-center text-app-text-muted">
                       <div className="flex flex-col items-center justify-center gap-2">
-                        <User className="h-8 w-8 text-app-text-muted" />
+                        <IconUser className="h-8 w-8 text-app-text-muted" />
                         <p className="font-medium text-app-text-secondary">No players found</p>
                         <p className="text-xs text-app-text-muted">
                           {searchQuery
@@ -290,7 +290,7 @@ export default function PlayersPage() {
                   className="flex h-7 w-7 items-center justify-center rounded-lg border border-app-border bg-app-input text-app-text-muted transition hover:text-app-text-primary disabled:cursor-not-allowed disabled:opacity-30"
                   aria-label="Previous page"
                 >
-                  <ChevronLeft size={14} />
+                  <IconChevronLeft size={14} />
                 </button>
 
                 {visiblePageNumbers.map((pageNum) => {
@@ -319,7 +319,7 @@ export default function PlayersPage() {
                   className="flex h-7 w-7 items-center justify-center rounded-lg border border-app-border bg-app-input text-app-text-muted transition hover:text-app-text-primary disabled:cursor-not-allowed disabled:opacity-30"
                   aria-label="Next page"
                 >
-                  <ChevronRight size={14} />
+                  <IconChevronRight size={14} />
                 </button>
               </div>
             )}

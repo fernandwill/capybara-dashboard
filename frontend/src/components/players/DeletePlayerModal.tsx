@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Modal from "../ui/Modal";
-import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
+import { IconAlertTriangle, IconLoader, IconTrash } from "@tabler/icons-react";
 import { authFetch } from "@/lib/authFetch";
 import { PlayerRecord } from "./EditPlayerModal";
 
@@ -76,12 +76,12 @@ export default function DeletePlayerModal({
           >
             {isDeleting ? (
               <>
-                <Loader2 size={13} className="animate-spin" />
+                <IconLoader size={13} className="animate-spin" />
                 <span>Deleting...</span>
               </>
             ) : (
               <>
-                <Trash2 size={13} />
+                <IconTrash size={13} />
                 <span>Delete Player</span>
               </>
             )}
@@ -91,7 +91,7 @@ export default function DeletePlayerModal({
     >
       <div className="space-y-3">
         <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+          <IconAlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
           <div className="text-xs text-red-600">
             <p className="font-semibold text-app-text-primary">Warning: Permanent Action</p>
             <p className="mt-1 text-app-text-secondary">

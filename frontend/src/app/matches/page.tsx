@@ -5,14 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  History,
-  Plus,
-  Search,
-} from "lucide-react";
+  IconArrowLeft,
+  IconCalendarEvent,
+  IconChevronLeft,
+  IconChevronRight,
+  IconHistory,
+  IconPlus,
+  IconSearch,
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMatches } from "@/hooks/useMatches";
@@ -265,7 +265,7 @@ export default function AllMatchesHistoryPage() {
                 href="/"
                 className="flex items-center gap-2 rounded-lg border border-app-border bg-app-card px-3 py-1.5 text-sm font-medium text-app-text-primary transition hover:bg-app-hover hover:text-app-text-primary"
               >
-                <ArrowLeft size={16} />
+                <IconArrowLeft size={16} />
                 <span>Dashboard</span>
               </Link>
               <div className="h-5 w-px bg-app-border" />                <div className="flex items-center gap-2">
@@ -284,7 +284,7 @@ export default function AllMatchesHistoryPage() {
 
             {/* Quick Action */}
             <Button variant="primary" onClick={handleNewMatch}>
-              <Plus size={16} />
+              <IconPlus size={16} />
               <span>New Match</span>
             </Button>
           </div>
@@ -298,7 +298,7 @@ export default function AllMatchesHistoryPage() {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <div className="mb-1 flex items-center gap-2 text-sm font-medium text-app-primary">
-                <History size={16} />
+                <IconHistory size={16} />
                 <span>Match Archive</span>
               </div>
               <h1 className="text-3xl font-bold tracking-tight text-app-text-primary">
@@ -346,7 +346,7 @@ export default function AllMatchesHistoryPage() {
           <div className="flex flex-col gap-3 rounded-xl border border-app-border bg-app-card p-4 sm:flex-row sm:items-center sm:justify-between">
             {/* Search Input */}
             <div className="relative flex-1">
-              <Search
+              <IconSearch
                 size={16}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
               />
@@ -384,7 +384,7 @@ export default function AllMatchesHistoryPage() {
             </div>
           ) : currentMatches.length === 0 ? (
             <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-app-border/60 bg-app-card p-8 text-center">
-              <CalendarDays size={48} className="mb-3 text-app-text-muted" strokeWidth={1.5} />
+              <IconCalendarEvent size={48} className="mb-3 text-app-text-muted" strokeWidth={1.5} />
               <h3 className="text-lg font-semibold text-app-text-primary">No matches found</h3>
               <p className="mt-1 max-w-sm text-sm text-app-text-muted">
                 {searchQuery || statusFilter !== "ALL"
@@ -445,7 +445,7 @@ export default function AllMatchesHistoryPage() {
                   disabled={currentPage === 1}
                   onClick={() => goToPage(currentPage - 1)}
                 >
-                  <ChevronLeft size={14} />
+                  <IconChevronLeft size={14} />
                   <span>Previous</span>
                 </Button>
 
@@ -472,7 +472,7 @@ export default function AllMatchesHistoryPage() {
                   onClick={() => goToPage(currentPage + 1)}
                 >
                   <span>Next</span>
-                  <ChevronRight size={14} />
+                  <IconChevronRight size={14} />
                 </Button>
               </div>
             </div>

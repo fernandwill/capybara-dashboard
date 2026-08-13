@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Calendar, CalendarDays, Star, Users } from "lucide-react";
+import { IconCalendar, IconCalendarEvent, IconStar, IconUsers } from "@tabler/icons-react";
 import type { PlayerRecord } from "./EditPlayerModal";
 
 interface PlayerStatsCardsProps {
@@ -52,14 +52,14 @@ export default function PlayerStatsCards({ players, isLoading }: PlayerStatsCard
     {
       label: "Total Players",
       sub: "All time players",
-      icon: <Users size={18} />,
+      icon: <IconUsers size={18} />,
       iconClass: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
       value: isLoading ? "-" : String(players.length),
     },
     {
       label: `Matches in ${currentYear}`,
       sub: "Total player appearances",
-      icon: <CalendarDays size={18} />,
+      icon: <IconCalendarEvent size={18} />,
       iconClass: "border-blue-500/20 bg-blue-500/10 text-blue-400",
       value: isLoading ? "-" : String(matchesThisYearCount),
     },
@@ -68,7 +68,7 @@ export default function PlayerStatsCards({ players, isLoading }: PlayerStatsCard
       sub: mostPlayedPlayer
         ? `${mostPlayedPlayer.totalMatches ?? 0} matches`
         : "0 matches",
-      icon: <Star size={18} />,
+      icon: <IconStar size={18} />,
       iconClass: "border-purple-500/20 bg-purple-500/10 text-purple-400",
       value: isLoading
         ? "-"
@@ -81,7 +81,7 @@ export default function PlayerStatsCards({ players, isLoading }: PlayerStatsCard
       sub: lastAddedPlayer
         ? formatRelativeTime(lastAddedPlayer.createdAt)
         : "No players yet",
-      icon: <Calendar size={18} />,
+      icon: <IconCalendar size={18} />,
       iconClass: "border-amber-500/20 bg-amber-500/10 text-amber-400",
       value: isLoading
         ? "-"

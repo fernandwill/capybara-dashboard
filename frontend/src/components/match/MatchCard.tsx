@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  Banknote,
-  Clock,
-  Hash,
-  MapPin,
-  MoreVertical,
-  Users,
-} from "lucide-react";
+  IconCashBanknote,
+  IconClock,
+  IconDotsVertical,
+  IconHash,
+  IconMapPin,
+  IconUsers,
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import type { Match } from "@/types/types";
 import {
@@ -64,7 +64,7 @@ export default function MatchCard({ match, onClick, onOpenMenu }: MatchCardProps
             onClick={(e) => onOpenMenu(e, match)}
             aria-label={`Actions for ${match.title}`}
           >
-            <MoreVertical size={16} />
+            <IconDotsVertical size={16} />
           </Button>
         </div>
 
@@ -73,26 +73,26 @@ export default function MatchCard({ match, onClick, onOpenMenu }: MatchCardProps
           {match.title}
         </h3>
         <p className="mt-1 flex items-center gap-1.5 line-clamp-1 text-sm text-app-text-secondary">
-          <MapPin size={14} className="shrink-0 text-app-text-muted" />
+          <IconMapPin size={14} className="shrink-0 text-app-text-muted" />
           <span className="truncate">{match.location}</span>
         </p>
 
         {/* Meta Information Grid */}
         <div className="mt-4 grid grid-cols-2 gap-2.5 rounded-lg border border-app-border/50 bg-app-bg/50 p-3 text-xs text-app-text-secondary">
           <div className="flex items-center gap-1.5">
-            <Clock size={13} className="text-app-text-muted shrink-0" />
+            <IconClock size={13} className="text-app-text-muted shrink-0" />
             <span className="truncate">{match.time}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Hash size={13} className="text-app-text-muted shrink-0" />
+            <IconHash size={13} className="text-app-text-muted shrink-0" />
             <span className="truncate">Court {match.courtNumber}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Users size={13} className="text-app-text-muted shrink-0" />
+            <IconUsers size={13} className="text-app-text-muted shrink-0" />
             <span>{match.players?.length || 0} Players</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Banknote size={13} className="text-app-text-muted shrink-0" />
+            <IconCashBanknote size={13} className="text-app-text-muted shrink-0" />
             <span className="font-semibold text-app-success-text truncate">
               {formatCurrency(match.fee)}
             </span>

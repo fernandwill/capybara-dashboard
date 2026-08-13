@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock3, TrendingUp, Zap } from "lucide-react";
+import { IconBolt, IconClock, IconTrendingUp } from "@tabler/icons-react";
 import { useAuth } from "@/contexts/AuthContext";
 import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
@@ -279,7 +279,7 @@ export function Dashboard() {
       label: "Total Matches",
       value: String(stats.totalMatches),
       trend: `${yearMatches} in ${selectedYear}`,
-      icon: Zap,
+      icon: IconBolt,
       accent: "green" as const,
     },
     {
@@ -287,7 +287,7 @@ export function Dashboard() {
       value: stats.hoursPlayed,
       suffix: "h",
       trend: `${yearHours.toFixed(1)}h in ${selectedYear}`,
-      icon: Clock3,
+      icon: IconClock,
       accent: "blue" as const,
     },
     {
@@ -295,7 +295,7 @@ export function Dashboard() {
       value: avgHoursPerMonth.toFixed(1),
       suffix: "h",
       trend: `${activeMonths} active months`,
-      icon: TrendingUp,
+      icon: IconTrendingUp,
       accent: "orange" as const,
     },
   ];

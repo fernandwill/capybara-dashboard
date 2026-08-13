@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { X } from "lucide-react";
+import { IconX } from "@tabler/icons-react";
 import type { PlayerInMatch } from "@/components/match/types";
 
 export interface SlotPickerState {
@@ -48,7 +48,7 @@ export default function SlotPickerModal({
             onClick={onClose}
             className="rounded-lg p-1 text-app-text-muted hover:text-app-text-primary"
           >
-            <X size={16} />
+            <IconX size={16} />
           </button>
         </div>
 

@@ -3,7 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { IconLoader } from '@tabler/icons-react';
 
 export default function DashboardLayout({
   children,
@@ -23,7 +23,7 @@ export default function DashboardLayout({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader2 className="animate-spin" size={48} />
+        <IconLoader className="animate-spin" size={48} />
       </div>
     );
   }

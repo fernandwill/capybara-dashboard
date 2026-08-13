@@ -1,4 +1,4 @@
-import { ChevronUp, type LucideIcon } from "lucide-react";
+import { IconChevronUp, type TablerIcon } from "@tabler/icons-react";
 
 const accentStyles = {
   green: { icon: "bg-green-500/10 text-app-icon-green" },
@@ -14,7 +14,7 @@ interface StatCardProps {
   value: string;
   suffix?: string;
   trend: string;
-  icon: LucideIcon;
+  icon: TablerIcon;
   accent?: Accent;
   isLoading?: boolean;
   showTrendIcon?: boolean;
@@ -53,7 +53,7 @@ export default function StatCard({
       </div>
 
       <div className="mt-auto flex items-center gap-1 pt-3 text-sm">
-        {showTrendIcon && <ChevronUp size={14} className="shrink-0 text-app-success" />}
+        {showTrendIcon && <IconChevronUp size={14} className="shrink-0 text-app-success" />}
         <span className="truncate text-app-text-muted">{trend}</span>
       </div>
     </article>

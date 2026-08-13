@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { IconTrash } from "@tabler/icons-react";
 import ConfirmModal from "./ConfirmModal";
 
 interface DeleteMatchModalProps {
@@ -33,7 +33,7 @@ export default function DeleteMatchModal({
       onConfirm={onConfirm}
       title="Delete Match"
       message={message}
-      icon={<Trash2 size={28} />}
+      icon={<IconTrash size={28} />}
       isLoading={isLoading}
       confirmLabel={isLoading ? "Deleting..." : "Delete Match"}
       cancelLabel="Cancel"

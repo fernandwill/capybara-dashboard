@@ -3,14 +3,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import {
-  CalendarDays,
-  Check,
-  ChevronRight,
-  ChevronLeft,
-  Clock,
-  MoreVertical,
-  Plus,
-} from "lucide-react";
+  IconCalendarEvent,
+  IconCheck,
+  IconChevronRight,
+  IconChevronLeft,
+  IconClock,
+  IconDotsVertical,
+  IconPlus,
+} from "@tabler/icons-react";
 import { Match } from "@/types/types";
 
 interface UpcomingMatchesCardProps {
@@ -131,7 +131,7 @@ export default function UpcomingMatchesCard({
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <CalendarDays size={18} className="text-app-text-muted" />
+          <IconCalendarEvent size={18} className="text-app-text-muted" />
           <h2 className="text-base font-bold text-app-text-primary">Upcoming Matches</h2>
         </div>
 
@@ -141,7 +141,7 @@ export default function UpcomingMatchesCard({
             onClick={onNewMatch}
             className="flex items-center gap-1 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-500"
           >
-            <Plus size={14} />
+            <IconPlus size={14} />
             <span>New Match</span>
           </button>
         </div>
@@ -155,10 +155,10 @@ export default function UpcomingMatchesCard({
       ) : matches.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-app-border bg-app-input py-10 text-center">
           <div className="relative mb-3">
-            <CalendarDays size={40} strokeWidth={1.5} className="text-app-text-muted" />
+            <IconCalendarEvent size={40} strokeWidth={1.5} className="text-app-text-muted" />
             <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-app-input">
               <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
-                <Check size={10} />
+                <IconCheck size={10} />
               </div>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function UpcomingMatchesCard({
             onClick={onNewMatch}
             className="mt-4 flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
           >
-            <Plus size={14} />
+            <IconPlus size={14} />
             <span>Schedule a Match</span>
           </button>
         </div>
@@ -185,7 +185,7 @@ export default function UpcomingMatchesCard({
               className="absolute -left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-app-border bg-app-bg/95 text-app-text-primary shadow-xl backdrop-blur transition hover:bg-app-hover"
               aria-label="Scroll left"
             >
-              <ChevronLeft size={16} />
+              <IconChevronLeft size={16} />
             </button>
           )}
 
@@ -229,7 +229,7 @@ export default function UpcomingMatchesCard({
                         {match.title}
                       </h4>
                       <p className="mt-1 flex items-center gap-1 text-[11px] text-app-text-muted">
-                        <Clock size={11} className="shrink-0 text-app-text-muted" />
+                        <IconClock size={11} className="shrink-0 text-app-text-muted" />
                         <span className="truncate">{formatTimeDuration(match.time)}</span>
                       </p>
                       <p className="mt-0.5 truncate text-[11px] text-app-text-muted">
@@ -251,7 +251,7 @@ export default function UpcomingMatchesCard({
                         className="rounded p-1 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
                         aria-label={`Actions for ${match.title}`}
                       >
-                        <MoreVertical size={14} />
+                        <IconDotsVertical size={14} />
                       </button>
                     </div>
                   </div>
@@ -295,13 +295,13 @@ export default function UpcomingMatchesCard({
                   {/* Card Footer: Countdown + View Details Button */}
                   <div className="flex items-center justify-between border-t border-app-border pt-2.5">
                     <div className="flex items-center gap-1 text-[11px] font-medium text-emerald-400">
-                      <Clock size={12} className="shrink-0 text-emerald-400" />
+                      <IconClock size={12} className="shrink-0 text-emerald-400" />
                       <span className="truncate">{countdownStr}</span>
                     </div>
 
                     <div className="flex items-center gap-1 rounded-xl border border-app-border bg-app-bg px-2.5 py-1 text-[11px] font-medium text-app-text-secondary transition group-hover/card:border-app-border-hover group-hover/card:bg-app-hover group-hover/card:text-app-text-primary">
                       <span>View Details</span>
-                      <ChevronRight size={12} />
+                      <IconChevronRight size={12} />
                     </div>
                   </div>
                 </div>
@@ -317,7 +317,7 @@ export default function UpcomingMatchesCard({
               className="absolute -right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-app-border bg-app-bg/95 text-app-text-primary shadow-xl backdrop-blur transition hover:bg-app-hover"
               aria-label="Scroll right"
             >
-              <ChevronRight size={16} />
+              <IconChevronRight size={16} />
             </button>
           )}
         </div>

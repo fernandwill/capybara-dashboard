@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Clock, History, MapPin, MoreVertical } from "lucide-react";
+import { IconArrowRight, IconClock, IconDotsVertical, IconHistory, IconMapPin } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Match } from "@/types/types";
 import { formatDurationHours, formatShortDate } from "@/utils/formatters";
@@ -30,7 +30,7 @@ export default function RecentMatchesCard({
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-app-border/50 bg-app-input text-emerald-400">
-            <History size={16} />
+            <IconHistory size={16} />
           </div>
           <div>
             <h2 className="text-base font-semibold text-app-text-primary">Recent Matches</h2>
@@ -44,7 +44,7 @@ export default function RecentMatchesCard({
             className="flex items-center gap-1.5 rounded-lg border border-app-border bg-app-input px-3 py-1.5 text-xs font-semibold text-app-text-secondary transition-all hover:border-app-border-hover hover:bg-app-hover hover:text-app-text-primary"
           >
             <span>View All Matches</span>
-            <ArrowRight size={13} className="text-app-text-muted" />
+            <IconArrowRight size={13} className="text-app-text-muted" />
           </Link>
         )}
       </div>
@@ -57,7 +57,7 @@ export default function RecentMatchesCard({
       ) : matches.length === 0 ? (
         <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-app-border/50 bg-app-bg/50 px-6 py-8 text-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-app-border bg-app-card text-app-text-muted">
-            <History size={18} />
+            <IconHistory size={18} />
           </div>
           <h3 className="mt-3 text-sm font-semibold text-app-text-primary">No completed matches yet</h3>
           <p className="mt-1 text-xs text-app-text-muted">
@@ -100,7 +100,7 @@ export default function RecentMatchesCard({
                         <>
                           <span className="text-app-text-muted">•</span>
                           <span className="flex items-center gap-1 truncate text-app-text-muted">
-                            <MapPin size={11} className="shrink-0 text-app-text-muted" />
+                            <IconMapPin size={11} className="shrink-0 text-app-text-muted" />
                             {match.location}
                           </span>
                         </>
@@ -112,7 +112,7 @@ export default function RecentMatchesCard({
                 {/* Right: Time, Status, Actions */}
                 <div className="mt-3 flex items-center justify-between gap-4 sm:mt-0 sm:justify-end">
                   <div className="flex items-center gap-1.5 text-xs text-app-text-muted">
-                    <Clock size={13} className="text-app-text-muted" />
+                    <IconClock size={13} className="text-app-text-muted" />
                     <span>{formatDurationHours(match.time)}</span>
                   </div>
 
@@ -128,7 +128,7 @@ export default function RecentMatchesCard({
                       onClick={(event) => onOpenMenu(event, match)}
                       aria-label={`Actions for ${match.title}`}
                     >
-                      <MoreVertical size={14} />
+                      <IconDotsVertical size={14} />
                     </Button>
                   </div>
                 </div>
