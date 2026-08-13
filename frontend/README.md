@@ -292,7 +292,7 @@ Both apps load it automatically — the frontend via `next.config.ts`, the backe
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/players` | GET | List all players (supports `?latest=true`) |
+| `/api/players` | GET | List all players |
 | `/api/players` | POST | Create player |
 | `/api/players/[id]` | GET | Get player by ID |
 | `/api/players/[id]` | PUT | Update player |

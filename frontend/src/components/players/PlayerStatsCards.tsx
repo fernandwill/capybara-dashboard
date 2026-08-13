@@ -10,7 +10,7 @@ interface PlayerStatsCardsProps {
 }
 
 /** Formats an ISO date into "Joined on Jan 5, 2025" or "Joined recently". */
-export function formatJoinedDate(isoString?: string): string {
+function formatJoinedDate(isoString?: string): string {
   if (!isoString) return "Joined recently";
   try {
     const d = new Date(isoString);

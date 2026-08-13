@@ -179,23 +179,6 @@ const schemas = {
         description: { validators: [validators.string] },
         playerIds: { validators: [validators.array] },
     } as Schema,
-
-    updateMatch: {
-        title: { validators: [validators.string, validators.minLength(3)] },
-        location: { validators: [validators.string] },
-        courtNumber: { validators: [validators.string] },
-        date: { validators: [validators.date] },
-        time: { validators: [validators.timeRange] },
-        fee: { validators: [validators.positiveNumber] },
-        status: { validators: [validators.enum(["UPCOMING", "COMPLETED"])] },
-        description: { validators: [validators.string] },
-        playerIds: { validators: [validators.array] },
-    } as Schema,
-
-    updatePaymentStatus: {
-        paymentStatus: { validators: [validators.required, validators.enum(["BELUM_SETOR", "SUDAH_SETOR"])] },
-    } as Schema,
 };
 
-export { validate, validationErrorResponse, validators, schemas };
-export type { ValidationResult, Schema };
+export { validate, validationErrorResponse, schemas };

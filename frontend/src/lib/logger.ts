@@ -6,7 +6,7 @@
  * Can be extended to integrate with external services like Sentry, LogRocket, etc.
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = 'info' | 'warn' | 'error';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -24,15 +24,6 @@ function formatMessage(level: LogLevel, message: string, data?: unknown): LogMes
         data,
         timestamp: new Date().toISOString(),
     };
-}
-
-/**
- * Debug level - only logs in development
- */
-function debug(message: string, data?: unknown): void {
-    if (!isDevelopment) return;
-    const log = formatMessage('debug', message, data);
-    console.log(`[DEBUG] ${log.timestamp}: ${log.message}`, data ?? '');
 }
 
 /**
@@ -64,7 +55,6 @@ function error(message: string, data?: unknown): void {
 }
 
 export const logger = {
-    debug,
     info,
     warn,
     error,

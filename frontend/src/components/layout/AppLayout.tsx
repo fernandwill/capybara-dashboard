@@ -12,7 +12,6 @@ interface AppLayoutProps {
   availableYears?: number[];
   onSelectYear?: (year: number) => void;
   onLogout?: () => void;
-  headerActions?: React.ReactNode;
 }
 
 export default function AppLayout({
@@ -21,7 +20,6 @@ export default function AppLayout({
   availableYears = [2024, 2025, 2026],
   onSelectYear,
   onLogout,
-  headerActions,
 }: AppLayoutProps) {
   // Theme cycle: system -> light -> dark -> system. `theme` (not resolved)
   // is the user's explicit choice, so "system" shows the OS-driven mode.
@@ -46,8 +44,6 @@ export default function AppLayout({
 
         {/* Right: Year Selector, Custom Actions & Dark Mode Action */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {headerActions}
-
           {/* Year Selector */}
           {onSelectYear && (
             <CustomDropdown<number>

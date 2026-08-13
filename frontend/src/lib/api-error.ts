@@ -41,21 +41,6 @@ export function handleApiError(
  * Common error responses
  */
 export const ApiErrors = {
-    notFound: (resource: string) => ({
-        clientMessage: `${resource} not found.`,
-        status: 404,
-    }),
-
-    badRequest: (message: string) => ({
-        clientMessage: message,
-        status: 400,
-    }),
-
-    conflict: (message: string) => ({
-        clientMessage: message,
-        status: 409,
-    }),
-
     serverError: (action: string) => ({
         clientMessage: `Failed to ${action}.`,
         status: 500,

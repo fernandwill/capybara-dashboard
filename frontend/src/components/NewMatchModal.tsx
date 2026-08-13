@@ -95,7 +95,7 @@ export default function NewMatchModal({
         setIsLoadingPlayers(true);
         try {
           const { authFetch } = await import("@/lib/auth-fetch");
-          const response = await authFetch("/api/players?latest=true");
+          const response = await authFetch("/api/players");
           if (response.ok) {
             const data = await response.json();
             setAvailablePlayers(data);
