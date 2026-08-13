@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  IconArrowLeft,
   IconCalendarEvent,
   IconChevronLeft,
   IconChevronRight,
-  IconCopyright,
   IconHistory,
   IconPlus,
   IconSearch,
@@ -22,6 +18,7 @@ import { Match, ModalState, SortOption } from "@/types/types";
 import { sortMatches } from "@/utils/match-utils";
 import CustomDropdown, { DropdownOption } from "@/components/ui/CustomDropdown";
 import MatchCard from "@/components/match/MatchCard";
+import AppLayout from "@/components/layout/AppLayout";
 
 const SORT_OPTIONS: DropdownOption<SortOption>[] = [
   { value: "date-latest", label: "Date: Newest First" },
@@ -255,47 +252,21 @@ export default function AllMatchesHistoryPage() {
   const upcomingCount = matches.filter((m) => m.status === "UPCOMING").length;
 
   return (
-    <div className="min-h-screen bg-app-bg text-app-text-primary">
-      {/* Navigation Top Bar */}
-      <nav className="sticky top-0 z-50 border-b border-app-border bg-app-bg/80 pt-[env(safe-area-inset-top)] backdrop-blur-md">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Brand and Back Link */}
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="flex items-center gap-2 rounded-lg border border-app-border bg-app-card px-3 py-1.5 text-sm font-medium text-app-text-primary transition hover:bg-app-hover hover:text-app-text-primary"
-              >
-                <IconArrowLeft size={16} />
-                <span>Dashboard</span>
-              </Link>
-              <div className="h-5 w-px bg-app-border" />                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-app-border">
-                    <Image
-                      src="/icons/icon.jpg"
-                      alt="CapyHub"
-                      width={28}
-                      height={28}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <span className="hidden sm:inline font-bold tracking-tight text-app-text-primary">CapyHub</span>
-                </div>
-            </div>
-
-            {/* Quick Action */}
-            <Button variant="primary" onClick={handleNewMatch}>
-              <IconPlus size={16} />
-              <span>New Match</span>
-            </Button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Container */}
-      <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-6">
-          {/* Header Section */}
+    <AppLayout
+      headerActions={
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={handleNewMatch}
+          className="flex items-center gap-1.5 font-semibold"
+        >
+          <IconPlus size={15} />
+          <span className="hidden sm:inline">New Match</span>
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-6">
+        {/* Header Section */}
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <div className="mb-1 flex items-center gap-2 text-sm font-medium text-app-primary">
@@ -479,15 +450,6 @@ export default function AllMatchesHistoryPage() {
             </div>
           )}
         </div>
-      </main>
-
-      {/* App Footer */}
-      <footer className="w-full border-t border-app-border/40 py-6 text-center text-xs text-app-text-muted">
-        <p className="flex items-center justify-center gap-1.5 font-medium">
-          <IconCopyright size={14} className="shrink-0 text-app-text-muted" />
-          <span>Capy Club Badmin</span>
-        </p>
-      </footer>
 
       {/* Row Menu */}
       <MatchRowMenu
@@ -528,6 +490,6 @@ export default function AllMatchesHistoryPage() {
         title={errorModal.title}
         message={errorModal.message}
       />
-    </div>
+    </AppLayout>
   );
 }
