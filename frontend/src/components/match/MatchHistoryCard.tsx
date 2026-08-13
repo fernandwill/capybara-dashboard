@@ -1,7 +1,7 @@
 "use client";
 
 import { IconHistory } from "@tabler/icons-react";
-import type { FinishedGameHistory } from "@/components/match/types";
+import type { FinishedGameHistory } from "@/types/match-types";
 
 interface MatchHistoryCardProps {
   history: FinishedGameHistory[];

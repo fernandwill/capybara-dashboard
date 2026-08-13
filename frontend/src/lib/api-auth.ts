@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabaseServer";
-import { getUserRole, isAdminUser } from "@/lib/supabaseAuth";
+import { createClient } from "@/lib/supabase-server";
+import { getUserRole, isAdminUser } from "@/lib/supabase-auth";
 import { logger } from "@/lib/logger";
 
 type AdminAuthResult =

@@ -14,7 +14,7 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { signOut } from "@/lib/authService";
+import { signOut } from "@/lib/auth-service";
 
 interface FloatingNavProps {
   onLogout?: () => void;

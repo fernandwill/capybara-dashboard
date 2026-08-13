@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
-import { requireAdminUser } from '@/lib/apiAuth';
-import { handleApiError, ApiErrors } from '@/lib/apiError';
-import { rateLimitGuard } from '@/lib/rateLimit';
+import { requireAdminUser } from '@/lib/api-auth';
+import { handleApiError, ApiErrors } from '@/lib/api-error';
+import { rateLimitGuard } from '@/lib/rate-limit';
 import { PaymentStatus } from "@/types/types";
 
 export async function PATCH(

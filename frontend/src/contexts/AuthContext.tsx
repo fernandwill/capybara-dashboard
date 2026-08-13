@@ -1,9 +1,9 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react"
-import { getCurrentUser } from "@/lib/authService"
-import { isAdminUser } from "@/lib/supabaseAuth"
-import { supabase } from "@/lib/supabaseClient"
+import { getCurrentUser } from "@/lib/auth-service"
+import { isAdminUser } from "@/lib/supabase-auth"
+import { supabase } from "@/lib/supabase-client"
 import { User } from "@supabase/supabase-js"
 
 type AuthContextType = {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ADMIN_ROLE, getUserRole, isAdminUser } from "./supabaseAuth";
+import { ADMIN_ROLE, getUserRole, isAdminUser } from './supabase-auth';
 
 describe("getUserRole", () => {
     it("returns the role from app metadata", () => {

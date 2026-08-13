@@ -2,8 +2,8 @@
 
 import { SWRConfig, useSWRConfig } from "swr";
 import type { ReactNode } from "react";
-import { authFetch } from "@/lib/authFetch";
-import { useRealtimeRefresh } from "@/hooks/useRealtimeRefresh";
+import { authFetch } from "@/lib/auth-fetch";
+import { useRealtimeRefresh } from "@/hooks/use-realtime-refresh";
 
 // Every cache key is fetched through authFetch (adds the Supabase token).
 const fetcher = async (url: string) => {

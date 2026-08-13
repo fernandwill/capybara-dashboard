@@ -8,7 +8,7 @@ import {
   IconMapPin,
   IconUsers,
 } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import type { Match } from "@/types/types";
 import {
   formatCurrency,

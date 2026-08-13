@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabaseClient'
-import { isAdminUser } from '@/lib/supabaseAuth'
+import { supabase } from '@/lib/supabase-client'
+import { isAdminUser } from '@/lib/supabase-auth'
 import { AuthResponse, UserResponse, AuthError } from '@supabase/supabase-js'
 
 const ADMIN_ACCESS_ERROR = 'You do not have admin access.'

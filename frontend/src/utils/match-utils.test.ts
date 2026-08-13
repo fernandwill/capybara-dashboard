@@ -6,7 +6,7 @@ import {
     areAllPlayersPaid,
     getPendingPaymentCount,
     getClosestUpcomingMatch,
-} from "./matchUtils";
+} from './match-utils';
 import { Match } from "@/types/types";
 
 // Helper to create a mock match

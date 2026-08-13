@@ -25,13 +25,13 @@ import MatchHistoryCard from "@/components/match/MatchHistoryCard";
 import SlotPickerModal, {
   SlotPickerState,
 } from "@/components/match/SlotPickerModal";
-import { useCourtManager } from "@/hooks/useCourtManager";
-import { usePlayers } from "@/hooks/usePlayers";
-import { authFetch } from "@/lib/authFetch";
+import { useCourtManager } from "@/hooks/use-court-manager";
+import { usePlayers } from "@/hooks/use-players";
+import { authFetch } from "@/lib/auth-fetch";
 import { Match, Player, ModalState } from "@/types/types";
 import { formatDate, formatTimeWithDuration } from "@/utils/formatters";
-import { exportPlayerList } from "@/utils/playerExport";
-import type { PlayerInMatch, FinishedGameHistory } from "@/components/match/types";
+import { exportPlayerList } from "@/utils/player-export";
+import type { PlayerInMatch, FinishedGameHistory } from "@/types/match-types";
 
 // Shape returned by GET /api/matches/:id (match + per-match play counts +
 // persisted round history).

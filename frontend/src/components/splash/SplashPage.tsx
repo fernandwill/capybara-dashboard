@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import "./splash.css";
+import '@/styles/splash.css';
 
 interface SplashPageProps {
   onDismiss: () => void;

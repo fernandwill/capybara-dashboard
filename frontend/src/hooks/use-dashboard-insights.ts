@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { Match, Player } from "@/types/types";
-import type { MonthlyPoint } from "@/hooks/useMonthlyStats";
+import type { MonthlyPoint } from "@/hooks/use-monthly-stats";
 
 const WEEKDAY_NAMES = [
   "Sunday",

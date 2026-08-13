@@ -26,7 +26,7 @@ vi.mock("@/lib/logger", () => ({
     },
 }));
 
-import { getMatchIdsToComplete, updateMatchStatuses } from "./matchStatusUtils";
+import { getMatchIdsToComplete, updateMatchStatuses } from './match-status-utils';
 
 describe("getMatchIdsToComplete", () => {
     beforeEach(() => {

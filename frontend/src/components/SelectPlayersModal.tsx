@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Modal from "./ui/Modal";
 import { IconLoader, IconPlus, IconSearch, IconStar, IconUser, IconX } from "@tabler/icons-react";
-import { authFetch } from "@/lib/authFetch";
+import { authFetch } from "@/lib/auth-fetch";
 
 export interface PlayerOption {
   id: string;

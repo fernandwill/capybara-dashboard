@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { IconArrowRight, IconClock, IconDotsVertical, IconHistory, IconMapPin } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Match } from "@/types/types";
 import { formatDurationHours, formatShortDate } from "@/utils/formatters";
 

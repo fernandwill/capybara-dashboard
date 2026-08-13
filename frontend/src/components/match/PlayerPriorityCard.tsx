@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { IconCrown } from "@tabler/icons-react";
-import type { PlayerInMatch } from "@/components/match/types";
+import type { PlayerInMatch } from "@/types/match-types";
 
 interface PlayerPriorityCardProps {
   players: PlayerInMatch[];

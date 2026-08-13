@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import ActivityChart from "./ActivityChart";
-import { MonthlyPoint } from "@/hooks/useMonthlyStats";
+import { MonthlyPoint } from "@/hooks/use-monthly-stats";
 
 interface MonthlyActivityCardProps {
   data: MonthlyPoint[];

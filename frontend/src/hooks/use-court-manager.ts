@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { authFetch } from "@/lib/authFetch";
-import type { PlayerInMatch } from "@/components/match/types";
+import { authFetch } from "@/lib/auth-fetch";
+import type { PlayerInMatch } from "@/types/match-types";
 
 export interface CourtSlot {
   playerId: string | null;

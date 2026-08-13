@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Modal from "../ui/Modal";
 import { IconAlertTriangle, IconLoader, IconTrash } from "@tabler/icons-react";
-import { authFetch } from "@/lib/authFetch";
+import { authFetch } from "@/lib/auth-fetch";
 import { PlayerRecord } from "./EditPlayerModal";
 
 interface DeletePlayerModalProps {

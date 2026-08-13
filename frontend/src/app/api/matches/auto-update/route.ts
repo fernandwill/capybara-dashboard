@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
-import { updateMatchStatuses } from '@/utils/matchStatusUtils';
+import { updateMatchStatuses } from '@/utils/match-status-utils';
 
 function authorizeCronRequest(request: NextRequest): NextResponse | null {
   const cronSecret = process.env.CRON_SECRET;

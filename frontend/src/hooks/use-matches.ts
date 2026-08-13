@@ -6,7 +6,7 @@
 
 import { useCallback } from "react";
 import useSWR from "swr";
-import { authFetch } from "@/lib/authFetch";
+import { authFetch } from "@/lib/auth-fetch";
 import { Match } from "@/types/types";
 
 interface MatchFormData {

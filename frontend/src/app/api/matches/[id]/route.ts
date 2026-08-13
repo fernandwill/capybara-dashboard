@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
-import { requireAdminUser } from '@/lib/apiAuth';
-import { determineMatchStatus, updateMatchStatuses } from '@/utils/matchStatusUtils';
-import { handleApiError, ApiErrors } from '@/lib/apiError';
-import { MATCH_INCLUDE } from '@/lib/prismaIncludes';
-import { rateLimitGuard } from '@/lib/rateLimit';
+import { requireAdminUser } from '@/lib/api-auth';
+import { determineMatchStatus, updateMatchStatuses } from '@/utils/match-status-utils';
+import { handleApiError, ApiErrors } from '@/lib/api-error';
+import { MATCH_INCLUDE } from '@/lib/prisma-includes';
+import { rateLimitGuard } from '@/lib/rate-limit';
 
 export async function GET(
   _request: Request,

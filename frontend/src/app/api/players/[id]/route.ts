@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/database';
-import { requireAdminUser } from '@/lib/apiAuth';
+import { requireAdminUser } from '@/lib/api-auth';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
-import { handleApiError, ApiErrors } from '@/lib/apiError';
-import { rateLimitGuard } from '@/lib/rateLimit';
+import { handleApiError, ApiErrors } from '@/lib/api-error';
+import { rateLimitGuard } from '@/lib/rate-limit';
 
 export async function GET(
   _request: Request,

@@ -14,12 +14,12 @@ import {
   IconPlus,
   IconSearch,
 } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
-import { useMatches } from "@/hooks/useMatches";
-import { usePagination } from "@/hooks/usePagination";
+import { useMatches } from "@/hooks/use-matches";
+import { usePagination } from "@/hooks/use-pagination";
 import { Match, ModalState, SortOption } from "@/types/types";
-import { sortMatches } from "@/utils/matchUtils";
+import { sortMatches } from "@/utils/match-utils";
 import CustomDropdown, { DropdownOption } from "@/components/ui/CustomDropdown";
 import MatchCard from "@/components/match/MatchCard";
 

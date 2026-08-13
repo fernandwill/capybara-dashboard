@@ -9,8 +9,8 @@ import DeletePlayerModal from "@/components/players/DeletePlayerModal";
 import PlayerStatsCards from "@/components/players/PlayerStatsCards";
 import PlayerTableRow from "@/components/players/PlayerTableRow";
 import { useAuth } from "@/contexts/AuthContext";
-import { usePlayers } from "@/hooks/usePlayers";
-import { usePagination } from "@/hooks/usePagination";
+import { usePlayers } from "@/hooks/use-players";
+import { usePagination } from "@/hooks/use-pagination";
 import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 8;

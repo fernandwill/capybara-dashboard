@@ -10,7 +10,7 @@ import {
   IconStar,
   IconUserPlus,
 } from "@tabler/icons-react";
-import { MonthlyPoint } from "@/hooks/useMonthlyStats";
+import { MonthlyPoint } from "@/hooks/use-monthly-stats";
 
 export interface TopPlayerPresence {
   id: string;

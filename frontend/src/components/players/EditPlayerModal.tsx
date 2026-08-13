@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Modal from "../ui/Modal";
 import { IconLoader } from "@tabler/icons-react";
-import { authFetch } from "@/lib/authFetch";
+import { authFetch } from "@/lib/auth-fetch";
 
 export interface PlayerRecord {
   id: string;

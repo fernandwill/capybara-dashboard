@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dashboard } from './Dashboard';
-import { signInWithEmail } from '@/lib/authService';
+import { signInWithEmail } from '@/lib/auth-service';
 
 import './login/login.css';
 

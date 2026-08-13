@@ -8,15 +8,15 @@ import NewMatchModal from "../components/NewMatchModal";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import DeleteMatchModal from "../components/DeleteMatchModal";
-import { signOut } from "@/lib/authService";
+import { signOut } from "@/lib/auth-service";
 import { Match, ModalState } from "@/types/types";
-import { sortMatches, getClosestUpcomingMatch } from "@/utils/matchUtils";
-import { useStats } from "@/hooks/useStats";
-import { useMatches } from "@/hooks/useMatches";
-import { useMonthlyStats } from "@/hooks/useMonthlyStats";
-import { useCountdown } from "@/hooks/useCountdown";
-import { usePlayers } from "@/hooks/usePlayers";
-import { useDashboardInsights } from "@/hooks/useDashboardInsights";
+import { sortMatches, getClosestUpcomingMatch } from "@/utils/match-utils";
+import { useStats } from "@/hooks/use-stats";
+import { useMatches } from "@/hooks/use-matches";
+import { useMonthlyStats } from "@/hooks/use-monthly-stats";
+import { useCountdown } from "@/hooks/use-countdown";
+import { usePlayers } from "@/hooks/use-players";
+import { useDashboardInsights } from "@/hooks/use-dashboard-insights";
 import AppLayout from "../components/layout/AppLayout";
 import StatCard from "../components/dashboard/StatCard";
 import MonthlyActivityCard from "../components/dashboard/MonthlyActivityCard";
@@ -315,7 +315,7 @@ export function Dashboard() {
             </h1>
 
             <p className="text-base text-app-text-secondary">
-              Capybara! Ia ma ia lo, su ma su lo.
+              ₍ᐢ-(ｪ)-ᐢ₎ Ia ma ia lo, su ma su lo.
             </p>
           </header>
 
