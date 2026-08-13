@@ -14,7 +14,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       <div className={cn("relative inline-block w-full", wrapperClassName)}>
         <select
           className={cn(
-            "flex h-10 w-full appearance-none rounded-xl border border-app-border bg-app-input px-3.5 py-2 pr-9 text-sm text-app-text-primary shadow-sm transition-colors hover:border-app-border-hover focus:border-app-primary focus:outline-none focus:ring-1 focus:ring-app-primary disabled:cursor-not-allowed disabled:opacity-50",
+            "flex h-10 w-full appearance-none rounded-xl border border-app-border bg-app-input px-3.5 py-2 pr-9 text-base sm:text-sm text-app-text-primary shadow-sm transition-colors hover:border-app-border-hover focus:border-app-primary focus:outline-none focus:ring-1 focus:ring-app-primary disabled:cursor-not-allowed disabled:opacity-50",
             className
           )}
           ref={ref}

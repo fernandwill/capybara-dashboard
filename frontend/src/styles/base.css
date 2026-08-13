@@ -18,6 +18,23 @@ body {
 }
 
 /* =============================================================================
+   MOBILE INPUT FOCUS ZOOM PREVENTION
+   iOS Safari and WebKit auto-zoom when an input/select/textarea is focused if
+   its font-size is < 16px. Enforcing 16px minimum font size on mobile viewports
+   prevents unwanted zooming while preserving accessibility.
+   ============================================================================= */
+@media screen and (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+  select,
+  textarea,
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* =============================================================================
    APP DESIGN TOKENS
    Dark slate palette shared by all dashboard components (Tailwind v4 @theme)
    ============================================================================= */
