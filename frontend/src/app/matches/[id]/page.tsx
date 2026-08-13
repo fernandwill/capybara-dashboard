@@ -401,7 +401,7 @@ export default function MatchDetailsPage() {
             />
 
             {/* Mobile Court Selector Tabs */}
-            <div className="flex overflow-x-auto gap-1.5 rounded-xl bg-app-bg p-1.5 border border-app-border md:hidden custom-scrollbar">
+            <div className="flex overflow-x-auto gap-1.5 rounded-xl bg-app-bg p-1.5 border border-app-border md:hidden no-scrollbar">
               {courtManager.courts.map((c, idx) => {
                 const courtHasPlayers =
                   c.teamA.some((s) => s.playerId) ||
@@ -413,9 +413,9 @@ export default function MatchDetailsPage() {
                     key={c.id}
                     type="button"
                     onClick={() => setActiveMobileCourtIndex(idx)}
-                    className={`flex flex-1 min-w-[80px] items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${
+                    className={`flex flex-1 min-w-[85px] min-h-[38px] items-center justify-center gap-1.5 rounded-lg py-2 px-2.5 text-xs font-semibold transition active:scale-[0.98] ${
                       isCurrent
-                        ? "bg-emerald-600 text-white shadow-md"
+                        ? "bg-app-primary text-white shadow-md font-bold"
                         : "bg-app-input text-app-text-muted hover:text-app-text-primary"
                     }`}
                   >
@@ -423,7 +423,7 @@ export default function MatchDetailsPage() {
                     {courtHasPlayers && (
                       <span
                         className={`h-1.5 w-1.5 rounded-full ${
-                          isCurrent ? "bg-white" : "bg-emerald-400"
+                          isCurrent ? "bg-white" : "bg-yellow-400"
                         }`}
                       />
                     )}

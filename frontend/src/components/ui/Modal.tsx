@@ -145,7 +145,7 @@ export default function Modal({
       aria-modal="true"
       tabIndex={-1}
       aria-label={typeof title === "string" ? title : ariaLabel || "Modal"}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm transition-opacity outline-none"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4 backdrop-blur-sm transition-opacity outline-none animate-in fade-in duration-150"
       onClick={(e) => {
         if (closeOnBackdropClick && e.target === e.currentTarget) {
           onClose();
@@ -153,8 +153,11 @@ export default function Modal({
       }}
     >
       <div
-        className={`relative flex max-h-[92vh] w-full ${maxWidthClass} flex-col rounded-2xl border border-app-border bg-app-card p-6 shadow-2xl text-app-text-primary transition-all ${className}`}
+        className={`relative flex max-h-[90vh] w-full ${maxWidthClass} flex-col rounded-t-3xl sm:rounded-2xl border-t sm:border border-app-border bg-app-card p-5 sm:p-6 pb-8 sm:pb-6 shadow-2xl text-app-text-primary transition-all animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 ${className}`}
       >
+        {/* Mobile Drag Indicator */}
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-app-border sm:hidden" />
+
         {/* Modal Header */}
         {(title || icon || showCloseButton) && (
           <div

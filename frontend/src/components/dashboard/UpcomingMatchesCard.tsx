@@ -193,7 +193,7 @@ export default function UpcomingMatchesCard({
           <div
             ref={scrollContainerRef}
             onScroll={checkScroll}
-            className="flex gap-4 overflow-x-auto pb-1 pt-1 scroll-smooth no-scrollbar"
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 pt-1 scroll-smooth no-scrollbar"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {matches.map((match) => {
@@ -206,7 +206,7 @@ export default function UpcomingMatchesCard({
                 <div
                   key={match.id}
                   onClick={() => onMatchClick(match)}
-                  className="flex w-[290px] sm:w-[310px] shrink-0 cursor-pointer flex-col justify-between rounded-2xl border border-app-border bg-app-input p-4 transition-all hover:border-app-border-hover hover:shadow-lg group/card"
+                  className="flex w-[82vw] snap-start sm:w-[310px] shrink-0 cursor-pointer flex-col justify-between rounded-2xl border border-app-border bg-app-input p-4 transition-all hover:border-app-border-hover hover:shadow-lg group/card"
                 >
                   {/* Card Top: Date Badge (Left) + Match Details (Middle) + Status & Menu (Right) */}
                   <div className="flex items-start justify-between gap-2.5">
@@ -225,7 +225,7 @@ export default function UpcomingMatchesCard({
 
                     {/* Middle: Title & Meta */}
                     <div className="min-w-0 flex-1">
-                      <h4 className="truncate text-xs font-bold text-app-text-primary transition group-hover/card:text-blue-400">
+                      <h4 className="truncate text-xs font-bold text-app-text-primary transition group-hover/card:text-yellow-400">
                         {match.title}
                       </h4>
                       <p className="mt-1 flex items-center gap-1 text-[11px] text-app-text-muted">
@@ -233,7 +233,7 @@ export default function UpcomingMatchesCard({
                         <span className="truncate">{formatTimeDuration(match.time)}</span>
                       </p>
                       <p className="mt-0.5 truncate text-[11px] text-app-text-muted">
-                        {courtCount} Courts • {playersCount} Players
+                        {courtCount} {Number(courtCount) === 1 ? "Court" : "Courts"} • {playersCount} {playersCount === 1 ? "Player" : "Players"}
                       </p>
                     </div>
 
@@ -248,7 +248,7 @@ export default function UpcomingMatchesCard({
                           e.stopPropagation();
                           onOpenMenu(e, match);
                         }}
-                        className="rounded p-1 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
+                        className="flex min-h-11 min-w-11 items-center justify-center rounded text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
                         aria-label={`Actions for ${match.title}`}
                       >
                         <IconDotsVertical size={14} />
@@ -300,7 +300,7 @@ export default function UpcomingMatchesCard({
                     </div>
 
                     <div className="flex items-center gap-1 rounded-xl border border-app-border bg-app-bg px-2.5 py-1 text-[11px] font-medium text-app-text-secondary transition group-hover/card:border-app-border-hover group-hover/card:bg-app-hover group-hover/card:text-app-text-primary">
-                      <span>View Details</span>
+                      <span>Match Management</span>
                       <IconChevronRight size={12} />
                     </div>
                   </div>

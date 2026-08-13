@@ -95,7 +95,11 @@ export default function UpcomingMatchBanner({
             </span>
 
             <span className="rounded-full border border-yellow-500/20 bg-yellow-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-400">
-              {courtCount} Courts • {playersCount} Players
+              {courtCount} {Number(courtCount) === 1 ? "Court" : "Courts"}
+            </span>
+
+            <span className="rounded-full border border-yellow-500/20 bg-yellow-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-400">
+              {playersCount} {playersCount === 1 ? "Player" : "Players"}
             </span>
           </div>
 
@@ -126,7 +130,7 @@ export default function UpcomingMatchBanner({
         </div>
 
         {/* Right: Countdown Display + CTA Button */}
-        <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:flex-col lg:items-end lg:justify-center shrink-0 pt-2 lg:pt-0 border-t border-[#1e2738] lg:border-t-0">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:flex-col lg:items-end lg:justify-center shrink-0 pt-2 lg:pt-0 border-t border-app-border/40 lg:border-t-0">
           {countdown && (
             <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-950/30 px-3.5 py-2 backdrop-blur">
               <div className="text-right">

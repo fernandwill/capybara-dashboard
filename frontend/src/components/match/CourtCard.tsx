@@ -94,10 +94,11 @@ export default function CourtCard({
                   <button
                     type="button"
                     onClick={() => onRemove(courtIndex, team, sIdx)}
-                    className="rounded p-1 text-app-text-muted transition hover:bg-rose-500/10 hover:text-rose-400"
+                    className="flex min-h-8 min-w-8 items-center justify-center rounded-lg text-app-text-muted transition hover:bg-rose-500/10 hover:text-rose-400"
                     title="Remove player"
+                    aria-label="Remove player"
                   >
-                    <IconX size={13} />
+                    <IconX size={14} />
                   </button>
                 </div>
               );
@@ -108,9 +109,9 @@ export default function CourtCard({
                 key={sIdx}
                 type="button"
                 onClick={() => onOpenSlotPicker(courtIndex, team, sIdx)}
-                className={`flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-app-border bg-app-input/60 py-2 text-xs font-medium text-app-text-muted transition ${emptyHoverClass}`}
+                className={`flex w-full min-h-[42px] items-center justify-center gap-1.5 rounded-xl border border-dashed border-app-border bg-app-input/60 py-2.5 text-xs font-medium text-app-text-muted transition ${emptyHoverClass}`}
               >
-                <IconPlus size={13} />
+                <IconPlus size={14} />
                 <span>Add player</span>
               </button>
             );
@@ -168,13 +169,13 @@ export default function CourtCard({
           type="button"
           disabled={!courtHasPlayers || isSavingRound}
           onClick={() => onFinishCourt(courtIndex)}
-          className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition shadow-sm ${
+          className={`flex w-full min-h-[42px] items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition shadow-sm ${
             courtHasPlayers
-              ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+              ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 active:scale-[0.99]"
               : "border border-transparent bg-app-input text-app-text-muted cursor-not-allowed"
           }`}
         >
-          <IconCircleCheck size={13} />
+          <IconCircleCheck size={14} />
           <span>Finish {court.name}</span>
         </button>
       </div>

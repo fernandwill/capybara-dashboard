@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { MonthlyPoint } from "@/hooks/useMonthlyStats";
 
 interface ActivityChartProps {
@@ -14,6 +14,8 @@ export default function ActivityChart({
   mode,
   selectedYear,
 }: ActivityChartProps) {
+  const [tappedMonthIdx, setTappedMonthIdx] = useState<number | null>(null);
+
   const rawMax = Math.max(
     0,
     ...data.map((item) => (mode === "hours" ? item.hours : item.matches))
@@ -52,7 +54,7 @@ export default function ActivityChart({
         {/* Plot surface */}
         <div className="relative flex-1">
           {/* Background horizontal grid lines */}
-          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none py-0.5">
             {gridLines.map((value, idx) => (
               <div
                 key={value}
@@ -73,14 +75,16 @@ export default function ActivityChart({
               const hasValue = value > 0;
               const isCurrentMonth =
                 selectedYear === currentYear && idx === currentMonthIndex;
+              const isTapped = tappedMonthIdx === idx;
 
               return (
                 <div
                   key={item.month}
-                  className="group relative flex h-full flex-1 flex-col items-center justify-end px-0.5 sm:px-1"
+                  onClick={() => setTappedMonthIdx((prev) => (prev === idx ? null : idx))}
+                  className="group relative flex h-full flex-1 flex-col items-center justify-end px-0.5 sm:px-1 cursor-pointer"
                 >
-                  {/* Floating Hover Tooltip */}
-                  <div className="pointer-events-none absolute bottom-full mb-2 z-30 hidden group-hover:flex flex-col items-center">
+                  {/* Floating Hover/Tap Tooltip */}
+                  <div className={`pointer-events-none absolute bottom-full mb-2 z-30 flex-col items-center ${isTapped ? "flex" : "hidden group-hover:flex"}`}>
                     <div className="rounded-lg border border-app-border bg-app-card px-2.5 py-1.5 shadow-xl text-center backdrop-blur whitespace-nowrap">
                       <div className="text-[11px] font-bold text-app-text-primary">
                         {item.month} {selectedYear}

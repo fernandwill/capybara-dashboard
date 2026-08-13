@@ -34,8 +34,16 @@ export default function SlotPickerModal({
   if (!slotPicker) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="w-full max-w-sm rounded-2xl border border-app-border bg-app-bg p-4 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4 backdrop-blur-sm animate-in fade-in duration-150"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="w-full max-w-sm rounded-t-3xl sm:rounded-2xl border-t sm:border border-app-border bg-app-bg p-5 sm:p-4 shadow-2xl pb-8 sm:pb-4 max-h-[80vh] flex flex-col animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
+        {/* Mobile drag handle indicator */}
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-app-border sm:hidden" />
+
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h4 className="text-sm font-bold text-app-text-primary">Select Player</h4>
@@ -46,7 +54,7 @@ export default function SlotPickerModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-app-text-muted hover:text-app-text-primary"
+            className="flex min-h-8 min-w-8 items-center justify-center rounded-lg text-app-text-muted hover:text-app-text-primary"
           >
             <IconX size={16} />
           </button>
