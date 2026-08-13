@@ -46,7 +46,7 @@ export default function UpcomingMatchBanner({
       <div className="relative overflow-hidden rounded-2xl border border-app-border bg-app-card p-5 transition hover:border-app-border-hover">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-input text-app-text-muted">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-yellow-500/20 bg-yellow-500/10 text-yellow-400">
               <IconCalendarEvent size={20} />
             </div>
             <div>

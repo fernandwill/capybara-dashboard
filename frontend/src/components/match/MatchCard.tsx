@@ -73,26 +73,26 @@ export default function MatchCard({ match, onClick, onOpenMenu }: MatchCardProps
           {match.title}
         </h3>
         <p className="mt-1 flex items-center gap-1.5 line-clamp-1 text-sm text-app-text-secondary">
-          <IconMapPin size={14} className="shrink-0 text-app-text-muted" />
+          <IconMapPin size={14} className="shrink-0 text-amber-400" />
           <span className="truncate">{match.location}</span>
         </p>
 
         {/* Meta Information Grid */}
         <div className="mt-4 grid grid-cols-2 gap-2.5 rounded-lg border border-app-border/50 bg-app-bg/50 p-3 text-xs text-app-text-secondary">
           <div className="flex items-center gap-1.5">
-            <IconClock size={13} className="text-app-text-muted shrink-0" />
+            <IconClock size={13} className="text-emerald-400 shrink-0" />
             <span className="truncate">{match.time}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <IconHash size={13} className="text-app-text-muted shrink-0" />
+            <IconHash size={13} className="text-blue-400 shrink-0" />
             <span className="truncate">Court {match.courtNumber}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <IconUsers size={13} className="text-app-text-muted shrink-0" />
+            <IconUsers size={13} className="text-purple-400 shrink-0" />
             <span>{match.players?.length || 0} Players</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <IconCashBanknote size={13} className="text-app-text-muted shrink-0" />
+            <IconCashBanknote size={13} className="text-emerald-400 shrink-0" />
             <span className="font-semibold text-app-success-text truncate">
               {formatCurrency(match.fee)}
             </span>

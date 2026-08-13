@@ -129,10 +129,15 @@ export default function UpcomingMatchesCard({
   return (
     <section className="rounded-xl border border-app-border bg-app-card p-5 sm:p-6">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <IconCalendarEvent size={18} className="text-app-text-muted" />
-          <h2 className="text-base font-bold text-app-text-primary">Upcoming Matches</h2>
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-400">
+            <IconCalendarEvent size={16} />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-app-text-primary">Upcoming Matches</h2>
+            <p className="text-xs text-app-text-muted">Scheduled badminton sessions</p>
+          </div>
         </div>
 
         {matches.length > 0 && (
@@ -157,7 +162,9 @@ export default function UpcomingMatchesCard({
       ) : matches.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-app-border bg-app-input py-10 text-center">
           <div className="relative mb-3">
-            <IconCalendarEvent size={40} strokeWidth={1.5} className="text-app-text-muted" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10 text-blue-400">
+              <IconCalendarEvent size={24} />
+            </div>
             <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-app-input">
               <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
                 <IconCheck size={10} />
@@ -231,7 +238,7 @@ export default function UpcomingMatchesCard({
                         {match.title}
                       </h4>
                       <p className="mt-1 flex items-center gap-1 text-[11px] text-app-text-muted">
-                        <IconClock size={11} className="shrink-0 text-app-text-muted" />
+                        <IconClock size={11} className="shrink-0 text-emerald-400" />
                         <span className="truncate">{formatTimeDuration(match.time)}</span>
                       </p>
                       <p className="mt-0.5 truncate text-[11px] text-app-text-muted">

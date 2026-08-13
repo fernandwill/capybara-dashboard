@@ -27,8 +27,8 @@ export default function RecentMatchesCard({
   return (
     <section className="rounded-xl border border-app-border bg-app-card p-5 sm:p-6 shadow-sm">
       {/* Header */}
-      <div className="mb-5 flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-app-border/50 bg-app-input text-emerald-400">
+        <div className="mb-5 flex items-center gap-2.5">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
           <IconHistory size={16} />
         </div>
         <div>
@@ -44,7 +44,7 @@ export default function RecentMatchesCard({
         </div>
       ) : matches.length === 0 ? (
         <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-app-border/50 bg-app-bg/50 px-6 py-8 text-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-app-border bg-app-card text-app-text-muted">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
             <IconHistory size={18} />
           </div>
           <h3 className="mt-3 text-sm font-semibold text-app-text-primary">No completed matches yet</h3>
@@ -89,7 +89,7 @@ export default function RecentMatchesCard({
                         </div>
                         {match.location && (
                           <div className="flex items-center gap-1 truncate text-app-text-muted">
-                            <IconMapPin size={11} className="shrink-0 text-app-text-muted" />
+                            <IconMapPin size={11} className="shrink-0 text-amber-400" />
                             <span className="truncate">{match.location}</span>
                           </div>
                         )}
@@ -100,7 +100,7 @@ export default function RecentMatchesCard({
                   {/* Right: Time, Status, Actions */}
                   <div className="mt-3 flex items-center justify-between gap-4 sm:mt-0 sm:justify-end">
                     <div className="flex items-center gap-1.5 text-xs text-app-text-muted">
-                      <IconClock size={13} className="text-app-text-muted" />
+                      <IconClock size={13} className="text-emerald-400" />
                       <span>{formatDurationHours(match.time)}</span>
                     </div>
 

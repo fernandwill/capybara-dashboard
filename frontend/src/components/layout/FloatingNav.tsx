@@ -117,6 +117,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
       icon: IconLayoutDashboard,
       description: "Overview & Analytics",
       isActive: isDashboardActive,
+      color: "text-blue-400 border-blue-500/20 bg-blue-500/10",
     },
     {
       href: "/matches",
@@ -124,6 +125,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
       icon: IconCalendarEvent,
       description: "All Match Records",
       isActive: isMatchesActive,
+      color: "text-emerald-400 border-emerald-500/20 bg-emerald-500/10",
     },
     {
       href: "/players",
@@ -131,6 +133,7 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
       icon: IconUsers,
       description: "Player Directory & Stats",
       isActive: isPlayersActive,
+      color: "text-purple-400 border-purple-500/20 bg-purple-500/10",
     },
   ];
 
@@ -222,10 +225,10 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
                       }`}
                     >
                       <div
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors ${
                           item.isActive
-                            ? "bg-yellow-500/20 text-yellow-400"
-                            : "bg-app-input text-app-text-muted group-hover:bg-app-hover group-hover:text-app-text-primary"
+                            ? "border-yellow-500/30 bg-yellow-500/20 text-yellow-400"
+                            : item.color
                         }`}
                       >
                         <Icon size={16} />

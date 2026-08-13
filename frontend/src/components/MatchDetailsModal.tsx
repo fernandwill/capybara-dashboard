@@ -163,7 +163,7 @@ export default function MatchDetailsModal({
           <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             {/* Location */}
             <div className="flex items-center gap-3 rounded-xl border border-app-border bg-app-input px-3.5 py-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-app-border bg-app-card text-app-text-muted">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10 text-amber-400">
                 <IconMapPin size={16} />
               </div>
               <div className="min-w-0">
@@ -178,7 +178,7 @@ export default function MatchDetailsModal({
 
             {/* Court # */}
             <div className="flex items-center gap-3 rounded-xl border border-app-border bg-app-input px-3.5 py-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-app-border bg-app-card text-app-text-muted">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10 text-blue-400">
                 <IconHash size={16} />
               </div>
               <div className="min-w-0">
@@ -193,7 +193,7 @@ export default function MatchDetailsModal({
 
             {/* Date */}
             <div className="flex items-center gap-3 rounded-xl border border-app-border bg-app-input px-3.5 py-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-app-border bg-app-card text-app-text-muted">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/20 bg-purple-500/10 text-purple-400">
                 <IconCalendar size={16} />
               </div>
               <div className="min-w-0">
@@ -208,7 +208,7 @@ export default function MatchDetailsModal({
 
             {/* Time */}
             <div className="flex items-center gap-3 rounded-xl border border-app-border bg-app-input px-3.5 py-2.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-app-border bg-app-card text-app-text-muted">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
                 <IconClock size={16} />
               </div>
               <div className="min-w-0">
@@ -225,7 +225,7 @@ export default function MatchDetailsModal({
           {/* Fee Summary */}
           <div className="mt-2.5 flex items-center justify-between rounded-xl border border-app-border bg-app-input px-3.5 py-2.5">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-app-border bg-app-card text-emerald-400">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
                 <IconReceipt size={16} />
               </div>
               <div>
@@ -304,7 +304,9 @@ export default function MatchDetailsModal({
 
           {players.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-app-border bg-app-input/60 p-6 text-center text-xs text-app-text-muted">
-              <IconUsers size={24} className="mb-2 text-app-text-muted" />
+              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 text-purple-400">
+                <IconUsers size={18} />
+              </div>
               <p className="font-semibold text-app-text-primary">No players in this match</p>
               <p className="mt-0.5">No roster recorded for this session.</p>
             </div>

@@ -82,9 +82,14 @@ export default function InsightsCard({
     <aside className="flex h-full min-w-0 flex-col rounded-xl border border-app-border bg-app-card p-5 sm:p-6">
       {/* Header */}
       <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <IconSparkles size={18} className="text-amber-400" />
-          <h2 className="text-base font-bold text-app-text-primary">{selectedYear} Insights</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10 text-amber-400">
+            <IconSparkles size={16} />
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-app-text-primary">{selectedYear} Insights</h2>
+            <p className="text-xs text-app-text-muted">Highlights & yearly stats</p>
+          </div>
         </div>
         <span className="rounded-full border border-app-border bg-app-input px-2.5 py-0.5 text-[11px] font-semibold text-app-text-secondary">
           Highlights
@@ -205,7 +210,7 @@ export default function InsightsCard({
               </p>
               <p className="mt-0.5 text-xs text-app-text-muted">
                 {newBloodCount > 0
-                  ? `Joined the badminton community in ${selectedYear}`
+                  ? `Joined Capy's community in ${selectedYear}`
                   : `No new players added yet in ${selectedYear}`}
               </p>
             </div>
@@ -238,8 +243,10 @@ export default function InsightsCard({
 
         {!hasData && (
           <div className="rounded-xl border border-dashed border-app-border p-6 text-center">
-            <IconStar size={20} className="mx-auto text-app-text-muted" />
-            <h3 className="mt-3 text-sm font-medium text-app-text-primary">No insights yet</h3>
+            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400">
+              <IconStar size={18} />
+            </div>
+            <h3 className="text-sm font-medium text-app-text-primary">No insights yet</h3>
             <p className="mt-1 text-xs text-app-text-muted">
               Play some matches in {selectedYear} to unlock insights.
             </p>

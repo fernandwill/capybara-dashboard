@@ -1,10 +1,10 @@
 import { IconChevronUp, type TablerIcon } from "@tabler/icons-react";
 
 const accentStyles = {
-  green: { icon: "bg-green-500/10 text-app-icon-green" },
-  blue: { icon: "bg-blue-500/10 text-app-icon-blue" },
-  purple: { icon: "bg-purple-500/10 text-app-icon-purple" },
-  orange: { icon: "bg-orange-500/10 text-app-icon-orange" },
+  green: { icon: "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400" },
+  blue: { icon: "border border-blue-500/20 bg-blue-500/10 text-blue-400" },
+  purple: { icon: "border border-purple-500/20 bg-purple-500/10 text-purple-400" },
+  orange: { icon: "border border-amber-500/20 bg-amber-500/10 text-amber-400" },
 } as const;
 
 type Accent = keyof typeof accentStyles;
