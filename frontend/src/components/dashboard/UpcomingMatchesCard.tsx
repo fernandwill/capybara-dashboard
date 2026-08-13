@@ -131,8 +131,8 @@ export default function UpcomingMatchesCard({
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <CalendarDays size={18} className="text-gray-400" />
-          <h2 className="text-base font-bold text-white">Upcoming Matches</h2>
+          <CalendarDays size={18} className="text-app-text-muted" />
+          <h2 className="text-base font-bold text-app-text-primary">Upcoming Matches</h2>
         </div>
 
         <div className="flex items-center gap-2">
@@ -149,21 +149,21 @@ export default function UpcomingMatchesCard({
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex min-h-[200px] animate-pulse items-center justify-center rounded-2xl border border-dashed border-[#232730] bg-[#12151c] text-xs text-gray-500">
+        <div className="flex min-h-[200px] animate-pulse items-center justify-center rounded-2xl border border-dashed border-app-border bg-app-input text-xs text-app-text-muted">
           Loading upcoming matches...
         </div>
       ) : matches.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#232730] bg-[#12151c] py-10 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-app-border bg-app-input py-10 text-center">
           <div className="relative mb-3">
-            <CalendarDays size={40} strokeWidth={1.5} className="text-gray-500" />
-            <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#12151c]">
+            <CalendarDays size={40} strokeWidth={1.5} className="text-app-text-muted" />
+            <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-app-input">
               <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
                 <Check size={10} />
               </div>
             </div>
           </div>
-          <h3 className="text-sm font-semibold text-white">No upcoming matches</h3>
-          <p className="mt-1 text-xs text-gray-400">
+          <h3 className="text-sm font-semibold text-app-text-primary">No upcoming matches</h3>
+          <p className="mt-1 text-xs text-app-text-muted">
             You&apos;re all caught up. Schedule your next match when you&apos;re ready.
           </p>
           <button
@@ -182,7 +182,7 @@ export default function UpcomingMatchesCard({
             <button
               type="button"
               onClick={() => handleScroll("left")}
-              className="absolute -left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
+              className="absolute -left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-app-border bg-app-bg/95 text-app-text-primary shadow-xl backdrop-blur transition hover:bg-app-hover"
               aria-label="Scroll left"
             >
               <ChevronLeft size={16} />
@@ -206,16 +206,16 @@ export default function UpcomingMatchesCard({
                 <div
                   key={match.id}
                   onClick={() => onMatchClick(match)}
-                  className="flex w-[290px] sm:w-[310px] shrink-0 cursor-pointer flex-col justify-between rounded-2xl border border-[#232730] bg-[#12151c] p-4 transition-all hover:border-[#384152] hover:shadow-lg group/card"
+                  className="flex w-[290px] sm:w-[310px] shrink-0 cursor-pointer flex-col justify-between rounded-2xl border border-app-border bg-app-input p-4 transition-all hover:border-app-border-hover hover:shadow-lg group/card"
                 >
                   {/* Card Top: Date Badge (Left) + Match Details (Middle) + Status & Menu (Right) */}
                   <div className="flex items-start justify-between gap-2.5">
                     {/* Left: Date Badge */}
-                    <div className="flex flex-col items-center justify-center rounded-xl bg-[#0c0e12] px-2.5 py-1.5 border border-[#1e232d] shrink-0 text-center min-w-[48px]">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                    <div className="flex flex-col items-center justify-center rounded-xl bg-app-bg px-2.5 py-1.5 border border-app-border shrink-0 text-center min-w-[48px]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-app-text-muted">
                         {month}
                       </span>
-                      <span className="text-xl font-black text-white leading-tight">
+                      <span className="text-xl font-black text-app-text-primary leading-tight">
                         {day}
                       </span>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
@@ -225,14 +225,14 @@ export default function UpcomingMatchesCard({
 
                     {/* Middle: Title & Meta */}
                     <div className="min-w-0 flex-1">
-                      <h4 className="truncate text-xs font-bold text-white transition group-hover/card:text-blue-400">
+                      <h4 className="truncate text-xs font-bold text-app-text-primary transition group-hover/card:text-blue-400">
                         {match.title}
                       </h4>
-                      <p className="mt-1 flex items-center gap-1 text-[11px] text-gray-400">
-                        <Clock size={11} className="shrink-0 text-gray-400" />
+                      <p className="mt-1 flex items-center gap-1 text-[11px] text-app-text-muted">
+                        <Clock size={11} className="shrink-0 text-app-text-muted" />
                         <span className="truncate">{formatTimeDuration(match.time)}</span>
                       </p>
-                      <p className="mt-0.5 truncate text-[11px] text-gray-400">
+                      <p className="mt-0.5 truncate text-[11px] text-app-text-muted">
                         {courtCount} Courts • {playersCount} Players
                       </p>
                     </div>
@@ -248,7 +248,7 @@ export default function UpcomingMatchesCard({
                           e.stopPropagation();
                           onOpenMenu(e, match);
                         }}
-                        className="rounded p-1 text-gray-500 transition hover:bg-[#1a1f29] hover:text-white"
+                        className="rounded p-1 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
                         aria-label={`Actions for ${match.title}`}
                       >
                         <MoreVertical size={14} />
@@ -257,13 +257,13 @@ export default function UpcomingMatchesCard({
                   </div>
 
                   {/* Card Middle: Players Stack */}
-                  <div className="my-3 space-y-1.5 border-t border-[#1e232d] pt-3">
-                    <span className="text-[11px] font-medium text-gray-400">
+                  <div className="my-3 space-y-1.5 border-t border-app-border pt-3">
+                    <span className="text-[11px] font-medium text-app-text-muted">
                       Players ({playersCount})
                     </span>
                     <div className="flex items-center -space-x-1 overflow-hidden py-0.5">
                       {playersCount === 0 ? (
-                        <span className="text-[11px] text-gray-500 italic">
+                        <span className="text-[11px] text-app-text-muted italic">
                           No players joined yet
                         </span>
                       ) : (
@@ -278,12 +278,12 @@ export default function UpcomingMatchesCard({
                                 title={playerName}
                                 width={400}
                                 height={383}
-                                className="h-6 w-6 shrink-0 rounded-full object-cover ring-2 ring-[#12151c] shadow-sm"
+                                className="h-6 w-6 shrink-0 rounded-full object-cover ring-2 ring-app-input shadow-sm"
                               />
                             );
                           })}
                           {playersCount > 11 && (
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-800 text-[9px] font-bold text-gray-300 ring-2 ring-[#12151c]">
+                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-app-input text-[9px] font-bold text-app-text-secondary ring-2 ring-app-input">
                               +{playersCount - 11}
                             </div>
                           )}
@@ -293,13 +293,13 @@ export default function UpcomingMatchesCard({
                   </div>
 
                   {/* Card Footer: Countdown + View Details Button */}
-                  <div className="flex items-center justify-between border-t border-[#1e232d] pt-2.5">
+                  <div className="flex items-center justify-between border-t border-app-border pt-2.5">
                     <div className="flex items-center gap-1 text-[11px] font-medium text-emerald-400">
                       <Clock size={12} className="shrink-0 text-emerald-400" />
                       <span className="truncate">{countdownStr}</span>
                     </div>
 
-                    <div className="flex items-center gap-1 rounded-xl border border-[#232730] bg-[#0c0e12] px-2.5 py-1 text-[11px] font-medium text-gray-200 transition group-hover/card:border-gray-600 group-hover/card:bg-[#1a1f29] group-hover/card:text-white">
+                    <div className="flex items-center gap-1 rounded-xl border border-app-border bg-app-bg px-2.5 py-1 text-[11px] font-medium text-app-text-secondary transition group-hover/card:border-app-border-hover group-hover/card:bg-app-hover group-hover/card:text-app-text-primary">
                       <span>View Details</span>
                       <ChevronRight size={12} />
                     </div>
@@ -314,7 +314,7 @@ export default function UpcomingMatchesCard({
             <button
               type="button"
               onClick={() => handleScroll("right")}
-              className="absolute -right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#232730] bg-[#0c0e12]/95 text-white shadow-xl backdrop-blur transition hover:bg-[#1a1f29]"
+              className="absolute -right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-app-border bg-app-bg/95 text-app-text-primary shadow-xl backdrop-blur transition hover:bg-app-hover"
               aria-label="Scroll right"
             >
               <ChevronRight size={16} />

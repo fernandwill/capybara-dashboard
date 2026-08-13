@@ -14,7 +14,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       <div className={cn("relative inline-block w-full", wrapperClassName)}>
         <select
           className={cn(
-            "flex h-10 w-full appearance-none rounded-xl border border-[#282c35] bg-[#12151c] px-3.5 py-2 pr-9 text-sm text-gray-200 shadow-sm transition-colors hover:border-gray-600 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50",
+            "flex h-10 w-full appearance-none rounded-xl border border-app-border bg-app-input px-3.5 py-2 pr-9 text-sm text-app-text-primary shadow-sm transition-colors hover:border-app-border-hover focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50",
             className
           )}
           ref={ref}
@@ -24,7 +24,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         </select>
         <ChevronDown
           size={15}
-          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-app-text-muted"
         />
       </div>
     );

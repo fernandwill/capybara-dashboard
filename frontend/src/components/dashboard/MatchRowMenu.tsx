@@ -25,32 +25,32 @@ export default function MatchRowMenu({
       <div className="fixed inset-0 z-40" onClick={onClose} />
 
       <div
-        className="fixed z-50 w-40 overflow-hidden rounded-xl border border-[#282c35] bg-[#12151c]/95 p-1.5 text-xs shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95"
+        className="fixed z-50 w-40 overflow-hidden rounded-xl border border-app-border bg-app-input/95 p-1.5 text-xs shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95"
         style={{ top: y + 6, left: x }}
       >
         <button
           type="button"
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-gray-300 transition-colors hover:bg-[#181d26] hover:text-white"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-app-text-secondary transition-colors hover:bg-app-hover hover:text-app-text-primary"
           onClick={() => {
             onClose();
             onDetails(match);
           }}
         >
-          <Eye size={14} className="text-gray-400" />
+          <Eye size={14} className="text-app-text-muted" />
           <span>View Details</span>
         </button>
         <button
           type="button"
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-gray-300 transition-colors hover:bg-[#181d26] hover:text-white"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-app-text-secondary transition-colors hover:bg-app-hover hover:text-app-text-primary"
           onClick={() => {
             onClose();
             onEdit(match);
           }}
         >
-          <Pencil size={14} className="text-gray-400" />
+          <Pencil size={14} className="text-app-text-muted" />
           <span>Edit Match</span>
         </button>
-        <div className="my-1 border-t border-[#282c35]/60" />
+        <div className="my-1 border-t border-app-border/60" />
         <button
           type="button"
           className="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-rose-400 transition-colors hover:bg-rose-500/10 hover:text-rose-300"

@@ -30,7 +30,7 @@ export default function MatchCard({ match, onClick, onOpenMenu }: MatchCardProps
   return (
     <div
       onClick={() => onClick(match)}
-      className="group relative flex flex-col justify-between rounded-xl border border-app-border bg-app-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-600 hover:shadow-lg cursor-pointer"
+      className="group relative flex flex-col justify-between rounded-xl border border-app-border bg-app-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-app-border-hover hover:shadow-lg cursor-pointer"
     >
       {/* Top Row: Date Badge, Status Badge, Row Menu */}
       <div>
@@ -40,7 +40,7 @@ export default function MatchCard({ match, onClick, onOpenMenu }: MatchCardProps
               <span className="text-[10px] font-bold uppercase tracking-wider text-app-text-muted">
                 {month}
               </span>
-              <span className="text-base font-bold text-white leading-none">
+              <span className="text-base font-bold text-app-text-primary leading-none">
                 {day}
               </span>
             </div>
@@ -60,7 +60,7 @@ export default function MatchCard({ match, onClick, onOpenMenu }: MatchCardProps
           <Button
             variant="ghost"
             size="icon"
-            className="text-app-text-muted hover:bg-gray-700 hover:text-white"
+            className="text-app-text-muted hover:bg-app-hover hover:text-app-text-primary"
             onClick={(e) => onOpenMenu(e, match)}
             aria-label={`Actions for ${match.title}`}
           >
@@ -69,7 +69,7 @@ export default function MatchCard({ match, onClick, onOpenMenu }: MatchCardProps
         </div>
 
         {/* Title & Location */}
-        <h3 className="line-clamp-1 text-lg font-bold text-white transition group-hover:text-app-primary">
+        <h3 className="line-clamp-1 text-lg font-bold text-app-text-primary transition group-hover:text-app-primary">
           {match.title}
         </h3>
         <p className="mt-1 flex items-center gap-1.5 line-clamp-1 text-sm text-app-text-secondary">

@@ -35,18 +35,18 @@ export default function SlotPickerModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="w-full max-w-sm rounded-2xl border border-[#232834] bg-[#0e1117] p-4 shadow-2xl">
+      <div className="w-full max-w-sm rounded-2xl border border-app-border bg-app-bg p-4 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-bold text-white">Select Player</h4>
-            <p className="text-xs text-gray-400">
+            <h4 className="text-sm font-bold text-app-text-primary">Select Player</h4>
+            <p className="text-xs text-app-text-muted">
               Choose from unassigned players in queue
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-gray-400 hover:text-white"
+            className="rounded-lg p-1 text-app-text-muted hover:text-app-text-primary"
           >
             <X size={16} />
           </button>
@@ -54,7 +54,7 @@ export default function SlotPickerModal({
 
         <div className="max-h-64 space-y-1 overflow-y-auto pr-1 custom-scrollbar">
           {unassignedPlayers.length === 0 ? (
-            <div className="py-6 text-center text-xs text-gray-400">
+            <div className="py-6 text-center text-xs text-app-text-muted">
               <p>All joined players are currently assigned.</p>
             </div>
           ) : (
@@ -73,10 +73,10 @@ export default function SlotPickerModal({
                       player.id
                     )
                   }
-                  className="flex w-full items-center justify-between rounded-xl border border-transparent bg-[#12151c] px-3 py-2 text-left transition hover:border-emerald-500/50 hover:bg-[#16202e]"
+                  className="flex w-full items-center justify-between rounded-xl border border-transparent bg-app-input px-3 py-2 text-left transition hover:border-emerald-500/50 hover:bg-app-hover"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-gray-700">
+                    <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-app-border">
                       <Image
                         src="/capybara-avatar.png"
                         alt={player.name}
@@ -85,7 +85,7 @@ export default function SlotPickerModal({
                         className="h-full w-full object-cover"
                       />
                     </div>
-                    <span className="truncate text-xs font-semibold text-white">
+                    <span className="truncate text-xs font-semibold text-app-text-primary">
                       {player.name}
                     </span>
                   </div>

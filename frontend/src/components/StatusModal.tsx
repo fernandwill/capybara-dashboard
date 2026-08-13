@@ -54,8 +54,8 @@ export default function StatusModal({
         >
           {isSuccess ? <CheckCircle2 size={30} /> : <AlertCircle size={30} />}
         </div>
-        <h2 className="mb-1.5 text-lg font-bold text-white">{title}</h2>
-        <div className="text-sm text-gray-400">{message}</div>
+        <h2 className="mb-1.5 text-lg font-bold text-app-text-primary">{title}</h2>
+        <div className="text-sm text-app-text-muted">{message}</div>
       </div>
     </Modal>
   );

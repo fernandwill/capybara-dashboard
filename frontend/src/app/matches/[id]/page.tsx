@@ -278,7 +278,7 @@ export default function MatchDetailsPage() {
     return (
       <AppLayout>
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-lg font-semibold text-white">Match not found</p>
+          <p className="text-lg font-semibold text-app-text-primary">Match not found</p>
           <Link
             href="/matches"
             className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-500"
@@ -308,26 +308,26 @@ export default function MatchDetailsPage() {
     <AppLayout>
       <div className="space-y-6 pb-12">
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-app-text-muted">
           <Link
             href="/matches"
-            className="flex items-center gap-1 transition hover:text-white"
+            className="flex items-center gap-1 transition hover:text-app-text-primary"
           >
             <ArrowLeft size={13} />
             <span>Matches</span>
           </Link>
-          <ChevronRight size={13} className="text-gray-600" />
-          <span className="truncate font-medium text-gray-300">
+          <ChevronRight size={13} className="text-app-text-muted" />
+          <span className="truncate font-medium text-app-text-secondary">
             {match.title}
           </span>
         </div>
 
         {/* Match Header Hero Card */}
-        <div className="rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-5 shadow-lg">
+        <div className="rounded-2xl border border-app-border bg-app-bg p-5 shadow-lg">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-2 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                <h1 className="text-2xl font-bold tracking-tight text-app-text-primary sm:text-3xl">
                   {match.title}
                 </h1>
                 <span
@@ -337,17 +337,17 @@ export default function MatchDetailsPage() {
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-app-text-muted">
                 <span className="flex items-center gap-1.5">
                   <Calendar size={14} className="text-emerald-400" />
                   {formatDate(match.date)}
                 </span>
-                <span className="text-gray-600">•</span>
+                <span className="text-app-text-muted">•</span>
                 <span className="flex items-center gap-1.5">
                   <Clock size={14} className="text-blue-400" />
                   {formatTimeWithDuration(match.time)}
                 </span>
-                <span className="text-gray-600">•</span>
+                <span className="text-app-text-muted">•</span>
                 <span className="flex items-center gap-1.5">
                   <MapPin size={14} className="text-amber-400" />
                   {match.location || "Badminton Hall"}
@@ -359,7 +359,7 @@ export default function MatchDetailsPage() {
               <button
                 type="button"
                 onClick={() => exportPlayerList(match, players)}
-                className="flex items-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] px-3.5 py-2 text-xs font-semibold text-gray-200 transition hover:border-[#2d3444] hover:bg-[#1a202c] hover:text-white"
+                className="flex items-center gap-1.5 rounded-xl border border-app-border bg-app-input px-3.5 py-2 text-xs font-semibold text-app-text-secondary transition hover:border-app-border-hover hover:bg-app-hover hover:text-app-text-primary"
                 aria-label="Export Players"
               >
                 <span>Export</span>
@@ -370,9 +370,9 @@ export default function MatchDetailsPage() {
                 disabled={isUpdatingStatus}
                 onClick={handleToggleMatchStatus}
                 aria-label={isMatchCompleted ? "Reopen Match" : "Finish Match"}
-                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold text-white shadow-md transition disabled:opacity-50 ${
+                className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-md transition disabled:opacity-50 ${
                   isMatchCompleted
-                    ? "border border-gray-700 bg-gray-800 hover:bg-gray-700"
+                    ? "border border-app-border bg-app-input text-app-text-primary hover:bg-app-hover"
                     : "border border-emerald-500/40 bg-emerald-600 hover:bg-emerald-500 text-white"
                 }`}
               >
@@ -401,7 +401,7 @@ export default function MatchDetailsPage() {
             />
 
             {/* Mobile Court Selector Tabs */}
-            <div className="flex overflow-x-auto gap-1.5 rounded-xl bg-[#0e1117] p-1.5 border border-[#1a1e26] md:hidden custom-scrollbar">
+            <div className="flex overflow-x-auto gap-1.5 rounded-xl bg-app-bg p-1.5 border border-app-border md:hidden custom-scrollbar">
               {courtManager.courts.map((c, idx) => {
                 const courtHasPlayers =
                   c.teamA.some((s) => s.playerId) ||
@@ -416,7 +416,7 @@ export default function MatchDetailsPage() {
                     className={`flex flex-1 min-w-[80px] items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition ${
                       isCurrent
                         ? "bg-emerald-600 text-white shadow-md"
-                        : "bg-[#141820] text-gray-400 hover:text-white"
+                        : "bg-app-input text-app-text-muted hover:text-app-text-primary"
                     }`}
                   >
                     <span>{c.name}</span>

@@ -20,7 +20,7 @@ export default function DeleteMatchModal({
 }: DeleteMatchModalProps) {
   const message = matchTitle ? (
     <p>
-      Are you sure you want to delete <strong className="text-white">&ldquo;{matchTitle}&rdquo;</strong>? This action cannot be undone.
+      Are you sure you want to delete <strong className="text-app-text-primary">&ldquo;{matchTitle}&rdquo;</strong>? This action cannot be undone.
     </p>
   ) : (
     <p>Are you sure you want to delete this match? This action cannot be undone.</p>

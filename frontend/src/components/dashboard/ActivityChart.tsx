@@ -41,7 +41,7 @@ export default function ActivityChart({
       {/* Chart Plot Area + Y Axis */}
       <div className="relative flex flex-1 items-stretch gap-3 min-h-[200px]">
         {/* Y-Axis labels */}
-        <div className="flex flex-col justify-between text-right text-[11px] font-medium text-gray-400 select-none w-8 shrink-0 py-0.5">
+        <div className="flex flex-col justify-between text-right text-[11px] font-medium text-app-text-muted select-none w-8 shrink-0 py-0.5">
           {gridLines.map((value) => (
             <span key={value} className="leading-none">
               {mode === "hours" ? `${value}h` : value}
@@ -58,8 +58,8 @@ export default function ActivityChart({
                 key={value}
                 className={`w-full border-b ${
                   idx === gridLines.length - 1
-                    ? "border-[#282c35]"
-                    : "border-[#232730]/70"
+                    ? "border-app-border"
+                    : "border-app-border/70"
                 }`}
               />
             ))}
@@ -81,11 +81,11 @@ export default function ActivityChart({
                 >
                   {/* Floating Hover Tooltip */}
                   <div className="pointer-events-none absolute bottom-full mb-2 z-30 hidden group-hover:flex flex-col items-center">
-                    <div className="rounded-lg border border-[#2e3440] bg-[#161a22] px-2.5 py-1.5 shadow-xl text-center backdrop-blur whitespace-nowrap">
-                      <div className="text-[11px] font-bold text-white">
+                    <div className="rounded-lg border border-app-border bg-app-card px-2.5 py-1.5 shadow-xl text-center backdrop-blur whitespace-nowrap">
+                      <div className="text-[11px] font-bold text-app-text-primary">
                         {item.month} {selectedYear}
                       </div>
-                      <div className="mt-0.5 text-[10px] text-gray-300">
+                      <div className="mt-0.5 text-[10px] text-app-text-secondary">
                         <span
                           className={`font-semibold ${
                             mode === "hours" ? "text-emerald-400" : "text-blue-400"
@@ -96,19 +96,19 @@ export default function ActivityChart({
                             : `${item.matches} matches`}
                         </span>
                         {mode === "hours" && (
-                          <span className="text-gray-400 ml-1">
+                          <span className="text-app-text-muted ml-1">
                             ({item.matches} {item.matches === 1 ? "match" : "matches"})
                           </span>
                         )}
                         {mode === "matches" && (
-                          <span className="text-gray-400 ml-1">
+                          <span className="text-app-text-muted ml-1">
                             ({item.hours}h)
                           </span>
                         )}
                       </div>
                     </div>
                     {/* Tooltip caret */}
-                    <div className="h-1.5 w-1.5 -translate-y-1 rotate-45 border-b border-r border-[#2e3440] bg-[#161a22]" />
+                    <div className="h-1.5 w-1.5 -translate-y-1 rotate-45 border-b border-r border-app-border bg-app-card" />
                   </div>
 
                   {/* Bar graphic */}
@@ -126,8 +126,8 @@ export default function ActivityChart({
                       <div
                         className={`h-1 w-full max-w-[12px] rounded-full transition ${
                           isCurrentMonth
-                            ? "bg-gray-600"
-                            : "bg-[#232730] opacity-60 group-hover:bg-[#343a46]"
+                            ? "bg-app-border"
+                            : "bg-app-border opacity-60 group-hover:bg-app-hover"
                         }`}
                       />
                     )}
@@ -140,7 +140,7 @@ export default function ActivityChart({
       </div>
 
       {/* X-Axis Month Labels */}
-      <div className="flex items-center justify-between pl-11 pr-1 sm:pr-2 pt-2.5 border-t border-[#232730]/80 mt-1">
+      <div className="flex items-center justify-between pl-11 pr-1 sm:pr-2 pt-2.5 border-t border-app-border/80 mt-1">
         {data.map((item, idx) => {
           const value = mode === "hours" ? item.hours : item.matches;
           const isCurrentMonth =
@@ -153,8 +153,8 @@ export default function ActivityChart({
                   isCurrentMonth
                     ? "font-bold text-emerald-400 underline underline-offset-4 decoration-emerald-500/50"
                     : value > 0
-                    ? "font-semibold text-white"
-                    : "font-normal text-gray-500 hover:text-gray-400"
+                    ? "font-semibold text-app-text-primary"
+                    : "font-normal text-app-text-muted hover:text-app-text-secondary"
                 }`}
               >
                 {item.month}

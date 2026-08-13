@@ -64,7 +64,7 @@ export default function DeletePlayerModal({
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className="rounded-xl px-4 py-2 text-xs font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-40"
+            className="rounded-xl px-4 py-2 text-xs font-medium text-app-text-secondary transition hover:bg-app-hover hover:text-app-text-primary disabled:opacity-40"
           >
             Cancel
           </button>
@@ -92,12 +92,12 @@ export default function DeletePlayerModal({
       <div className="space-y-3">
         <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
-          <div className="text-xs text-red-200">
-            <p className="font-semibold text-white">Warning: Permanent Action</p>
-            <p className="mt-1 text-gray-300">
-              Are you sure you want to delete <span className="font-bold text-white">{player?.name}</span>? This will remove their record from the historical player database.
+          <div className="text-xs text-red-600">
+            <p className="font-semibold text-app-text-primary">Warning: Permanent Action</p>
+            <p className="mt-1 text-app-text-secondary">
+              Are you sure you want to delete <span className="font-bold text-app-text-primary">{player?.name}</span>? This will remove their record from the historical player database.
             </p>
-            <p className="mt-1 text-[11px] text-gray-400">
+            <p className="mt-1 text-[11px] text-app-text-muted">
               Players with match or payment history cannot be deleted.
             </p>
           </div>

@@ -59,7 +59,7 @@ export default function ConfirmModal({
         <>
           <button
             type="button"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-50"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-app-text-secondary transition hover:bg-app-hover hover:text-app-text-primary disabled:opacity-50"
             onClick={handleClose}
             disabled={isLoading}
           >
@@ -88,7 +88,7 @@ export default function ConfirmModal({
             {icon}
           </div>
         )}
-        <div className="text-sm leading-relaxed text-gray-300">{message}</div>
+        <div className="text-sm leading-relaxed text-app-text-secondary">{message}</div>
       </div>
     </Modal>
   );

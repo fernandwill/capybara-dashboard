@@ -94,22 +94,22 @@ export default function PlayerStatsCards({ players, isLoading }: PlayerStatsCard
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card) => (
-        <div key={card.label} className="rounded-2xl border border-[#1a1e26] bg-[#0c0e12] p-4">
+        <div key={card.label} className="rounded-2xl border border-app-border bg-app-bg p-4">
           <div className="flex items-center justify-between">
             <div
               className={`flex h-9 w-9 items-center justify-center rounded-xl border ${card.iconClass}`}
             >
               {card.icon}
             </div>
-            <span className="text-[11px] font-medium text-gray-400">
+            <span className="text-[11px] font-medium text-app-text-muted">
               {card.label}
             </span>
           </div>
           <div className="mt-3">
-            <p className="truncate text-2xl font-bold tracking-tight text-white">
+            <p className="truncate text-2xl font-bold tracking-tight text-app-text-primary">
               {card.value}
             </p>
-            <p className="mt-0.5 text-xs text-gray-400">{card.sub}</p>
+            <p className="mt-0.5 text-xs text-app-text-muted">{card.sub}</p>
           </div>
         </div>
       ))}

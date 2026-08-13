@@ -70,10 +70,10 @@ export default function CourtCard({
               return (
                 <div
                   key={sIdx}
-                  className="flex items-center justify-between rounded-xl border border-[#232834] bg-[#12151c] px-2.5 py-1.5"
+                  className="flex items-center justify-between rounded-xl border border-app-border bg-app-input px-2.5 py-1.5"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-gray-700">
+                    <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full border border-app-border">
                       <Image
                         src="/capybara-avatar.png"
                         alt={playerObj.name}
@@ -83,10 +83,10 @@ export default function CourtCard({
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-semibold text-white">
+                      <p className="truncate text-xs font-semibold text-app-text-primary">
                         {playerObj.name}
                       </p>
-                      <p className="text-[10px] text-gray-400">
+                      <p className="text-[10px] text-app-text-muted">
                         {count}x played
                       </p>
                     </div>
@@ -94,7 +94,7 @@ export default function CourtCard({
                   <button
                     type="button"
                     onClick={() => onRemove(courtIndex, team, sIdx)}
-                    className="rounded p-1 text-gray-400 transition hover:bg-rose-500/10 hover:text-rose-400"
+                    className="rounded p-1 text-app-text-muted transition hover:bg-rose-500/10 hover:text-rose-400"
                     title="Remove player"
                   >
                     <X size={13} />
@@ -108,7 +108,7 @@ export default function CourtCard({
                 key={sIdx}
                 type="button"
                 onClick={() => onOpenSlotPicker(courtIndex, team, sIdx)}
-                className={`flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#282d38] bg-[#12151c]/60 py-2 text-xs font-medium text-gray-400 transition ${emptyHoverClass}`}
+                className={`flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-app-border bg-app-input/60 py-2 text-xs font-medium text-app-text-muted transition ${emptyHoverClass}`}
               >
                 <Plus size={13} />
                 <span>Add player</span>
@@ -122,25 +122,25 @@ export default function CourtCard({
 
   return (
     <div
-      className={`flex-col justify-between rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 transition-all hover:border-[#28303f] shadow-sm ${
+      className={`flex-col justify-between rounded-2xl border border-app-border bg-app-bg p-4 transition-all hover:border-app-border-hover shadow-sm ${
         isActive ? "flex" : "hidden md:flex"
       }`}
     >
       {/* Court Title & Status Header */}
-      <div className="mb-3.5 flex items-center justify-between border-b border-[#181d26] pb-3">
+      <div className="mb-3.5 flex items-center justify-between border-b border-app-border pb-3">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-white text-sm">{court.name}</span>
+          <span className="font-bold text-app-text-primary text-sm">{court.name}</span>
           <span
             className={`rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
               courtStatus === "IN PROGRESS"
                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                : "bg-[#141820] text-gray-400 border border-[#232834]"
+                : "bg-app-input text-app-text-muted border border-app-border"
             }`}
           >
             {courtStatus}
           </span>
         </div>
-        <span className="rounded bg-[#141820] px-1.5 py-0.5 text-[10px] font-semibold text-gray-400">
+        <span className="rounded bg-app-input px-1.5 py-0.5 text-[10px] font-semibold text-app-text-muted">
           2v2
         </span>
       </div>
@@ -152,9 +152,9 @@ export default function CourtCard({
         {/* VS Divider */}
         <div className="relative flex items-center justify-center py-0.5">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#1a1f28]" />
+            <div className="w-full border-t border-app-border" />
           </div>
-          <span className="relative rounded-full bg-[#141820] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-400 border border-[#222734]">
+          <span className="relative rounded-full bg-app-input px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-app-text-muted border border-app-border">
             VS
           </span>
         </div>
@@ -163,7 +163,7 @@ export default function CourtCard({
       </div>
 
       {/* Finish Court Button */}
-      <div className="mt-4 pt-3 border-t border-[#181d26]">
+      <div className="mt-4 pt-3 border-t border-app-border">
         <button
           type="button"
           disabled={!courtHasPlayers || isSavingRound}
@@ -171,7 +171,7 @@ export default function CourtCard({
           className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition shadow-sm ${
             courtHasPlayers
               ? "border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-              : "border border-transparent bg-[#141820] text-gray-600 cursor-not-allowed"
+              : "border border-transparent bg-app-input text-app-text-muted cursor-not-allowed"
           }`}
         >
           <CheckCircle2 size={13} />

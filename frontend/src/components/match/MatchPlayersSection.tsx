@@ -60,20 +60,20 @@ export default function MatchPlayersSection({
         /* State 1: Clean empty state with Add Players CTA */
         <div>
           <div className="mb-2">
-            <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-app-text-muted">
               PLAYERS
             </h3>
-            <p className="text-xs text-gray-400">Add players to this match.</p>
+            <p className="text-xs text-app-text-muted">Add players to this match.</p>
           </div>
 
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#232730] bg-[#0c0e12]/60 p-6 text-center">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-app-border bg-app-input/60 p-6 text-center">
             <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
               <UserPlus size={20} />
             </div>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-app-text-primary">
               No players added yet
             </p>
-            <p className="mt-0.5 text-xs text-gray-400">
+            <p className="mt-0.5 text-xs text-app-text-muted">
               Add players to get started.
             </p>
             <button
@@ -92,7 +92,7 @@ export default function MatchPlayersSection({
         <div>
           <div className="mb-2.5 flex items-center justify-between">
             <div>
-              <h3 className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+              <h3 className="text-[11px] font-bold uppercase tracking-wider text-app-text-muted">
                 PLAYERS
               </h3>
               <p className="text-xs font-semibold text-emerald-400">
@@ -106,7 +106,7 @@ export default function MatchPlayersSection({
             {selectedPlayersList.map((player) => (
               <div
                 key={player.id}
-                className="flex items-center justify-between rounded-xl border border-[#232730] bg-[#0c0e12] px-3 py-2"
+                className="flex items-center justify-between rounded-xl border border-app-border bg-app-input px-3 py-2"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Image
@@ -114,9 +114,9 @@ export default function MatchPlayersSection({
                     alt={player.name}
                     width={400}
                     height={383}
-                    className="h-7 w-7 shrink-0 rounded-full object-cover border border-gray-700 shadow-sm"
+                    className="h-7 w-7 shrink-0 rounded-full object-cover border border-app-border shadow-sm"
                   />
-                  <span className="truncate text-xs font-semibold text-white">
+                  <span className="truncate text-xs font-semibold text-app-text-primary">
                     {player.name}
                   </span>
                 </div>
@@ -124,7 +124,7 @@ export default function MatchPlayersSection({
                   <button
                     type="button"
                     onClick={() => handleRemovePlayerChip(player.id)}
-                    className="rounded p-1 text-gray-400 transition hover:bg-gray-800 hover:text-white"
+                    className="rounded p-1 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
                     aria-label={`Remove ${player.name}`}
                   >
                     <X size={14} />

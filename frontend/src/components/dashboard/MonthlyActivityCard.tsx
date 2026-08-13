@@ -22,7 +22,7 @@ export default function MonthlyActivityCard({
     <section className="flex h-full flex-col rounded-xl border border-app-border bg-app-card p-5 sm:p-6">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-lg font-semibold text-app-text-primary">Monthly Activity</h2>
-        <div className="flex rounded-lg border border-app-border bg-[#1E232B] p-1">
+        <div className="flex rounded-lg border border-app-border bg-app-input p-1">
           {(["hours", "matches"] as const).map((mode) => (
             <Button
               key={mode}
@@ -30,8 +30,8 @@ export default function MonthlyActivityCard({
               size="sm"
               className={`rounded-md px-4 py-1.5 font-medium ${
                 chartMode === mode
-                  ? "bg-[#282C35] text-white shadow-sm hover:bg-[#282C35]"
-                  : "text-app-text-secondary hover:text-white"
+                  ? "bg-app-selected text-app-text-primary shadow-sm hover:bg-app-selected"
+                  : "text-app-text-secondary hover:text-app-text-primary"
               }`}
               onClick={() => setChartMode(mode)}
             >

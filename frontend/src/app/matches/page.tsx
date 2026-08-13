@@ -75,11 +75,6 @@ export default function AllMatchesHistoryPage() {
     message: "",
   });
 
-  // Dark mode
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-  }, []);
-
   // Redirect if unauthenticated
   useEffect(() => {
     if (!authLoading && !user) {
@@ -268,13 +263,13 @@ export default function AllMatchesHistoryPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/"
-                className="flex items-center gap-2 rounded-lg border border-app-border bg-app-card px-3 py-1.5 text-sm font-medium text-app-text-primary transition hover:bg-gray-700 hover:text-white"
+                className="flex items-center gap-2 rounded-lg border border-app-border bg-app-card px-3 py-1.5 text-sm font-medium text-app-text-primary transition hover:bg-app-hover hover:text-app-text-primary"
               >
                 <ArrowLeft size={16} />
                 <span>Dashboard</span>
               </Link>
               <div className="h-5 w-px bg-app-border" />                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-gray-700">
+                  <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-app-border">
                     <Image
                       src="/icons/icon.jpg"
                       alt="CapyHub"
@@ -283,7 +278,7 @@ export default function AllMatchesHistoryPage() {
                       className="h-full w-full object-cover"
                     />
                   </div>
-                  <span className="hidden sm:inline font-bold tracking-tight text-white">CapyHub</span>
+                  <span className="hidden sm:inline font-bold tracking-tight text-app-text-primary">CapyHub</span>
                 </div>
             </div>
 
@@ -306,7 +301,7 @@ export default function AllMatchesHistoryPage() {
                 <History size={16} />
                 <span>Match Archive</span>
               </div>
-              <h1 className="text-3xl font-bold tracking-tight text-white">
+              <h1 className="text-3xl font-bold tracking-tight text-app-text-primary">
                 All Matches History
               </h1>
               <p className="mt-1 text-sm text-app-text-secondary">
@@ -328,7 +323,7 @@ export default function AllMatchesHistoryPage() {
                 variant={statusFilter === "COMPLETED" ? "success" : "secondary"}
                 size="xs"
                 className={`font-semibold ${
-                  statusFilter === "COMPLETED" ? "" : "text-app-text-secondary hover:text-white"
+                  statusFilter === "COMPLETED" ? "" : "text-app-text-secondary hover:text-app-text-primary"
                 }`}
                 onClick={() => handleFilterChange("COMPLETED")}
               >
@@ -338,7 +333,7 @@ export default function AllMatchesHistoryPage() {
                 variant={statusFilter === "UPCOMING" ? "primary" : "secondary"}
                 size="xs"
                 className={`font-semibold ${
-                  statusFilter === "UPCOMING" ? "bg-blue-500 hover:bg-blue-600" : "text-app-text-secondary hover:text-white"
+                  statusFilter === "UPCOMING" ? "bg-blue-500 hover:bg-blue-600" : "text-app-text-secondary hover:text-app-text-primary"
                 }`}
                 onClick={() => handleFilterChange("UPCOMING")}
               >
@@ -390,7 +385,7 @@ export default function AllMatchesHistoryPage() {
           ) : currentMatches.length === 0 ? (
             <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-app-border/60 bg-app-card p-8 text-center">
               <CalendarDays size={48} className="mb-3 text-app-text-muted" strokeWidth={1.5} />
-              <h3 className="text-lg font-semibold text-white">No matches found</h3>
+              <h3 className="text-lg font-semibold text-app-text-primary">No matches found</h3>
               <p className="mt-1 max-w-sm text-sm text-app-text-muted">
                 {searchQuery || statusFilter !== "ALL"
                   ? "Try adjusting your search query or status filter."
@@ -437,10 +432,10 @@ export default function AllMatchesHistoryPage() {
             <div className="mt-4 flex flex-col items-center justify-between gap-4 border-t border-app-border pt-6 sm:flex-row">
               <p className="text-xs text-app-text-muted">
                 Showing{" "}
-                <span className="font-medium text-white">{startIndex}</span>{" "}
+                <span className="font-medium text-app-text-primary">{startIndex}</span>{" "}
                 to{" "}
-                <span className="font-medium text-white">{endIndex}</span>{" "}
-                of <span className="font-medium text-white">{filteredMatches.length}</span> matches
+                <span className="font-medium text-app-text-primary">{endIndex}</span>{" "}
+                of <span className="font-medium text-app-text-primary">{filteredMatches.length}</span> matches
               </p>
 
               <div className="flex items-center gap-2">
@@ -461,7 +456,7 @@ export default function AllMatchesHistoryPage() {
                       variant={currentPage === pageNum ? "primary" : "secondary"}
                       size="icon"
                       className={`text-xs font-semibold ${
-                        currentPage === pageNum ? "" : "text-app-text-secondary hover:text-white"
+                        currentPage === pageNum ? "" : "text-app-text-secondary hover:text-app-text-primary"
                       }`}
                       onClick={() => goToPage(pageNum)}
                     >

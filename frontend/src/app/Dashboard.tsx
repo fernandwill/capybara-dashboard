@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Clock3, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -123,11 +123,6 @@ export function Dashboard() {
     players,
     selectedYear,
   });
-
-  // Force dark theme for the whole app (matches the new design)
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-  }, []);
 
   // Logout handler
   const handleLogout = async () => {

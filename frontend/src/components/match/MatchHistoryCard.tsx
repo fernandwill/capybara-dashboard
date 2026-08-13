@@ -19,40 +19,40 @@ function formatTimeHM(isoString: string): string {
 /** Persisted finished-games feed: team vs team per round. */
 export default function MatchHistoryCard({ history }: MatchHistoryCardProps) {
   return (
-    <div className="rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 shadow-sm">
+    <div className="rounded-2xl border border-app-border bg-app-bg p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-bold text-white">
-          <History size={15} className="text-gray-400" />
+        <h3 className="flex items-center gap-2 text-sm font-bold text-app-text-primary">
+          <History size={15} className="text-app-text-muted" />
           <span>Match History</span>
         </h3>
-        <span className="rounded-md border border-[#232834] bg-[#141820] px-2 py-0.5 text-[10px] font-medium text-gray-400">
+        <span className="rounded-md border border-app-border bg-app-input px-2 py-0.5 text-[10px] font-medium text-app-text-muted">
           {history.length} round{history.length === 1 ? "" : "s"}
         </span>
       </div>
 
       <div className="max-h-64 space-y-2 overflow-y-auto pr-1 custom-scrollbar">
         {history.length === 0 ? (
-          <p className="py-6 text-center text-xs text-gray-500">
+          <p className="py-6 text-center text-xs text-app-text-muted">
             No rounds recorded for this match yet.
           </p>
         ) : (
           history.map((g) => (
             <div
               key={g.id}
-              className="rounded-xl border border-[#1d222d] bg-[#12151c] p-2.5 text-xs text-gray-300"
+              className="rounded-xl border border-app-border bg-app-input p-2.5 text-xs text-app-text-secondary"
             >
               <div className="mb-1 flex items-center justify-between">
                 <span className="font-semibold text-emerald-400">
                   {g.courtName}
                 </span>
-                <span className="text-[10px] font-medium text-gray-500">
+                <span className="text-[10px] font-medium text-app-text-muted">
                   {formatTimeHM(g.finishedAt)}
                 </span>
               </div>
-              <div className="text-[11px] text-gray-400">
-                <span className="text-gray-200">{g.teamANames.join(" & ")}</span>{" "}
-                <span className="text-gray-500 font-bold">vs</span>{" "}
-                <span className="text-gray-200">{g.teamBNames.join(" & ")}</span>
+              <div className="text-[11px] text-app-text-muted">
+                <span className="text-app-text-primary">{g.teamANames.join(" & ")}</span>{" "}
+                <span className="text-app-text-muted font-bold">vs</span>{" "}
+                <span className="text-app-text-primary">{g.teamBNames.join(" & ")}</span>
               </div>
             </div>
           ))

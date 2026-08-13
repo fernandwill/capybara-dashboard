@@ -9,10 +9,10 @@ const buttonVariants = cva(
       variant: {
         primary: "bg-app-primary text-white shadow-sm hover:bg-app-primary-hover",
         secondary:
-          "border border-app-border bg-app-card text-app-text-primary hover:bg-white/[0.06]",
+          "border border-app-border bg-app-card text-app-text-primary hover:bg-app-hover",
         success: "bg-app-success text-white shadow-sm hover:bg-green-600",
         destructive: "bg-red-500 text-white shadow-sm hover:bg-red-600",
-        ghost: "text-app-text-primary hover:bg-white/[0.06]",
+        ghost: "text-app-text-primary hover:bg-app-hover",
         link: "text-app-primary underline-offset-4 hover:underline",
       },
       size: {

@@ -34,7 +34,7 @@ export default function PlayerTableRow({
   onDelete,
 }: PlayerTableRowProps) {
   return (
-    <tr className="transition-colors hover:bg-[#12151c]/60 group">
+    <tr className="transition-colors hover:bg-app-hover/60 group">
       {/* Player Column */}
       <td className="px-5 py-3.5">
         <div className="flex items-center gap-3">
@@ -43,10 +43,10 @@ export default function PlayerTableRow({
             alt={player.name}
             width={400}
             height={383}
-            className="h-9 w-9 shrink-0 rounded-full object-cover border border-[#232730] shadow-sm"
+            className="h-9 w-9 shrink-0 rounded-full object-cover border border-app-border shadow-sm"
           />
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-white">{player.name}</span>
+            <span className="font-semibold text-app-text-primary">{player.name}</span>
             {isTopPlayer && (
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
                 Most Played
@@ -57,7 +57,7 @@ export default function PlayerTableRow({
       </td>
 
       {/* Total Matches */}
-      <td className="px-4 py-3.5 text-center font-medium text-white">
+      <td className="px-4 py-3.5 text-center font-medium text-app-text-primary">
         {player.totalMatches ?? 0}
       </td>
 
@@ -67,7 +67,7 @@ export default function PlayerTableRow({
       </td>
 
       {/* Last Played */}
-      <td className="px-4 py-3.5 text-gray-300">{formatDate(player.lastPlayed)}</td>
+      <td className="px-4 py-3.5 text-app-text-secondary">{formatDate(player.lastPlayed)}</td>
 
       {/* Actions (Pencil & Trash icons) */}
       <td className="px-5 py-3.5 text-right">
@@ -75,7 +75,7 @@ export default function PlayerTableRow({
           <button
             type="button"
             onClick={() => onEdit(player)}
-            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-[#1c222e] hover:text-white"
+            className="rounded-lg p-1.5 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
             title="Edit player"
           >
             <Pencil size={14} />
@@ -83,7 +83,7 @@ export default function PlayerTableRow({
           <button
             type="button"
             onClick={() => onDelete(player)}
-            className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-500/10 hover:text-red-400"
+            className="rounded-lg p-1.5 text-app-text-muted transition hover:bg-red-500/10 hover:text-red-400"
             title="Delete player"
           >
             <Trash2 size={14} />

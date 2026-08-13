@@ -31,11 +31,11 @@ export default function UpcomingMatchBanner({
       <div className="relative overflow-hidden rounded-2xl border border-app-border bg-app-card p-5 animate-pulse">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2.5">
-            <div className="h-4 w-32 rounded bg-gray-800" />
-            <div className="h-6 w-64 rounded bg-gray-800" />
-            <div className="h-4 w-48 rounded bg-gray-800" />
+            <div className="h-4 w-32 rounded bg-app-border" />
+            <div className="h-6 w-64 rounded bg-app-border" />
+            <div className="h-4 w-48 rounded bg-app-border" />
           </div>
-          <div className="h-12 w-36 rounded-xl bg-gray-800" />
+          <div className="h-12 w-36 rounded-xl bg-app-border" />
         </div>
       </div>
     );
@@ -43,14 +43,14 @@ export default function UpcomingMatchBanner({
 
   if (!match) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-app-border bg-app-card p-5 transition hover:border-gray-700">
+      <div className="relative overflow-hidden rounded-2xl border border-app-border bg-app-card p-5 transition hover:border-app-border-hover">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#232730] bg-[#12151c] text-gray-400">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-input text-app-text-muted">
               <CalendarDays size={20} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">No upcoming matches scheduled</h3>
+              <h3 className="text-sm font-bold text-app-text-primary">No upcoming matches scheduled</h3>
               <p className="text-xs text-app-text-secondary">
                 Schedule your next badminton session to organize courts, players, and match rotations.
               </p>
@@ -72,6 +72,8 @@ export default function UpcomingMatchBanner({
   const courtCount = match.courtNumber || "4";
   const playersCount = match.players?.length || 0;
 
+  // ponytail: hero banner intentionally stays a dark navy gradient in both
+  // themes (accent element), so its white/gray text is kept as-is.
   return (
     <div
       onClick={() => onMatchClick(match)}

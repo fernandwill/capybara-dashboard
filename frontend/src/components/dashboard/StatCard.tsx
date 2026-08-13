@@ -33,7 +33,7 @@ export default function StatCard({
   const Icon = icon;
 
   return (
-    <article className="flex h-full min-w-0 flex-col rounded-xl border border-app-border bg-app-card p-5 transition-colors hover:border-gray-600">
+    <article className="flex h-full min-w-0 flex-col rounded-xl border border-app-border bg-app-card p-5 transition-colors hover:border-app-border-hover">
       <div className="mb-4 flex items-center gap-3">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${accentStyles[accent].icon}`}>
           <Icon size={18} />
@@ -43,7 +43,7 @@ export default function StatCard({
 
       <div className="flex items-end justify-between">
         <div className="flex min-w-0 items-baseline gap-1">
-          <span className={`truncate text-4xl font-bold tracking-tight text-white ${isLoading ? "animate-pulse" : ""}`}>
+          <span className={`truncate text-4xl font-bold tracking-tight text-app-text-primary ${isLoading ? "animate-pulse" : ""}`}>
             {isLoading ? "..." : value}
           </span>
           {suffix && !isLoading && (

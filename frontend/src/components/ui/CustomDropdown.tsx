@@ -121,27 +121,27 @@ export default function CustomDropdown<T extends string | number = string>({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={ariaLabel || placeholder}
-        className={`flex w-full items-center justify-between border border-[#282c35] bg-[#12151c] font-medium text-white transition-all duration-150 hover:border-gray-600 hover:bg-[#161a22] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`flex w-full items-center justify-between border border-app-border bg-app-input font-medium text-app-text-primary transition-all duration-150 hover:border-app-border-hover hover:bg-app-hover focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 ${
           sizeClasses[size]
         } ${triggerClassName}`}
       >
         <div className="flex items-center gap-2 truncate">
-          {icon && <span className="shrink-0 text-gray-400">{icon}</span>}
+          {icon && <span className="shrink-0 text-app-text-muted">{icon}</span>}
           {selectedOption ? (
             <div className="flex items-center gap-2 truncate">
               {selectedOption.icon && (
                 <span className="shrink-0">{selectedOption.icon}</span>
               )}
-              <span className="truncate text-white">{selectedOption.label}</span>
+              <span className="truncate text-app-text-primary">{selectedOption.label}</span>
             </div>
           ) : (
-            <span className="text-gray-400">{placeholder}</span>
+            <span className="text-app-text-muted">{placeholder}</span>
           )}
         </div>
 
         <ChevronDown
           size={size === "sm" ? 13 : 15}
-          className={`shrink-0 text-gray-400 transition-transform duration-200 ${
+          className={`shrink-0 text-app-text-muted transition-transform duration-200 ${
             isOpen ? "rotate-180 text-blue-400" : ""
           }`}
         />
@@ -151,7 +151,7 @@ export default function CustomDropdown<T extends string | number = string>({
       {isOpen && (
         <div
           role="listbox"
-          className={`custom-scrollbar absolute z-50 mt-1.5 max-h-64 min-w-full overflow-y-auto rounded-xl border border-[#282c35] bg-[#12151c]/95 p-1.5 shadow-2xl backdrop-blur-md transition-all duration-150 animate-in fade-in zoom-in-95 ${
+          className={`custom-scrollbar absolute z-50 mt-1.5 max-h-64 min-w-full overflow-y-auto rounded-xl border border-app-border bg-app-input/95 p-1.5 shadow-2xl backdrop-blur-md transition-all duration-150 animate-in fade-in zoom-in-95 ${
             align === "right" ? "right-0" : "left-0"
           } ${menuClassName}`}
         >
@@ -179,20 +179,20 @@ export default function CustomDropdown<T extends string | number = string>({
                   isSelected
                     ? "bg-blue-600/15 text-blue-400 font-semibold"
                     : isFocused
-                    ? "bg-[#1d222d] text-white"
-                    : "text-gray-300 hover:bg-[#181d26] hover:text-white"
+                    ? "bg-app-selected text-app-text-primary"
+                    : "text-app-text-secondary hover:bg-app-hover hover:text-app-text-primary"
                 } ${option.disabled ? "cursor-not-allowed opacity-40" : "cursor-pointer"}`}
               >
                 <div className="flex items-center gap-2 min-w-0 pr-2">
                   {option.icon && (
-                    <span className="shrink-0 text-gray-400 group-hover:text-white">
+                    <span className="shrink-0 text-app-text-muted group-hover:text-app-text-primary">
                       {option.icon}
                     </span>
                   )}
                   <div className="min-w-0">
                     <div className="truncate font-medium">{option.label}</div>
                     {option.description && (
-                      <div className="truncate text-[11px] text-gray-500">
+                      <div className="truncate text-[11px] text-app-text-muted">
                         {option.description}
                       </div>
                     )}

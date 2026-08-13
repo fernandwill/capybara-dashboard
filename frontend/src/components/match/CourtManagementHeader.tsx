@@ -13,10 +13,10 @@ export default function CourtManagementHeader({
   onResetAll,
 }: CourtManagementHeaderProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-[#1a1e26] bg-[#0e1117] p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-app-border bg-app-bg p-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-base font-bold text-white">Court Management</h2>
-        <p className="text-xs text-gray-400">
+        <h2 className="text-base font-bold text-app-text-primary">Court Management</h2>
+        <p className="text-xs text-app-text-muted">
           Assign players to court slots (2v2). Lower play count is prioritized.
         </p>
       </div>
@@ -32,7 +32,7 @@ export default function CourtManagementHeader({
         <button
           type="button"
           onClick={onResetAll}
-          className="flex items-center gap-1.5 rounded-xl border border-[#232834] bg-[#141820] px-3 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-[#1a202c] hover:text-white"
+          className="flex items-center gap-1.5 rounded-xl border border-app-border bg-app-input px-3 py-1.5 text-xs font-medium text-app-text-secondary transition hover:bg-app-hover hover:text-app-text-primary"
         >
           <RotateCcw size={13} />
           <span>Reset</span>

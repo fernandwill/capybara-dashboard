@@ -116,7 +116,7 @@ export default function EditPlayerModal({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-xl px-4 py-2 text-xs font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-40"
+            className="rounded-xl px-4 py-2 text-xs font-medium text-app-text-secondary transition hover:bg-app-hover hover:text-app-text-primary disabled:opacity-40"
           >
             Cancel
           </button>
@@ -141,7 +141,7 @@ export default function EditPlayerModal({
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name Field */}
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-gray-300">
+          <label className="mb-1.5 block text-xs font-semibold text-app-text-secondary">
             Name
           </label>
           <input
@@ -153,15 +153,15 @@ export default function EditPlayerModal({
             }}
             placeholder="e.g. Yocelyn"
             required
-            className="w-full rounded-xl border border-[#232730] bg-[#0c0e12] px-3.5 py-2.5 text-xs text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full rounded-xl border border-app-border bg-app-input px-3.5 py-2.5 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
           />
         </div>
 
         {/* Notes (optional) */}
         <div>
-          <div className="mb-1.5 flex items-center justify-between text-xs font-semibold text-gray-300">
-            <span>Notes <span className="font-normal text-gray-500">(optional)</span></span>
-            <span className="text-[11px] font-normal text-gray-500">
+          <div className="mb-1.5 flex items-center justify-between text-xs font-semibold text-app-text-secondary">
+            <span>Notes <span className="font-normal text-app-text-muted">(optional)</span></span>
+            <span className="text-[11px] font-normal text-app-text-muted">
               {notes.length}/200
             </span>
           </div>
@@ -171,7 +171,7 @@ export default function EditPlayerModal({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Add any notes about this player..."
-            className="w-full resize-none rounded-xl border border-[#232730] bg-[#0c0e12] p-3 text-xs text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full resize-none rounded-xl border border-app-border bg-app-input p-3 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
           />
         </div>
 

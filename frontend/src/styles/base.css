@@ -21,29 +21,58 @@ body {
    APP DESIGN TOKENS
    Dark slate palette shared by all dashboard components (Tailwind v4 @theme)
    ============================================================================= */
-@theme {
+@theme inline {
     --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-    --color-app-bg: #0f1115;
-    --color-app-card: #16191f;
-    --color-app-border: #282c35;
-    --color-app-text-primary: #f3f4f6;
-    --color-app-text-secondary: #9ca3af;
-    --color-app-text-muted: #6b7280;
-    --color-app-primary: #3b82f6;
-    --color-app-primary-hover: #2563eb;
-    --color-app-success: #22c55e;
-    --color-app-success-bg: rgba(34, 197, 94, 0.1);
-    --color-app-success-text: #4ade80;
-    --color-app-icon-green: #22c55e;
-    --color-app-icon-blue: #3b82f6;
-    --color-app-icon-purple: #a855f7;
-    --color-app-icon-orange: #f97316;
+    /* App design tokens resolve to the --app-* vars below, which flip between
+       the light (:root) and dark (.dark) palettes at runtime. */
+    --color-app-bg: var(--app-bg);
+    --color-app-card: var(--app-card);
+    --color-app-border: var(--app-border);
+    --color-app-border-hover: var(--app-border-hover);
+    --color-app-text-primary: var(--app-text-primary);
+    --color-app-text-secondary: var(--app-text-secondary);
+    --color-app-text-muted: var(--app-text-muted);
+    --color-app-primary: var(--app-primary);
+    --color-app-primary-hover: var(--app-primary-hover);
+    --color-app-success: var(--app-success);
+    --color-app-success-bg: var(--app-success-bg);
+    --color-app-success-text: var(--app-success-text);
+    --color-app-icon-green: var(--app-icon-green);
+    --color-app-icon-blue: var(--app-icon-blue);
+    --color-app-icon-purple: var(--app-icon-purple);
+    --color-app-icon-orange: var(--app-icon-orange);
+    --color-app-hover: var(--app-hover);
+    --color-app-input: var(--app-input);
+    --color-app-selected: var(--app-selected);
 }
 
 /* Light theme variables and base elements */
 @layer base {
     :root {
+        /* App design tokens — light palette */
+        --app-bg: #f6f7f9;
+        --app-card: #ffffff;
+        --app-border: #e2e8f0;
+        --app-border-hover: #94a3b8;
+        --app-text-primary: #0f172a;
+        --app-text-secondary: #475569;
+        --app-text-muted: #94a3b8;
+        --app-primary: #3b82f6;
+        --app-primary-hover: #2563eb;
+        --app-success: #22c55e;
+        --app-success-bg: rgba(34, 197, 94, 0.12);
+        --app-success-text: #16a34a;
+        --app-icon-green: #22c55e;
+        --app-icon-blue: #3b82f6;
+        --app-icon-purple: #a855f7;
+        --app-icon-orange: #f97316;
+        --app-hover: #eef1f5;
+        --app-input: #f1f4f8;
+        --app-selected: #e2e8f0;
+        --app-scrollbar-thumb: rgba(15, 23, 42, 0.25);
+        --app-scrollbar-thumb-hover: rgba(15, 23, 42, 0.35);
+
         --bg-color: #ffffff;
         --text-color: #000000;
         --card-bg: #f8f9fa;
@@ -88,6 +117,29 @@ body {
 
     /* Dark theme variables */
     .dark {
+        /* App design tokens — dark palette */
+        --app-bg: #0f1115;
+        --app-card: #16191f;
+        --app-border: #282c35;
+        --app-border-hover: #4b5563;
+        --app-text-primary: #f3f4f6;
+        --app-text-secondary: #9ca3af;
+        --app-text-muted: #6b7280;
+        --app-primary: #3b82f6;
+        --app-primary-hover: #2563eb;
+        --app-success: #22c55e;
+        --app-success-bg: rgba(34, 197, 94, 0.1);
+        --app-success-text: #4ade80;
+        --app-icon-green: #22c55e;
+        --app-icon-blue: #3b82f6;
+        --app-icon-purple: #a855f7;
+        --app-icon-orange: #f97316;
+        --app-hover: #1d222d;
+        --app-input: #12151c;
+        --app-selected: #1d222d;
+        --app-scrollbar-thumb: rgba(255, 255, 255, 0.15);
+        --app-scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
+
         --bg-color: #0f1115;
         --text-color: #f3f4f6;
         --card-bg: #16191f;
@@ -131,8 +183,8 @@ body {
         font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
             "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
             "Helvetica Neue", sans-serif;
-        background-color: #0f1115;
-        color: #f3f4f6;
+        background-color: var(--app-bg);
+        color: var(--app-text-primary);
         line-height: 1.6;
     }
 
@@ -179,7 +231,7 @@ input[type="time"]::-webkit-datetime-edit-text {
 /* Standard CSS for modern browsers */
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    scrollbar-color: var(--app-scrollbar-thumb) transparent;
 }
 
 /* WebKit (Chrome, Safari, Edge, Opera) */
@@ -193,13 +245,13 @@ input[type="time"]::-webkit-datetime-edit-text {
 }
 
 *::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: var(--app-scrollbar-thumb);
     border-radius: 9999px;
     transition: background-color 0.2s ease;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--app-scrollbar-thumb-hover);
 }
 
 *::-webkit-scrollbar-corner {
@@ -209,7 +261,7 @@ input[type="time"]::-webkit-datetime-edit-text {
 /* Specific class for explicitly styled containers */
 .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: var(--app-scrollbar-thumb) transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -222,10 +274,10 @@ input[type="time"]::-webkit-datetime-edit-text {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--app-scrollbar-thumb);
     border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.35);
+    background-color: var(--app-scrollbar-thumb-hover);
 }

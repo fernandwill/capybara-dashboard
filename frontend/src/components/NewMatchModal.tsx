@@ -192,7 +192,7 @@ export default function NewMatchModal({
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-50"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-app-text-secondary transition hover:bg-app-hover hover:text-app-text-primary disabled:opacity-50"
             >
               Cancel
             </button>
@@ -219,13 +219,13 @@ export default function NewMatchModal({
         <form id="new-match-form" onSubmit={handleSubmit} className="space-y-4">
           {/* Section: MATCH DETAILS */}
           <div>
-            <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+            <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-app-text-muted">
               MATCH DETAILS
             </h3>
 
             {/* Title */}
             <div className="mb-3">
-              <label htmlFor="title" className="mb-1.5 block text-xs font-medium text-gray-300">
+              <label htmlFor="title" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                 Title
               </label>
               <input
@@ -237,14 +237,14 @@ export default function NewMatchModal({
                 required
                 placeholder="Match title..."
                 minLength={3}
-                className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
               />
             </div>
 
             {/* Location & Court # */}
             <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label htmlFor="location" className="mb-1.5 block text-xs font-medium text-gray-300">
+                <label htmlFor="location" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                   Location
                 </label>
                 <input
@@ -255,14 +255,14 @@ export default function NewMatchModal({
                   onChange={handleChange}
                   required
                   placeholder="Court location..."
-                  className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
                 />
               </div>
               <div>
-                <label htmlFor="courtNumber" className="mb-1.5 block text-xs font-medium text-gray-300">
+                <label htmlFor="courtNumber" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                   Court #
                 </label>
-                <div className="flex items-center rounded-lg border border-[#232730] bg-[#0c0e12] transition-colors focus-within:border-blue-500">
+                <div className="flex items-center rounded-lg border border-app-border bg-app-input transition-colors focus-within:border-blue-500">
                   <button
                     type="button"
                     onClick={() => {
@@ -272,7 +272,7 @@ export default function NewMatchModal({
                         courtNumber: String(Math.max(1, current - 1)),
                       }));
                     }}
-                    className="px-3 py-2 text-gray-400 hover:text-white transition-colors"
+                    className="px-3 py-2 text-app-text-muted hover:text-app-text-primary transition-colors"
                     aria-label="Decrease court number"
                   >
                     <Minus size={14} />
@@ -286,7 +286,7 @@ export default function NewMatchModal({
                     onChange={handleChange}
                     placeholder="1"
                     required
-                    className="w-full bg-transparent py-2 text-center text-sm text-white placeholder:text-gray-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full bg-transparent py-2 text-center text-sm text-app-text-primary placeholder:text-app-text-muted focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     type="button"
@@ -297,7 +297,7 @@ export default function NewMatchModal({
                         courtNumber: String(current + 1),
                       }));
                     }}
-                    className="px-3 py-2 text-gray-400 hover:text-white transition-colors"
+                    className="px-3 py-2 text-app-text-muted hover:text-app-text-primary transition-colors"
                     aria-label="Increase court number"
                   >
                     <Plus size={14} />
@@ -309,13 +309,13 @@ export default function NewMatchModal({
             {/* Date & Start Time */}
             <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label htmlFor="date" className="mb-1.5 block text-xs font-medium text-gray-300">
+                <label htmlFor="date" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                   Date
                 </label>
                 <div className="relative">
                   <Calendar
                     size={15}
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
                   />
                   <input
                     type="date"
@@ -324,18 +324,18 @@ export default function NewMatchModal({
                     value={formData.date}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] py-2 pl-9 pr-3.5 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="startTime" className="mb-1.5 block text-xs font-medium text-gray-300">
+                <label htmlFor="startTime" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                   Start Time
                 </label>
                 <div className="relative">
                   <Clock
                     size={15}
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
                   />
                   <input
                     type="time"
@@ -344,7 +344,7 @@ export default function NewMatchModal({
                     value={formData.startTime}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] py-2 pl-9 pr-3.5 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -353,13 +353,13 @@ export default function NewMatchModal({
             {/* End Time & Court Fee (Rp) */}
             <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label htmlFor="endTime" className="mb-1.5 block text-xs font-medium text-gray-300">
+                <label htmlFor="endTime" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                   End Time
                 </label>
                 <div className="relative">
                   <Clock
                     size={15}
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
                   />
                   <input
                     type="time"
@@ -368,12 +368,12 @@ export default function NewMatchModal({
                     value={formData.endTime}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] py-2 pl-9 pr-3.5 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="fee" className="mb-1.5 block text-xs font-medium text-gray-300">
+                <label htmlFor="fee" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                   Court Fee (Rp)
                 </label>
                 <input
@@ -386,14 +386,14 @@ export default function NewMatchModal({
                   placeholder="50,000"
                   min="0"
                   step="1000"
-                  className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             {/* Description (optional) */}
             <div className="mb-3">
-              <label htmlFor="description" className="mb-1.5 block text-xs font-medium text-gray-300">
+              <label htmlFor="description" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                 Description (optional)
               </label>
               <textarea
@@ -403,7 +403,7 @@ export default function NewMatchModal({
                 onChange={handleChange}
                 rows={3}
                 placeholder="Add any notes about this match..."
-                className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3.5 py-2 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors resize-none"
+                className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors resize-none"
               />
             </div>
           </div>

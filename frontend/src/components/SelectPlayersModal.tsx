@@ -200,7 +200,7 @@ export default function SelectPlayersModal({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg px-3.5 py-1.5 text-xs font-medium text-gray-300 transition hover:bg-gray-800 hover:text-white disabled:opacity-40"
+              className="rounded-lg px-3.5 py-1.5 text-xs font-medium text-app-text-secondary transition hover:bg-app-hover hover:text-app-text-primary disabled:opacity-40"
             >
               Cancel
             </button>
@@ -234,20 +234,20 @@ export default function SelectPlayersModal({
         <div className="relative">
           <Search
             size={15}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
           />
           <input
             type="text"
             placeholder="Search players..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-[#232730] bg-[#0c0e12] py-2 pl-9 pr-8 text-xs text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full rounded-xl border border-app-border bg-app-input py-2 pl-9 pr-8 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-app-text-muted hover:text-app-text-primary"
             >
               <X size={13} />
             </button>
@@ -255,14 +255,14 @@ export default function SelectPlayersModal({
         </div>
 
         {/* Tabs: All, Frequently Played, Favorites */}
-        <div className="flex rounded-xl bg-[#0c0e12] p-1 border border-[#232730]/60">
+        <div className="flex rounded-xl bg-app-input p-1 border border-app-border/60">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
             className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors ${
               activeTab === "all"
                 ? "bg-blue-600 text-white shadow"
-                : "text-gray-400 hover:text-gray-200"
+                : "text-app-text-muted hover:text-app-text-primary"
             }`}
           >
             All ({availablePlayers.length})
@@ -273,7 +273,7 @@ export default function SelectPlayersModal({
             className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors ${
               activeTab === "frequent"
                 ? "bg-blue-600 text-white shadow"
-                : "text-gray-400 hover:text-gray-200"
+                : "text-app-text-muted hover:text-app-text-primary"
             }`}
           >
             Frequently Played
@@ -284,7 +284,7 @@ export default function SelectPlayersModal({
             className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors ${
               activeTab === "favorites"
                 ? "bg-blue-600 text-white shadow"
-                : "text-gray-400 hover:text-gray-200"
+                : "text-app-text-muted hover:text-app-text-primary"
             }`}
           >
             Favorites ({favoriteIds.length})
@@ -292,8 +292,8 @@ export default function SelectPlayersModal({
         </div>
 
         {/* Add New Player Bar (not yet in database) */}
-        <div className="rounded-xl border border-[#232730] bg-[#101318] p-2.5">
-          <div className="mb-1.5 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        <div className="rounded-xl border border-app-border bg-app-input p-2.5">
+          <div className="mb-1.5 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-app-text-muted">
             <span>Add New Player to Database</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -311,7 +311,7 @@ export default function SelectPlayersModal({
                   handleCreateNewPlayer();
                 }
               }}
-              className="w-full rounded-lg border border-[#232730] bg-[#0c0e12] px-3 py-1.5 text-xs text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none transition-colors"
+              className="w-full rounded-lg border border-app-border bg-app-input px-3 py-1.5 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
             />
             <button
               type="button"
@@ -335,8 +335,8 @@ export default function SelectPlayersModal({
         {/* Player List */}
         <div className="max-h-[300px] space-y-1 overflow-y-auto pr-1">
           {displayedPlayers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center text-xs text-gray-500">
-              <User size={24} className="mb-2 text-gray-600" />
+            <div className="flex flex-col items-center justify-center py-8 text-center text-xs text-app-text-muted">
+              <User size={24} className="mb-2 text-app-text-muted" />
               {searchQuery ? (
                 <p>
                   No players matching &ldquo;{searchQuery}&rdquo;. Add them above!
@@ -358,8 +358,8 @@ export default function SelectPlayersModal({
                   onClick={() => handleTogglePlayer(player.id)}
                   className={`flex cursor-pointer items-center justify-between rounded-xl border px-3 py-2 transition-colors select-none ${
                     isSelected
-                      ? "border-blue-500/60 bg-[#161f30] text-white"
-                      : "border-transparent bg-[#0c0e12]/60 text-gray-300 hover:border-[#232730] hover:bg-[#101318]"
+                      ? "border-blue-500/60 bg-app-selected text-app-text-primary"
+                      : "border-transparent bg-app-input/60 text-app-text-secondary hover:border-app-border hover:bg-app-hover"
                   }`}
                 >
                   {/* Left: Checkbox + Avatar + Name */}
@@ -369,16 +369,16 @@ export default function SelectPlayersModal({
                       checked={isSelected}
                       onChange={() => handleTogglePlayer(player.id)}
                       onClick={(e) => e.stopPropagation()}
-                      className="h-4 w-4 rounded border-gray-600 bg-[#16191f] text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
+                      className="h-4 w-4 rounded border-app-border bg-app-input text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
                     />
                     <Image
                       src="/capybara-avatar.png"
                       alt={player.name}
                       width={400}
                       height={383}
-                      className="h-8 w-8 shrink-0 rounded-full object-cover border border-[#232730] shadow-sm"
+                      className="h-8 w-8 shrink-0 rounded-full object-cover border border-app-border shadow-sm"
                     />
-                    <span className="truncate text-xs font-semibold text-white">
+                    <span className="truncate text-xs font-semibold text-app-text-primary">
                       {player.name}
                     </span>
                   </div>
@@ -391,7 +391,7 @@ export default function SelectPlayersModal({
                       className={`p-1 transition-colors ${
                         isFav
                           ? "text-amber-400 hover:text-amber-300"
-                          : "text-gray-600 hover:text-gray-400"
+                          : "text-app-text-muted hover:text-app-text-secondary"
                       }`}
                       title={isFav ? "Remove favorite" : "Add to favorites"}
                     >

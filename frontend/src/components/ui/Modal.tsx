@@ -153,7 +153,7 @@ export default function Modal({
       }}
     >
       <div
-        className={`relative flex max-h-[92vh] w-full ${maxWidthClass} flex-col rounded-2xl border border-[#232730] bg-[#13161c] p-6 shadow-2xl text-white transition-all ${className}`}
+        className={`relative flex max-h-[92vh] w-full ${maxWidthClass} flex-col rounded-2xl border border-app-border bg-app-card p-6 shadow-2xl text-app-text-primary transition-all ${className}`}
       >
         {/* Modal Header */}
         {(title || icon || showCloseButton) && (
@@ -164,12 +164,12 @@ export default function Modal({
               {icon && <div className="shrink-0">{icon}</div>}
               <div>
                 {title && (
-                  <h2 className="text-xl font-bold tracking-tight text-white">
+                  <h2 className="text-xl font-bold tracking-tight text-app-text-primary">
                     {title}
                   </h2>
                 )}
                 {subtitle && (
-                  <p className="mt-0.5 text-xs text-gray-400">{subtitle}</p>
+                  <p className="mt-0.5 text-xs text-app-text-muted">{subtitle}</p>
                 )}
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function Modal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close dialog"
-                className="shrink-0 rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-800 hover:text-white"
+                className="shrink-0 rounded-lg p-1.5 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
               >
                 <X size={18} />
               </button>
@@ -195,7 +195,7 @@ export default function Modal({
         {/* Modal Footer */}
         {footer && (
           <div
-            className={`mt-5 flex items-center justify-end gap-3 border-t border-[#232730] pt-4 ${footerClassName}`}
+            className={`mt-5 flex items-center justify-end gap-3 border-t border-app-border pt-4 ${footerClassName}`}
           >
             {footer}
           </div>

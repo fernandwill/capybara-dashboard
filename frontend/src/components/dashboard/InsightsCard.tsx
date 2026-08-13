@@ -67,12 +67,12 @@ export default function InsightsCard({
   if (isLoading) {
     return (
       <aside className="flex h-full min-w-0 flex-col rounded-xl border border-app-border bg-app-card p-5 sm:p-6 animate-pulse">
-        <div className="mb-4 h-6 w-36 rounded bg-gray-800" />
+        <div className="mb-4 h-6 w-36 rounded bg-app-border" />
         <div className="space-y-3">
-          <div className="h-20 rounded-xl bg-gray-800/60" />
-          <div className="h-20 rounded-xl bg-gray-800/60" />
-          <div className="h-20 rounded-xl bg-gray-800/60" />
-          <div className="h-16 rounded-xl bg-gray-800/60" />
+          <div className="h-20 rounded-xl bg-app-border/60" />
+          <div className="h-20 rounded-xl bg-app-border/60" />
+          <div className="h-20 rounded-xl bg-app-border/60" />
+          <div className="h-16 rounded-xl bg-app-border/60" />
         </div>
       </aside>
     );
@@ -84,23 +84,23 @@ export default function InsightsCard({
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles size={18} className="text-amber-400" />
-          <h2 className="text-base font-bold text-white">{selectedYear} Insights</h2>
+          <h2 className="text-base font-bold text-app-text-primary">{selectedYear} Insights</h2>
         </div>
-        <span className="rounded-full border border-[#232730] bg-[#12151c] px-2.5 py-0.5 text-[11px] font-semibold text-gray-300">
+        <span className="rounded-full border border-app-border bg-app-input px-2.5 py-0.5 text-[11px] font-semibold text-app-text-secondary">
           Highlights
         </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-3">
         {/* 1. Favorite Badminton Centre */}
-        <div className="rounded-xl border border-[#232730] bg-[#12151c] p-3.5 transition hover:border-[#2f3542]">
+        <div className="rounded-xl border border-app-border bg-app-input p-3.5 transition hover:border-app-border-hover">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400">
               <MapPin size={17} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-app-text-muted">
                   Favorite Badminton Centre
                 </span>
                 {favoriteCentre && (
@@ -109,10 +109,10 @@ export default function InsightsCard({
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 truncate text-sm font-bold text-white">
+              <p className="mt-0.5 truncate text-sm font-bold text-app-text-primary">
                 {favoriteCentre ? favoriteCentre.name : "No location data"}
               </p>
-              <p className="mt-0.5 text-xs text-gray-400">
+              <p className="mt-0.5 text-xs text-app-text-muted">
                 {favoriteCentre
                   ? `Most played venue in ${selectedYear}`
                   : `Play matches in ${selectedYear} to track favorite centres`}
@@ -122,14 +122,14 @@ export default function InsightsCard({
         </div>
 
         {/* 2. Most Presence */}
-        <div className="rounded-xl border border-[#232730] bg-[#12151c] p-3.5 transition hover:border-[#2f3542]">
+        <div className="rounded-xl border border-app-border bg-app-input p-3.5 transition hover:border-app-border-hover">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
               <Crown size={17} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-app-text-muted">
                   Most Presence
                 </span>
                 {mostPresence && (
@@ -151,15 +151,15 @@ export default function InsightsCard({
                           title={p.name}
                           width={400}
                           height={383}
-                          className="h-6 w-6 rounded-full object-cover ring-2 ring-[#12151c]"
+                          className="h-6 w-6 rounded-full object-cover ring-2 ring-app-input"
                         />
                       ))}
                     </div>
-                    <span className="truncate text-xs font-bold text-white">
+                    <span className="truncate text-xs font-bold text-app-text-primary">
                       {mostPresence.players.map((p) => p.name).join(", ")}
                     </span>
                   </div>
-                  <p className="text-[11px] text-gray-400">
+                  <p className="text-[11px] text-app-text-muted">
                     {mostPresence.players.length > 1
                       ? `Tied with ${mostPresence.count} match attendances each`
                       : `Top attendance MVP in ${selectedYear}`}
@@ -167,10 +167,10 @@ export default function InsightsCard({
                 </div>
               ) : (
                 <>
-                  <p className="mt-0.5 truncate text-sm font-bold text-white">
+                  <p className="mt-0.5 truncate text-sm font-bold text-app-text-primary">
                     No attendance records
                   </p>
-                  <p className="mt-0.5 text-xs text-gray-400">
+                  <p className="mt-0.5 text-xs text-app-text-muted">
                     Attendance will update as players join matches
                   </p>
                 </>
@@ -180,21 +180,21 @@ export default function InsightsCard({
         </div>
 
         {/* 3. New Blood */}
-        <div className="rounded-xl border border-[#232730] bg-[#12151c] p-3.5 transition hover:border-[#2f3542]">
+        <div className="rounded-xl border border-app-border bg-app-input p-3.5 transition hover:border-app-border-hover">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-400">
               <UserPlus size={17} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-app-text-muted">
                   New Blood
                 </span>
                 <span className="rounded-md bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-400">
                   {selectedYear}
                 </span>
               </div>
-              <p className="mt-0.5 text-sm font-bold text-white">
+              <p className="mt-0.5 text-sm font-bold text-app-text-primary">
                 {newBloodCount > 0 ? (
                   <span>
                     +{newBloodCount} {newBloodCount === 1 ? "New Player" : "New Players"}
@@ -203,7 +203,7 @@ export default function InsightsCard({
                   <span>0 New Players</span>
                 )}
               </p>
-              <p className="mt-0.5 text-xs text-gray-400">
+              <p className="mt-0.5 text-xs text-app-text-muted">
                 {newBloodCount > 0
                   ? `Joined the badminton community in ${selectedYear}`
                   : `No new players added yet in ${selectedYear}`}
@@ -214,21 +214,21 @@ export default function InsightsCard({
 
         {/* 4. Activity Rhythm: Strongest Month & Peak Time */}
         {(strongestMonth || mostActiveDay) && (
-          <div className="mt-auto rounded-xl border border-[#1e232d] bg-[#0c0e12] p-3">
-            <div className="flex items-center gap-2 text-[11px] font-bold text-gray-300">
+          <div className="mt-auto rounded-xl border border-app-border bg-app-bg p-3">
+            <div className="flex items-center gap-2 text-[11px] font-bold text-app-text-secondary">
               <CalendarClock size={13} className="text-emerald-400 shrink-0" />
               <span>Activity Rhythm</span>
             </div>
-            <div className="mt-1.5 space-y-1 text-xs text-gray-400">
+            <div className="mt-1.5 space-y-1 text-xs text-app-text-muted">
               {strongestMonth && (
                 <p className="truncate">
-                  <span className="text-gray-300 font-semibold">{strongestMonth.month}:</span>{" "}
+                  <span className="text-app-text-secondary font-semibold">{strongestMonth.month}:</span>{" "}
                   {strongestMonth.hours}h across {strongestMonth.matches} matches (Peak Month)
                 </p>
               )}
               {mostActiveDay && (
                 <p className="truncate">
-                  <span className="text-gray-300 font-semibold">{mostActiveDay}s:</span>{" "}
+                  <span className="text-app-text-secondary font-semibold">{mostActiveDay}s:</span>{" "}
                   Usually {typicalStartHour !== null ? formatHourRange(typicalStartHour) : "—"}
                 </p>
               )}
@@ -237,10 +237,10 @@ export default function InsightsCard({
         )}
 
         {!hasData && (
-          <div className="rounded-xl border border-dashed border-[#232730] p-6 text-center">
-            <Star size={20} className="mx-auto text-gray-500" />
-            <h3 className="mt-3 text-sm font-medium text-white">No insights yet</h3>
-            <p className="mt-1 text-xs text-gray-400">
+          <div className="rounded-xl border border-dashed border-app-border p-6 text-center">
+            <Star size={20} className="mx-auto text-app-text-muted" />
+            <h3 className="mt-3 text-sm font-medium text-app-text-primary">No insights yet</h3>
+            <p className="mt-1 text-xs text-app-text-muted">
               Play some matches in {selectedYear} to unlock insights.
             </p>
           </div>
