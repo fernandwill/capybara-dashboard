@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import {
   IconCalendar,
   IconCheck,
   IconClock,
   IconEdit,
+  IconHash,
   IconLoader,
   IconMapPin,
   IconReceipt,
@@ -37,20 +38,21 @@ export default function MatchDetailsModal({
   onUpdatePaymentStatus,
 }: MatchDetailsModalProps) {
   const [updatingPlayerId, setUpdatingPlayerId] = useState<string | null>(null);
+  const [isUpdatingAll, setIsUpdatingAll] = useState(false);
 
-  if (!match) return null;
-
-  const players: MatchPlayer[] = match.players || [];
+  const players: MatchPlayer[] = match?.players || [];
   const paidPlayersCount = players.filter(
     (p) => p.paymentStatus === "SUDAH_SETOR"
   ).length;
   const totalPlayersCount = players.length;
   const isAllPaid = totalPlayersCount > 0 && paidPlayersCount === totalPlayersCount;
   const feePerPlayer =
-    totalPlayersCount > 0 ? Math.round(match.fee / totalPlayersCount) : match.fee;
+    match && totalPlayersCount > 0
+      ? Math.round(match.fee / totalPlayersCount)
+      : (match?.fee ?? 0);
 
   const handleTogglePayment = async (playerId: string, currentStatus: string) => {
-    if (!onUpdatePaymentStatus || updatingPlayerId) return;
+    if (!match || !onUpdatePaymentStatus || updatingPlayerId || isUpdatingAll) return;
 
     const nextStatus =
       currentStatus === "SUDAH_SETOR" ? "BELUM_SETOR" : "SUDAH_SETOR";
@@ -64,6 +66,47 @@ export default function MatchDetailsModal({
       setUpdatingPlayerId(null);
     }
   };
+
+  const handleMarkAllPaid = useCallback(async () => {
+    if (!match || !onUpdatePaymentStatus || isUpdatingAll) return;
+    const unpaidPlayers = (match.players || []).filter(
+      (p) => p.paymentStatus !== "SUDAH_SETOR"
+    );
+    if (unpaidPlayers.length === 0) return;
+
+    setIsUpdatingAll(true);
+    try {
+      await Promise.all(
+        unpaidPlayers.map((p) =>
+          onUpdatePaymentStatus(match.id, p.player.id, "SUDAH_SETOR")
+        )
+      );
+    } catch (err) {
+      console.error("Failed to mark all as paid:", err);
+    } finally {
+      setIsUpdatingAll(false);
+    }
+  }, [match, onUpdatePaymentStatus, isUpdatingAll]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cheat shortcuts: Shift + P, or Alt + P, or Ctrl + Shift + P
+      if (
+        e.key.toLowerCase() === "p" &&
+        (e.shiftKey || e.altKey || (e.ctrlKey && e.shiftKey))
+      ) {
+        e.preventDefault();
+        handleMarkAllPaid();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, handleMarkAllPaid]);
+
+  if (!match) return null;
 
   return (
     <Modal
@@ -136,9 +179,7 @@ export default function MatchDetailsModal({
             {/* Court # */}
             <div className="flex items-center gap-3 rounded-xl border border-app-border bg-app-input px-3.5 py-2.5">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-app-border bg-app-card text-app-text-muted">
-                <span className="text-xs font-bold text-app-text-primary">
-                  #{match.courtNumber || "1"}
-                </span>
+                <IconHash size={16} />
               </div>
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-app-text-muted">
@@ -221,29 +262,44 @@ export default function MatchDetailsModal({
 
         {/* Section: PLAYERS & PAYMENT STATUS */}
         <div>
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3.5 space-y-2">
             <div>
               <h3 className="text-[11px] font-bold uppercase tracking-wider text-app-text-muted">
                 PLAYERS & PAYMENT ({totalPlayersCount})
               </h3>
               <p className="text-xs text-app-text-muted">
-                Click a status badge to toggle payment between Sudah & Belum Setor.
+                Click a status badge to toggle payment status, from "Sudah Setor" to "Belum Setor" and vice versa.
               </p>
             </div>
-            <div className="text-right">
-              {isAllPaid ? (
-                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
-                  <IconCheck size={13} />
-                  <span>All Paid</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-400">
-                  <span>
-                    {totalPlayersCount - paidPlayersCount} Unpaid
+            {totalPlayersCount > 0 && (
+              <div className="flex justify-center pt-0.5">
+                {isAllPaid ? (
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+                    <IconCheck size={14} />
+                    <span>Senang Bertepok dengan Anda</span>
                   </span>
-                </span>
-              )}
-            </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleMarkAllPaid}
+                    disabled={isUpdatingAll || Boolean(updatingPlayerId)}
+                    title="Cheat: Click (or press Shift+P) to mark all as paid"
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400 transition hover:border-amber-500/40 hover:bg-amber-500/20 active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+                  >
+                    {isUpdatingAll ? (
+                      <>
+                        <IconLoader size={13} className="animate-spin" />
+                        <span>Updating all...</span>
+                      </>
+                    ) : (
+                      <span>
+                        {totalPlayersCount - paidPlayersCount} Orang Belum Setor
+                      </span>
+                    )}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {players.length === 0 ? (
