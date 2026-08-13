@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { IconCircleCheck, IconPlus, IconX } from "@tabler/icons-react";
-import type { CourtState } from "@/hooks/use-court-manager";
+import type { CourtState } from "@/utils/court-assign";
 import type { PlayerInMatch } from "@/types/match-types";
 
 interface CourtCardProps {

@@ -3,18 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { authFetch } from "@/lib/auth-fetch";
 import type { PlayerInMatch } from "@/types/match-types";
+import {
+  assignUnassignedPlayers,
+  type CourtSlot,
+  type CourtState,
+} from "@/utils/court-assign";
 
-export interface CourtSlot {
-  playerId: string | null;
-}
-
-export interface CourtState {
-  id: number;
-  name: string;
-  status: "IN PROGRESS" | "EMPTY" | "COMPLETED";
-  teamA: [CourtSlot, CourtSlot];
-  teamB: [CourtSlot, CourtSlot];
-}
+export type { CourtSlot, CourtState } from "@/utils/court-assign";
 
 interface UseCourtManagerOptions {
   /** Match id used for the rounds POST endpoint. */
@@ -118,47 +113,14 @@ export function useCourtManager({
     []
   );
 
-  const handleAutoAssign = useCallback(
-    (unassignedPlayers: PlayerInMatch[]) => {
-      const available = [...unassignedPlayers];
-      if (available.length === 0) {
-        onAutoAssignEmptyRef.current?.();
-        return;
-      }
+  const handleAutoAssign = useCallback((unassignedPlayers: PlayerInMatch[]) => {
+    if (unassignedPlayers.length === 0) {
+      onAutoAssignEmptyRef.current?.();
+      return;
+    }
 
-      setCourts((prev) => {
-        const next = prev.map((c) => ({
-          ...c,
-          teamA: [{ ...c.teamA[0] }, { ...c.teamA[1] }] as [CourtSlot, CourtSlot],
-          teamB: [{ ...c.teamB[0] }, { ...c.teamB[1] }] as [CourtSlot, CourtSlot],
-        }));
-
-        for (let i = 0; i < next.length; i++) {
-          const court = next[i];
-          for (let s = 0; s < 2; s++) {
-            if (!court.teamA[s].playerId && available.length > 0) {
-              const p = available.shift()!;
-              court.teamA[s].playerId = p.id;
-            }
-          }
-          for (let s = 0; s < 2; s++) {
-            if (!court.teamB[s].playerId && available.length > 0) {
-              const p = available.shift()!;
-              court.teamB[s].playerId = p.id;
-            }
-          }
-
-          const hasAny =
-            court.teamA.some((s) => s.playerId) ||
-            court.teamB.some((s) => s.playerId);
-          court.status = hasAny ? "IN PROGRESS" : "EMPTY";
-        }
-
-        return next;
-      });
-    },
-    []
-  );
+    setCourts((prev) => assignUnassignedPlayers(prev, unassignedPlayers));
+  }, []);
 
   const handleResetAllCourts = useCallback(() => {
     setCourts((prev) =>
