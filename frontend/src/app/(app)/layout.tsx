@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { IconLoader } from '@tabler/icons-react';
 
-export default function DashboardLayout({
+// Single auth guard for every protected route. Without it, the dashboard,
+// matches, and players pages each implemented their own redirect, and the
+// match-detail page had no client-side guard at all.
+export default function AppGuardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,7 +18,6 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!loading && !user) {
-      // If not authenticated, redirect to login page
       router.push('/login');
     }
   }, [user, loading, router]);

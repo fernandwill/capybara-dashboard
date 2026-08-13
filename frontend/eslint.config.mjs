@@ -1,27 +1,28 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
   {
-    // Keep `eslint .` fast: skip build output and generated files.
-    ignores: [
-      ".next/**",
-      "out/**",
-      "build/**",
-      "coverage/**",
-      "next-env.d.ts",
-      ".eslintcache",
-    ],
+    // The modals and countdown deliberately reset state when their props
+    // change (e.g. clearing form fields when a modal opens). The rule only
+    // fires on those intentional sync-in-effect patterns, so disable it
+    // project-wide instead of silencing a dozen call sites.
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
   },
-];
+  globalIgnores([
+    // Keep `eslint .` fast: skip build output and generated files.
+    ".next/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "next-env.d.ts",
+    ".eslintcache",
+  ]),
+]);
 
 export default eslintConfig;

@@ -9,7 +9,7 @@ import useSWR from "swr";
 import { authFetch } from "@/lib/auth-fetch";
 import { Match } from "@/types/types";
 
-interface MatchFormData {
+export interface MatchFormData {
     title: string;
     location: string;
     courtNumber: string;

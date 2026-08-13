@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import {
   IconCalendarEvent,
   IconChevronLeft,
@@ -10,10 +9,10 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/contexts/AuthContext";
 import { useMatches } from "@/hooks/use-matches";
+import { useMatchModals } from "@/hooks/use-match-modals";
 import { usePagination } from "@/hooks/use-pagination";
-import { Match, ModalState, SortOption } from "@/types/types";
+import { Match, SortOption } from "@/types/types";
 import { sortMatches } from "@/utils/match-utils";
 import CustomDropdown, { DropdownOption } from "@/components/ui/CustomDropdown";
 import MatchCard from "@/components/match/MatchCard";
@@ -38,9 +37,6 @@ const MATCHES_PER_PAGE = 9;
 type FilterStatus = "ALL" | "COMPLETED" | "UPCOMING";
 
 export default function AllMatchesHistoryPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
-
   const {
     matches,
     isLoading: isMatchesLoading,
@@ -55,33 +51,37 @@ export default function AllMatchesHistoryPage() {
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("ALL");
   const [sortOption, setSortOption] = useState<SortOption>("date-latest");
 
-  // Modals state
-  const [editingMatch, setEditingMatch] = useState<Match | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCompletedMatch, setSelectedCompletedMatch] = useState<Match | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeletingMatch, setIsDeletingMatch] = useState(false);
-  const [isSubmittingMatch, setIsSubmittingMatch] = useState(false);
-  const [menu, setMenu] = useState<{ match: Match; x: number; y: number } | null>(null);
-  const [successModal, setSuccessModal] = useState<ModalState>({
-    isOpen: false,
-    title: "",
-    message: "",
+  const {
+    editingMatch,
+    isModalOpen,
+    isDetailsModalOpen,
+    matchPendingDeletion,
+    isDeleteModalOpen,
+    isDeletingMatch,
+    isSubmittingMatch,
+    menu,
+    successModal,
+    errorModal,
+    activeCompletedMatch,
+    handleNewMatch,
+    handleEditMatch,
+    handleCloseModal,
+    handleMatchClick,
+    handleCloseDetailsModal,
+    handleRequestDeleteMatch,
+    handleCloseDeleteModal,
+    handleConfirmDeleteMatch,
+    handleSubmitMatch,
+    openRowMenu,
+    closeRowMenu,
+    setSuccessModal,
+    setErrorModal,
+  } = useMatchModals({
+    matches,
+    createMatch,
+    updateMatch,
+    deleteMatch,
   });
-  const [errorModal, setErrorModal] = useState<ModalState>({
-    isOpen: false,
-    title: "",
-    message: "",
-  });
-
-  // Redirect if unauthenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/");
-    }
-  }, [authLoading, user, router]);
 
   // Filter & Sort logic
   const filteredMatches = useMemo(() => {
@@ -133,133 +133,6 @@ export default function AllMatchesHistoryPage() {
     goToPage(1);
   };
 
-  // Modal Handlers
-  const handleMatchClick = (match: Match) => {
-    if (match.status === "COMPLETED") {
-      setSelectedCompletedMatch(match);
-      setIsDetailsModalOpen(true);
-    } else {
-      router.push(`/matches/${match.id}`);
-    }
-  };
-
-  const activeCompletedMatch = useMemo(() => {
-    if (!selectedCompletedMatch) return null;
-    return matches.find((m) => m.id === selectedCompletedMatch.id) || selectedCompletedMatch;
-  }, [matches, selectedCompletedMatch]);
-
-  const handleNewMatch = () => {
-    setEditingMatch(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEditMatch = (match: Match) => {
-    setEditingMatch(match);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingMatch(null);
-  };
-
-  const handleRequestDeleteMatch = (match: Match) => {
-    setMatchPendingDeletion(match);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-    setMatchPendingDeletion(null);
-  };
-
-  const handleConfirmDeleteMatch = async () => {
-    if (!matchPendingDeletion) return;
-    setIsDeletingMatch(true);
-    try {
-      const success = await deleteMatch(matchPendingDeletion.id);
-      if (success) {
-        handleCloseDeleteModal();
-        setSuccessModal({
-          isOpen: true,
-          title: "Success!",
-          message: "Match deleted successfully!",
-        });
-      } else {
-        throw new Error("Delete failed");
-      }
-    } catch (err) {
-      console.error("Error deleting match:", err);
-      setErrorModal({
-        isOpen: true,
-        title: "Error!",
-        message: "Failed to delete match. Please try again.",
-      });
-    } finally {
-      setIsDeletingMatch(false);
-    }
-  };
-
-  const handleSubmitMatch = async (matchData: {
-    title: string;
-    location: string;
-    courtNumber: string;
-    date: string;
-    time: string;
-    fee: number;
-    status: string;
-    description?: string;
-    playerIds?: string[];
-  }) => {
-    setIsSubmittingMatch(true);
-    try {
-      const isEditing = editingMatch !== null;
-      const success = isEditing
-        ? await updateMatch(editingMatch.id, matchData)
-        : await createMatch(matchData);
-
-      if (!success) {
-        throw new Error("Operation failed");
-      }
-
-      setIsModalOpen(false);
-      setEditingMatch(null);
-      // createMatch/updateMatch optimistically update the shared SWR cache;
-      // realtime revalidates on the write — no explicit refetch needed here.
-
-      setSuccessModal({
-        isOpen: true,
-        title: "Success!",
-        message: `Match ${isEditing ? "updated" : "created"} successfully!`,
-      });
-    } catch (err) {
-      console.error("Error submitting match:", err);
-      setErrorModal({
-        isOpen: true,
-        title: "Error!",
-        message: `Failed to ${editingMatch ? "update" : "create"} match. Please try again.`,
-      });
-    } finally {
-      setIsSubmittingMatch(false);
-    }
-  };
-
-  const openRowMenu = (event: React.MouseEvent<HTMLButtonElement>, match: Match) => {
-    event.stopPropagation();
-    const rect = event.currentTarget.getBoundingClientRect();
-    const menuWidth = 176;
-    setMenu({ match, x: Math.max(8, rect.right - menuWidth), y: rect.bottom });
-  };
-
-  const closeRowMenu = () => setMenu(null);
-
-  if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-app-bg text-app-text-muted">
-        Loading...
-      </div>
-    );
-  }
 
   const completedCount = matches.filter((m) => m.status === "COMPLETED").length;
   const upcomingCount = matches.filter((m) => m.status === "UPCOMING").length;
@@ -473,10 +346,7 @@ export default function AllMatchesHistoryPage() {
       <MatchDetailsModal
         isOpen={isDetailsModalOpen}
         match={activeCompletedMatch}
-        onClose={() => {
-          setIsDetailsModalOpen(false);
-          setSelectedCompletedMatch(null);
-        }}
+        onClose={handleCloseDetailsModal}
         onEdit={handleEditMatch}
         onUpdatePaymentStatus={updatePlayerPaymentStatus}
       />

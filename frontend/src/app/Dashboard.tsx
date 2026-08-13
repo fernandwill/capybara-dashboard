@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { IconBolt, IconClock, IconTrendingUp } from "@tabler/icons-react";
 import { useAuth } from "@/contexts/AuthContext";
 import NewMatchModal from "../components/NewMatchModal";
@@ -10,10 +9,11 @@ import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import DeleteMatchModal from "../components/DeleteMatchModal";
 import { signOut } from "@/lib/auth-service";
-import { Match, ModalState } from "@/types/types";
+
 import { sortMatches, getClosestUpcomingMatch } from "@/utils/match-utils";
 import { useStats } from "@/hooks/use-stats";
 import { useMatches } from "@/hooks/use-matches";
+import { useMatchModals } from "@/hooks/use-match-modals";
 import { useMonthlyStats } from "@/hooks/use-monthly-stats";
 import { useCountdown } from "@/hooks/use-countdown";
 import { usePlayers } from "@/hooks/use-players";
@@ -28,7 +28,6 @@ import RecentMatchesCard from "../components/dashboard/RecentMatchesCard";
 import MatchRowMenu from "../components/dashboard/MatchRowMenu";
 
 export function Dashboard() {
-  const router = useRouter();
   const { setUser } = useAuth();
 
   // Data hooks — all SWR-backed and shared with the other pages via the
@@ -51,31 +50,36 @@ export function Dashboard() {
     raw: rawMonthly,
   } = useMonthlyStats(selectedYear);
 
-  // UI state
-  const [menu, setMenu] = useState<{ match: Match; x: number; y: number } | null>(null);
-
-  // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMatch, setEditingMatch] = useState<Match | null>(null);
-  const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedCompletedMatch, setSelectedCompletedMatch] = useState<Match | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-
-  // Loading states
-  const [isDeletingMatch, setIsDeletingMatch] = useState(false);
-  const [isSubmittingMatch, setIsSubmittingMatch] = useState(false);
-
-  // Feedback modals
-  const [successModal, setSuccessModal] = useState<ModalState>({
-    isOpen: false,
-    title: "",
-    message: "",
-  });
-  const [errorModal, setErrorModal] = useState<ModalState>({
-    isOpen: false,
-    title: "",
-    message: "",
+  const {
+    editingMatch,
+    isModalOpen,
+    isDetailsModalOpen,
+    matchPendingDeletion,
+    isDeleteModalOpen,
+    isDeletingMatch,
+    isSubmittingMatch,
+    menu,
+    successModal,
+    errorModal,
+    activeCompletedMatch,
+    handleNewMatch,
+    handleEditMatch,
+    handleCloseModal,
+    handleMatchClick,
+    handleCloseDetailsModal,
+    handleRequestDeleteMatch,
+    handleCloseDeleteModal,
+    handleConfirmDeleteMatch,
+    handleSubmitMatch,
+    openRowMenu,
+    closeRowMenu,
+    setSuccessModal,
+    setErrorModal,
+  } = useMatchModals({
+    matches,
+    createMatch,
+    updateMatch,
+    deleteMatch,
   });
 
   // Computed values
@@ -151,133 +155,12 @@ export function Dashboard() {
     }
   };
 
-  // Modal handlers
-  const handleNewMatch = () => setIsModalOpen(true);
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingMatch(null);
-  };
-
-  const handleEditMatch = (match: Match) => {
-    setEditingMatch(match);
-    setIsModalOpen(true);
-  };
-
-  const handleMatchClick = (match: Match) => {
-    if (match.status === "COMPLETED") {
-      setSelectedCompletedMatch(match);
-      setIsDetailsModalOpen(true);
-    } else {
-      router.push(`/matches/${match.id}`);
-    }
-  };
-
-  const activeCompletedMatch = useMemo(() => {
-    if (!selectedCompletedMatch) return null;
-    return matches.find((m) => m.id === selectedCompletedMatch.id) || selectedCompletedMatch;
-  }, [matches, selectedCompletedMatch]);
-
-  const handleRequestDeleteMatch = (match: Match) => {
-    setMatchPendingDeletion(match);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-    setMatchPendingDeletion(null);
-  };
-
   const handleCloseSuccessModal = () => {
     setSuccessModal({ isOpen: false, title: "", message: "" });
   };
 
   const handleCloseErrorModal = () => {
     setErrorModal({ isOpen: false, title: "", message: "" });
-  };
-
-  // Row action menu
-  const openRowMenu = (event: React.MouseEvent<HTMLButtonElement>, match: Match) => {
-    event.stopPropagation();
-    const rect = event.currentTarget.getBoundingClientRect();
-    const menuWidth = 176;
-    setMenu({ match, x: Math.max(8, rect.right - menuWidth), y: rect.bottom });
-  };
-
-  const closeRowMenu = () => setMenu(null);
-
-  // Delete match handler
-  const handleConfirmDeleteMatch = async () => {
-    if (!matchPendingDeletion) return;
-
-    setIsDeletingMatch(true);
-    try {
-      const success = await deleteMatch(matchPendingDeletion.id);
-
-      if (success) {
-        handleCloseDeleteModal();
-        setSuccessModal({
-          isOpen: true,
-          title: "Success!",
-          message: "Match deleted successfully!",
-        });
-      } else {
-        throw new Error("Delete failed");
-      }
-    } catch (error) {
-      console.error("Error deleting match:", error);
-      setErrorModal({
-        isOpen: true,
-        title: "Error!",
-        message: "Failed to delete match. Please try again.",
-      });
-    } finally {
-      setIsDeletingMatch(false);
-    }
-  };
-
-  // Submit match handler (create/update)
-  const handleSubmitMatch = async (matchData: {
-    title: string;
-    location: string;
-    courtNumber: string;
-    date: string;
-    time: string;
-    fee: number;
-    status: string;
-    description?: string;
-    playerIds?: string[];
-  }) => {
-    setIsSubmittingMatch(true);
-    try {
-      const isEditing = editingMatch !== null;
-
-      const success = isEditing
-        ? await updateMatch(editingMatch.id, matchData)
-        : await createMatch(matchData);
-
-      if (!success) {
-        throw new Error("Operation failed");
-      }
-
-      setIsModalOpen(false);
-      setEditingMatch(null);
-
-      setSuccessModal({
-        isOpen: true,
-        title: "Success!",
-        message: `Match ${isEditing ? "updated" : "created"} successfully!`,
-      });
-    } catch (error) {
-      console.error(`Error ${editingMatch ? "updating" : "creating"} match:`, error);
-      setErrorModal({
-        isOpen: true,
-        title: "Error!",
-        message: `Failed to ${editingMatch ? "update" : "create"} match. Please try again.`,
-      });
-    } finally {
-      setIsSubmittingMatch(false);
-    }
   };
 
   const isLoadingFirstPass = isMatchesLoading && matches.length === 0;
@@ -338,7 +221,7 @@ export function Dashboard() {
             match={closestMatch}
             countdown={countdown}
             isLoading={isLoadingFirstPass}
-            onNewMatch={() => setIsModalOpen(true)}
+            onNewMatch={handleNewMatch}
             onMatchClick={handleMatchClick}
           />
 
@@ -433,10 +316,7 @@ export function Dashboard() {
       <MatchDetailsModal
         isOpen={isDetailsModalOpen}
         match={activeCompletedMatch}
-        onClose={() => {
-          setIsDetailsModalOpen(false);
-          setSelectedCompletedMatch(null);
-        }}
+        onClose={handleCloseDetailsModal}
         onEdit={handleEditMatch}
         onUpdatePaymentStatus={updatePlayerPaymentStatus}
       />

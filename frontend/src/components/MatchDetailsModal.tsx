@@ -38,6 +38,7 @@ export default function MatchDetailsModal({
 }: MatchDetailsModalProps) {
   const [updatingPlayerId, setUpdatingPlayerId] = useState<string | null>(null);
   const [isUpdatingAll, setIsUpdatingAll] = useState(false);
+  const [bulkUpdateError, setBulkUpdateError] = useState<string | null>(null);
 
   const players: MatchPlayer[] = match?.players || [];
   const paidPlayersCount = players.filter(
@@ -74,21 +75,35 @@ export default function MatchDetailsModal({
     if (unpaidPlayers.length === 0) return;
 
     setIsUpdatingAll(true);
+    setBulkUpdateError(null);
     try {
-      await Promise.all(
+      // onUpdatePaymentStatus resolves false on failure (it catches internally
+      // and rolls the cache back), so Promise.all alone would report success
+      // even when every update failed — check the individual results.
+      const results = await Promise.all(
         unpaidPlayers.map((p) =>
           onUpdatePaymentStatus(match.id, p.player.id, "SUDAH_SETOR")
         )
       );
+      const failedCount = results.filter((ok) => !ok).length;
+      if (failedCount > 0) {
+        setBulkUpdateError(
+          `Could not update ${failedCount} of ${unpaidPlayers.length} players. Please try again.`
+        );
+      }
     } catch (err) {
       console.error("Failed to mark all as paid:", err);
+      setBulkUpdateError("Failed to update payments. Please try again.");
     } finally {
       setIsUpdatingAll(false);
     }
   }, [match, onUpdatePaymentStatus, isUpdatingAll]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setBulkUpdateError(null);
+      return;
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Cheat shortcuts: Shift + P, or Alt + P, or Ctrl + Shift + P
@@ -271,7 +286,12 @@ export default function MatchDetailsModal({
               </p>
             </div>
             {totalPlayersCount > 0 && (
-              <div className="flex justify-center pt-0.5">
+              <div className="flex flex-col items-center gap-1.5 pt-0.5">
+                {bulkUpdateError && (
+                  <p className="text-[11px] font-medium text-rose-400">
+                    {bulkUpdateError}
+                  </p>
+                )}
                 {isAllPaid ? (
                   <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
                     <IconCheck size={14} />

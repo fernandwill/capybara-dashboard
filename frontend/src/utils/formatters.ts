@@ -50,32 +50,27 @@ function parseTimeRangeMinutes(timeString: string): number | null {
         return null;
     }
 
-    try {
-        const [startTime, endTime] = timeString.split("-").map((t) => t.trim());
-        const [startHours, startMinutes] = startTime.split(":").map(Number);
-        const [endHours, endMinutes] = endTime.split(":").map(Number);
+    const [startTime, endTime] = timeString.split("-").map((t) => t.trim());
+    const [startHours, startMinutes] = startTime.split(":").map(Number);
+    const [endHours, endMinutes] = endTime.split(":").map(Number);
 
-        if (
-            isNaN(startHours) ||
-            isNaN(startMinutes) ||
-            isNaN(endHours) ||
-            isNaN(endMinutes)
-        ) {
-            return null;
-        }
-
-        const startTotal = startHours * 60 + startMinutes;
-        let endTotal = endHours * 60 + endMinutes;
-        if (endTotal < startTotal) {
-            // Handle overnight case
-            endTotal += 24 * 60;
-        }
-
-        return endTotal - startTotal;
-    } catch (error) {
-        console.error("Error parsing time range:", error);
+    if (
+        isNaN(startHours) ||
+        isNaN(startMinutes) ||
+        isNaN(endHours) ||
+        isNaN(endMinutes)
+    ) {
         return null;
     }
+
+    const startTotal = startHours * 60 + startMinutes;
+    let endTotal = endHours * 60 + endMinutes;
+    if (endTotal < startTotal) {
+        // Handle overnight case
+        endTotal += 24 * 60;
+    }
+
+    return endTotal - startTotal;
 }
 
 /**

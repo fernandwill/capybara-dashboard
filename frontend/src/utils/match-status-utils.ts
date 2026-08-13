@@ -32,6 +32,29 @@ function parseEndTime(timeString: string): [number, number] | null {
 }
 
 /**
+ * Builds the match end time as an explicit WIB (UTC+7) Date from the date
+ * and the end of its "HH:MM-HH:MM" time range. Returns null when the time
+ * range cannot be parsed.
+ */
+function getWibEndDate(date: string | Date, time: string): Date | null {
+    const endTimeParts = parseEndTime(time);
+    if (!endTimeParts) {
+        return null;
+    }
+
+    const [endHour, endMin] = endTimeParts;
+    // matchDate is typically the start of the day in UTC from Prisma
+    const matchDate = new Date(date);
+    const year = matchDate.getUTCFullYear();
+    const month = String(matchDate.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(matchDate.getUTCDate()).padStart(2, '0');
+    const hours = String(endHour).padStart(2, '0');
+    const minutes = String(endMin).padStart(2, '0');
+
+    return new Date(`${year}-${month}-${day}T${hours}:${minutes}:00+07:00`);
+}
+
+/**
  * Determines the correct match status based on date and time.
  * Returns "COMPLETED" if the match end time has passed, otherwise returns the current status.
  */
@@ -45,31 +68,12 @@ export function determineMatchStatus(
     }
 
     try {
-        const now = new Date();
-        const matchDate = new Date(date);
-        const endTimeParts = parseEndTime(time);
-
-        if (!endTimeParts) {
+        const matchEndDate = getWibEndDate(date, time);
+        if (!matchEndDate) {
             return currentStatus as MatchStatus;
         }
 
-        const [endHour, endMin] = endTimeParts;
-        
-        // Construct the end time ISO string explicitly in WIB (UTC+7)
-        // matchDate is typically the start of the day in UTC from Prisma
-        const year = matchDate.getUTCFullYear();
-        const month = String(matchDate.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(matchDate.getUTCDate()).padStart(2, '0');
-        const hours = String(endHour).padStart(2, '0');
-        const minutes = String(endMin).padStart(2, '0');
-        
-        const matchEndDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00+07:00`);
-
-        if (matchEndDate < now) {
-            return "COMPLETED";
-        }
-
-        return "UPCOMING";
+        return matchEndDate < new Date() ? "COMPLETED" : "UPCOMING";
     } catch (error) {
         logger.warn("Error determining match status", error);
         return currentStatus as MatchStatus;
@@ -86,23 +90,12 @@ export function getMatchIdsToComplete(
     const matchIdsToComplete: string[] = [];
 
     for (const match of matches) {
-        const endTimeParts = parseEndTime(match.time);
+        const matchEndDate = getWibEndDate(match.date, match.time);
 
-        if (!endTimeParts) {
+        if (!matchEndDate) {
             logger.warn(`Invalid time format for match ${match.id}: ${match.time}`);
             continue;
         }
-
-        const [endHour, endMin] = endTimeParts;
-        const matchDate = new Date(match.date);
-        
-        const year = matchDate.getUTCFullYear();
-        const month = String(matchDate.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(matchDate.getUTCDate()).padStart(2, '0');
-        const hours = String(endHour).padStart(2, '0');
-        const minutes = String(endMin).padStart(2, '0');
-        
-        const matchEndDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00+07:00`);
 
         if (matchEndDate < now) {
             matchIdsToComplete.push(match.id);
