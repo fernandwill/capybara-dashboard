@@ -5,15 +5,3 @@
 
 /* Base styles: reset, variables, body */
 @import "../styles/base.css";
-
-/* Match status badges */
-@import "../styles/matches.css";
-
-/* Modal dialogs */
-@import "../styles/modals.css";
-
-/* Player cards and management */
-@import "../styles/players.css";
-
-/* Responsive breakpoints */
-@import "../styles/responsive.css";

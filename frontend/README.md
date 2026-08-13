@@ -83,7 +83,7 @@ A modern badminton match tracker and management system built with Next.js 16, Re
 | Auth | Supabase |
 | Components | Radix UI |
 | Charts | Recharts |
-| Icons | Lucide React |
+| Icons | Tabler Icons |
 | PDF Export | jsPDF & jspdf-autotable |
 | Testing | Vitest |
 
