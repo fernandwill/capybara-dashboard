@@ -6,7 +6,6 @@ import type { PlayerRecord } from "./EditPlayerModal";
 
 interface PlayerTableRowProps {
   player: PlayerRecord;
-  isTopPlayer: boolean;
   onEdit: (player: PlayerRecord) => void;
   onDelete: (player: PlayerRecord) => void;
 }
@@ -29,7 +28,6 @@ function formatDate(isoString?: string | null): string {
 /** Single row in the historical players table. */
 export default function PlayerTableRow({
   player,
-  isTopPlayer,
   onEdit,
   onDelete,
 }: PlayerTableRowProps) {
@@ -45,14 +43,7 @@ export default function PlayerTableRow({
             height={383}
             className="h-9 w-9 shrink-0 rounded-full object-cover border border-app-border shadow-sm"
           />
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-app-text-primary">{player.name}</span>
-            {isTopPlayer && (
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                Most Played
-              </span>
-            )}
-          </div>
+          <span className="font-semibold text-app-text-primary">{player.name}</span>
         </div>
       </td>
 

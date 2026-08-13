@@ -266,19 +266,7 @@ export default function AllMatchesHistoryPage() {
   const upcomingCount = matches.filter((m) => m.status === "UPCOMING").length;
 
   return (
-    <AppLayout
-      headerActions={
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleNewMatch}
-          className="flex items-center gap-1.5 font-semibold"
-        >
-          <IconPlus size={15} />
-          <span className="hidden sm:inline">New Match</span>
-        </Button>
-      }
-    >
+    <AppLayout>
       <div className="flex flex-col gap-6">
         {/* Header Section */}
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { IconCalendar, IconCalendarEvent, IconStar, IconUsers } from "@tabler/icons-react";
+import { IconCalendar, IconStar, IconUserPlus, IconUsers } from "@tabler/icons-react";
 import type { PlayerRecord } from "./EditPlayerModal";
 
 interface PlayerStatsCardsProps {
@@ -9,28 +9,34 @@ interface PlayerStatsCardsProps {
   isLoading: boolean;
 }
 
-/** Formats an ISO date into a relative label like "Added 3 days ago". */
-export function formatRelativeTime(isoString?: string): string {
-  if (!isoString) return "Recently";
-  const date = new Date(isoString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays <= 0) return "Added today";
-  if (diffDays === 1) return "Added yesterday";
-  if (diffDays < 30) return `Added ${diffDays} days ago`;
-  const diffMonths = Math.floor(diffDays / 30);
-  return `Added ${diffMonths} month${diffMonths === 1 ? "" : "s"} ago`;
+/** Formats an ISO date into "Joined on Jan 5, 2025" or "Joined recently". */
+export function formatJoinedDate(isoString?: string): string {
+  if (!isoString) return "Joined recently";
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return "Joined recently";
+    const formatted = d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    return `Joined on ${formatted}`;
+  } catch {
+    return "Joined recently";
+  }
 }
 
 /** The four summary stat cards above the players table. */
 export default function PlayerStatsCards({ players, isLoading }: PlayerStatsCardsProps) {
   const currentYear = new Date().getFullYear();
 
-  const matchesThisYearCount = players.reduce(
-    (sum, p) => sum + (p.thisYearMatches ?? 0),
-    0
-  );
+  const newPlayersThisYearCount = useMemo(() => {
+    return players.filter((p) => {
+      if (!p.createdAt) return false;
+      const playerYear = new Date(p.createdAt).getFullYear();
+      return playerYear === currentYear;
+    }).length;
+  }, [players, currentYear]);
 
   const mostPlayedPlayer = useMemo(() => {
     if (players.length === 0) return null;
@@ -57,11 +63,11 @@ export default function PlayerStatsCards({ players, isLoading }: PlayerStatsCard
       value: isLoading ? "-" : String(players.length),
     },
     {
-      label: `Matches in ${currentYear}`,
-      sub: "Total player appearances",
-      icon: <IconCalendarEvent size={18} />,
+      label: "New Face",
+      sub: `Joined in ${currentYear}`,
+      icon: <IconUserPlus size={18} />,
       iconClass: "border-blue-500/20 bg-blue-500/10 text-blue-400",
-      value: isLoading ? "-" : String(matchesThisYearCount),
+      value: isLoading ? "-" : String(newPlayersThisYearCount),
     },
     {
       label: "Most Played",
@@ -79,7 +85,7 @@ export default function PlayerStatsCards({ players, isLoading }: PlayerStatsCard
     {
       label: "Last Added",
       sub: lastAddedPlayer
-        ? formatRelativeTime(lastAddedPlayer.createdAt)
+        ? formatJoinedDate(lastAddedPlayer.createdAt)
         : "No players yet",
       icon: <IconCalendar size={18} />,
       iconClass: "border-amber-500/20 bg-amber-500/10 text-amber-400",

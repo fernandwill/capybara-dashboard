@@ -40,13 +40,6 @@ export default function PlayersPage() {
   // Only show loading states on the first load; background refetches stay silent
   const isLoadingFirstPass = isLoading && players.length === 0;
 
-  const mostPlayedPlayer = useMemo(() => {
-    if (players.length === 0) return null;
-    return [...players].sort(
-      (a, b) => (b.totalMatches ?? 0) - (a.totalMatches ?? 0)
-    )[0];
-  }, [players]);
-
   // Filter & Search & Sort
   const filteredPlayers = useMemo(() => {
     let list = [...players];
@@ -92,20 +85,23 @@ export default function PlayersPage() {
     <AppLayout>
       <div className="space-y-6">
         {/* Page Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-app-text-primary sm:text-3xl">
-              Historical Players
-            </h1>
-            <p className="mt-1 text-xs text-app-text-muted sm:text-sm">
-              Manage players who have played in your matches.
-            </p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-app-text-primary sm:text-3xl">
+            Historical Players
+          </h1>
+          <p className="mt-1 text-xs text-app-text-muted sm:text-sm">
+            Manage players who have played in your matches.
+          </p>
+        </div>
 
-          {/* Top Right Actions */}
-          <div className="flex flex-wrap items-center gap-2.5">
+        {/* 4 Stat Cards (Analytics stay on top) */}
+        <PlayerStatsCards players={players} isLoading={isLoadingFirstPass} />
+
+        {/* Controls: Search, Sort & Add Player */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 flex-wrap items-center gap-2.5">
             {/* Search Box */}
-            <div className="relative min-w-[220px]">
+            <div className="relative flex-1 sm:max-w-xs min-w-[200px]">
               <IconSearch
                 size={14}
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted"
@@ -152,7 +148,7 @@ export default function PlayersPage() {
                     className="fixed inset-0 z-30"
                     onClick={() => setIsFilterMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full z-40 mt-2 w-48 overflow-hidden rounded-xl border border-app-border bg-app-input p-1.5 shadow-2xl text-xs">
+                  <div className="absolute left-0 sm:left-auto sm:right-0 top-full z-40 mt-2 w-48 overflow-hidden rounded-xl border border-app-border bg-app-input p-1.5 shadow-2xl text-xs">
                     <p className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-app-text-muted">
                       Sort Players By
                     </p>
@@ -202,21 +198,18 @@ export default function PlayersPage() {
                 </>
               )}
             </div>
-
-            {/* Add Player Button */}
-            <button
-              type="button"
-              onClick={() => setIsAddModalOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-app-primary px-4 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-app-primary-hover"
-            >
-              <IconPlus size={14} />
-              <span>Add Player</span>
-            </button>
           </div>
-        </div>
 
-        {/* 4 Stat Cards */}
-      <PlayerStatsCards players={players} isLoading={isLoadingFirstPass} />
+          {/* Add Player Button */}
+          <button
+            type="button"
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-app-primary px-4 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-app-primary-hover shrink-0"
+          >
+            <IconPlus size={14} />
+            <span>Add Player</span>
+          </button>
+        </div>
 
         {/* Players Table Card */}
         <div className="overflow-hidden rounded-2xl border border-app-border bg-app-bg">
@@ -260,11 +253,6 @@ export default function PlayersPage() {
                     <PlayerTableRow
                       key={player.id}
                       player={player}
-                      isTopPlayer={
-                        !!mostPlayedPlayer &&
-                        mostPlayedPlayer.id === player.id &&
-                        (player.totalMatches ?? 0) > 0
-                      }
                       onEdit={setEditingPlayer}
                       onDelete={setDeletingPlayer}
                     />
