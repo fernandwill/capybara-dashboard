@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DataProvider } from "@/providers/DataProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import NavigationProgress from "@/components/layout/NavigationProgress";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -46,6 +48,9 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <DataProvider>
+              <Suspense fallback={null}>
+                <NavigationProgress />
+              </Suspense>
               {children}
             </DataProvider>
           </AuthProvider>

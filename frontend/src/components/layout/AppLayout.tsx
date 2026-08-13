@@ -79,7 +79,7 @@ export default function AppLayout({
       </header>
 
       {/* Main Body */}
-      <main className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
+      <main className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1 animate-in fade-in-0 slide-in-from-bottom-1.5 duration-200 ease-out">
         {children}
       </main>
 
