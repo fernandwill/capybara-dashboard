@@ -92,18 +92,17 @@ export default function RecentMatchesCard({
                     <h4 className="truncate font-semibold text-sm text-app-text-primary group-hover:text-blue-400 transition-colors">
                       {match.title}
                     </h4>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-app-text-secondary">
-                      <span>{courtText}</span>
-                      <span className="text-app-text-muted">•</span>
-                      <span>{playersCount} Players</span>
+                    <div className="mt-0.5 space-y-0.5 text-xs">
+                      <div className="flex items-center gap-1.5 text-app-text-secondary">
+                        <span>{courtText}</span>
+                        <span className="text-app-text-muted">•</span>
+                        <span>{playersCount} Players</span>
+                      </div>
                       {match.location && (
-                        <>
-                          <span className="text-app-text-muted">•</span>
-                          <span className="flex items-center gap-1 truncate text-app-text-muted">
-                            <IconMapPin size={11} className="shrink-0 text-app-text-muted" />
-                            {match.location}
-                          </span>
-                        </>
+                        <div className="flex items-center gap-1 truncate text-app-text-muted">
+                          <IconMapPin size={11} className="shrink-0 text-app-text-muted" />
+                          <span className="truncate">{match.location}</span>
+                        </div>
                       )}
                     </div>
                   </div>

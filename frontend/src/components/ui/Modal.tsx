@@ -145,7 +145,7 @@ export default function Modal({
       aria-modal="true"
       tabIndex={-1}
       aria-label={typeof title === "string" ? title : ariaLabel || "Modal"}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 p-0 sm:p-4 backdrop-blur-sm transition-opacity outline-none animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-0 sm:p-4 backdrop-blur-sm transition-opacity outline-none animate-in fade-in duration-150"
       onClick={(e) => {
         if (closeOnBackdropClick && e.target === e.currentTarget) {
           onClose();
@@ -153,11 +153,8 @@ export default function Modal({
       }}
     >
       <div
-        className={`relative flex max-h-[85dvh] w-full ${maxWidthClass} flex-col rounded-t-3xl sm:rounded-2xl border-t sm:border border-app-border bg-app-card p-5 sm:p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:pb-6 shadow-2xl text-app-text-primary transition-all animate-in slide-in-from-bottom-6 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 ${className}`}
+        className={`relative flex h-full sm:h-auto sm:max-h-[85vh] w-full ${maxWidthClass} flex-col rounded-none sm:rounded-2xl border-0 sm:border border-app-border bg-app-card p-5 sm:p-6 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] sm:pt-6 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:pb-6 shadow-2xl text-app-text-primary transition-all animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 ${className}`}
       >
-        {/* Mobile Drag Indicator */}
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-app-border sm:hidden" />
-
         {/* Modal Header */}
         {(title || icon || showCloseButton) && (
           <div

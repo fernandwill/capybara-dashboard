@@ -29,6 +29,7 @@ const SORT_OPTIONS: DropdownOption<SortOption>[] = [
 
 // Modals
 import NewMatchModal from "@/components/NewMatchModal";
+import MatchDetailsModal from "@/components/MatchDetailsModal";
 import DeleteMatchModal from "@/components/DeleteMatchModal";
 import SuccessModal from "@/components/SuccessModal";
 import ErrorModal from "@/components/ErrorModal";
@@ -47,6 +48,7 @@ export default function AllMatchesHistoryPage() {
     createMatch,
     updateMatch,
     deleteMatch,
+    updatePlayerPaymentStatus,
   } = useMatches();
 
   // Search, Filter & Pagination state
@@ -57,6 +59,8 @@ export default function AllMatchesHistoryPage() {
   // Modals state
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCompletedMatch, setSelectedCompletedMatch] = useState<Match | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeletingMatch, setIsDeletingMatch] = useState(false);
@@ -132,8 +136,18 @@ export default function AllMatchesHistoryPage() {
 
   // Modal Handlers
   const handleMatchClick = (match: Match) => {
-    router.push(`/matches/${match.id}`);
+    if (match.status === "COMPLETED") {
+      setSelectedCompletedMatch(match);
+      setIsDetailsModalOpen(true);
+    } else {
+      router.push(`/matches/${match.id}`);
+    }
   };
+
+  const activeCompletedMatch = useMemo(() => {
+    if (!selectedCompletedMatch) return null;
+    return matches.find((m) => m.id === selectedCompletedMatch.id) || selectedCompletedMatch;
+  }, [matches, selectedCompletedMatch]);
 
   const handleNewMatch = () => {
     setEditingMatch(null);
@@ -234,7 +248,7 @@ export default function AllMatchesHistoryPage() {
   const openRowMenu = (event: React.MouseEvent<HTMLButtonElement>, match: Match) => {
     event.stopPropagation();
     const rect = event.currentTarget.getBoundingClientRect();
-    const menuWidth = 144;
+    const menuWidth = 176;
     setMenu({ match, x: Math.max(8, rect.right - menuWidth), y: rect.bottom });
   };
 
@@ -467,6 +481,17 @@ export default function AllMatchesHistoryPage() {
         onSubmit={handleSubmitMatch}
         editingMatch={editingMatch}
         isSubmitting={isSubmittingMatch}
+      />
+
+      <MatchDetailsModal
+        isOpen={isDetailsModalOpen}
+        match={activeCompletedMatch}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedCompletedMatch(null);
+        }}
+        onEdit={handleEditMatch}
+        onUpdatePaymentStatus={updatePlayerPaymentStatus}
       />
 
       <DeleteMatchModal

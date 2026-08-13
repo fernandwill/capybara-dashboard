@@ -101,33 +101,33 @@ export default function MatchPlayersSection({
             </div>
           </div>
 
-          {/* Chips Grid */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {/* Chips Grid (2x2 grid) */}
+          <div className="grid grid-cols-2 gap-2">
             {selectedPlayersList.map((player) => (
               <div
                 key={player.id}
-                className="flex items-center justify-between rounded-xl border border-app-border bg-app-input px-3 py-2"
+                className="flex items-center justify-between rounded-xl border border-app-border bg-app-input px-2.5 py-1.5 min-w-0"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center gap-2 min-w-0">
                   <Image
                     src="/capybara-avatar.png"
                     alt={player.name}
                     width={400}
                     height={383}
-                    className="h-7 w-7 shrink-0 rounded-full object-cover border border-app-border shadow-sm"
+                    className="h-6 w-6 shrink-0 rounded-full object-cover border border-app-border shadow-sm"
                   />
                   <span className="truncate text-xs font-semibold text-app-text-primary">
                     {player.name}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleRemovePlayerChip(player.id)}
                     className="rounded p-1 text-app-text-muted transition hover:bg-app-hover hover:text-app-text-primary"
                     aria-label={`Remove ${player.name}`}
                   >
-                    <IconX size={14} />
+                    <IconX size={13} />
                   </button>
                 </div>
               </div>

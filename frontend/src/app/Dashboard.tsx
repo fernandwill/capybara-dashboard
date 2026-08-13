@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { IconBolt, IconClock, IconTrendingUp } from "@tabler/icons-react";
 import { useAuth } from "@/contexts/AuthContext";
 import NewMatchModal from "../components/NewMatchModal";
+import MatchDetailsModal from "../components/MatchDetailsModal";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import DeleteMatchModal from "../components/DeleteMatchModal";
@@ -38,6 +39,7 @@ export function Dashboard() {
     createMatch,
     updateMatch,
     deleteMatch,
+    updatePlayerPaymentStatus,
     isLoading: isMatchesLoading,
   } = useMatches();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -57,6 +59,8 @@ export function Dashboard() {
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
   const [matchPendingDeletion, setMatchPendingDeletion] = useState<Match | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCompletedMatch, setSelectedCompletedMatch] = useState<Match | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   // Loading states
   const [isDeletingMatch, setIsDeletingMatch] = useState(false);
@@ -161,8 +165,18 @@ export function Dashboard() {
   };
 
   const handleMatchClick = (match: Match) => {
-    router.push(`/matches/${match.id}`);
+    if (match.status === "COMPLETED") {
+      setSelectedCompletedMatch(match);
+      setIsDetailsModalOpen(true);
+    } else {
+      router.push(`/matches/${match.id}`);
+    }
   };
+
+  const activeCompletedMatch = useMemo(() => {
+    if (!selectedCompletedMatch) return null;
+    return matches.find((m) => m.id === selectedCompletedMatch.id) || selectedCompletedMatch;
+  }, [matches, selectedCompletedMatch]);
 
   const handleRequestDeleteMatch = (match: Match) => {
     setMatchPendingDeletion(match);
@@ -186,7 +200,7 @@ export function Dashboard() {
   const openRowMenu = (event: React.MouseEvent<HTMLButtonElement>, match: Match) => {
     event.stopPropagation();
     const rect = event.currentTarget.getBoundingClientRect();
-    const menuWidth = 144;
+    const menuWidth = 176;
     setMenu({ match, x: Math.max(8, rect.right - menuWidth), y: rect.bottom });
   };
 
@@ -414,6 +428,17 @@ export function Dashboard() {
         onClose={handleCloseErrorModal}
         title={errorModal.title}
         message={errorModal.message}
+      />
+
+      <MatchDetailsModal
+        isOpen={isDetailsModalOpen}
+        match={activeCompletedMatch}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedCompletedMatch(null);
+        }}
+        onEdit={handleEditMatch}
+        onUpdatePaymentStatus={updatePlayerPaymentStatus}
       />
 
       <DeleteMatchModal

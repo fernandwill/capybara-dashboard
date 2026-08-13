@@ -337,21 +337,24 @@ export default function MatchDetailsPage() {
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-app-text-muted">
-                <span className="flex items-center gap-1.5">
-                  <IconCalendar size={14} className="text-emerald-400" />
-                  {formatDate(match.date)}
-                </span>
-                <span className="text-app-text-muted">•</span>
-                <span className="flex items-center gap-1.5">
-                  <IconClock size={14} className="text-blue-400" />
-                  {formatTimeWithDuration(match.time)}
-                </span>
-                <span className="text-app-text-muted">•</span>
-                <span className="flex items-center gap-1.5">
-                  <IconMapPin size={14} className="text-amber-400" />
-                  {match.location || "Badminton Hall"}
-                </span>
+              <div className="space-y-1.5 text-xs text-app-text-muted">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span className="flex items-center gap-1.5">
+                    <IconCalendar size={14} className="text-emerald-400" />
+                    {formatDate(match.date)}
+                  </span>
+                  <span className="text-app-text-muted">•</span>
+                  <span className="flex items-center gap-1.5">
+                    <IconClock size={14} className="text-blue-400" />
+                    {formatTimeWithDuration(match.time)}
+                  </span>
+                </div>
+                {match.location && (
+                  <div className="flex items-center gap-1.5 text-app-text-secondary">
+                    <IconMapPin size={14} className="shrink-0 text-amber-400" />
+                    <span className="truncate">{match.location}</span>
+                  </div>
+                )}
               </div>
             </div>
 

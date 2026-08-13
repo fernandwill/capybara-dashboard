@@ -29,6 +29,11 @@ interface UseMatchesReturn {
     createMatch: (data: MatchFormData) => Promise<boolean>;
     updateMatch: (id: string, data: MatchFormData) => Promise<boolean>;
     deleteMatch: (id: string) => Promise<boolean>;
+    updatePlayerPaymentStatus: (
+        matchId: string,
+        playerId: string,
+        paymentStatus: "BELUM_SETOR" | "SUDAH_SETOR"
+    ) => Promise<boolean>;
 }
 
 export function useMatches(): UseMatchesReturn {
@@ -113,6 +118,46 @@ export function useMatches(): UseMatchesReturn {
         }
     }, [mutate]);
 
+    const updatePlayerPaymentStatus = useCallback(
+        async (matchId: string, playerId: string, paymentStatus: "BELUM_SETOR" | "SUDAH_SETOR"): Promise<boolean> => {
+            try {
+                // Optimistically update the match player paymentStatus in SWR cache
+                await mutate(
+                    (current: Match[] = []) =>
+                        current.map((m) => {
+                            if (m.id !== matchId) return m;
+                            return {
+                                ...m,
+                                players: m.players?.map((p) =>
+                                    p.player.id === playerId ? { ...p, paymentStatus } : p
+                                ),
+                            };
+                        }),
+                    { revalidate: false }
+                );
+
+                const response = await authFetch(`/api/matches/${matchId}/players/${playerId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ paymentStatus }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Revalidate in background to confirm consistency
+                await mutate();
+                return true;
+            } catch (err) {
+                console.error("Error updating payment status:", err);
+                await mutate();
+                return false;
+            }
+        },
+        [mutate]
+    );
+
     return {
         matches,
         isLoading,
@@ -121,5 +166,6 @@ export function useMatches(): UseMatchesReturn {
         createMatch,
         updateMatch,
         deleteMatch,
+        updatePlayerPaymentStatus,
     };
 }
