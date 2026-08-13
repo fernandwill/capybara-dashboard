@@ -35,12 +35,12 @@ export default function SlotPickerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-0 sm:p-4 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full h-full sm:h-auto sm:max-h-[85vh] max-w-sm rounded-none sm:rounded-2xl border-0 sm:border border-app-border bg-app-bg p-5 sm:p-5 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] sm:pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:pb-5 shadow-2xl flex flex-col animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
+      <div className="w-full h-auto max-h-[85vh] max-w-sm rounded-2xl border border-app-border bg-app-bg p-5 shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h4 className="text-sm font-bold text-app-text-primary">Select Player</h4>
