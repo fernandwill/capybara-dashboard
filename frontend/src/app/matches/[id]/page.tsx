@@ -30,7 +30,6 @@ import { usePlayers } from "@/hooks/use-players";
 import { authFetch } from "@/lib/auth-fetch";
 import { Match, Player, ModalState } from "@/types/types";
 import { formatDate, formatTimeWithDuration } from "@/utils/formatters";
-import { exportPlayerList } from "@/utils/player-export";
 import type { PlayerInMatch, FinishedGameHistory } from "@/types/match-types";
 
 // Shape returned by GET /api/matches/:id (match + per-match play counts +
@@ -361,7 +360,11 @@ export default function MatchDetailsPage() {
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
               <button
                 type="button"
-                onClick={() => exportPlayerList(match, players)}
+                onClick={async () => {
+                  // jsPDF is heavy; load it only when the user actually exports.
+                  const { exportPlayerList } = await import("@/utils/player-export");
+                  exportPlayerList(match, players);
+                }}
                 className="flex items-center gap-1.5 rounded-xl border border-app-border bg-app-input px-3.5 py-2 text-xs font-semibold text-app-text-secondary transition hover:border-app-border-hover hover:bg-app-hover hover:text-app-text-primary"
                 aria-label="Export Players"
               >

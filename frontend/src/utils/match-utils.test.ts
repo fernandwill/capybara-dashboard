@@ -2,9 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
     parseDate,
     sortMatches,
-    filterMatches,
-    areAllPlayersPaid,
-    getPendingPaymentCount,
     getClosestUpcomingMatch,
 } from './match-utils';
 import { Match } from "@/types/types";
@@ -67,86 +64,6 @@ describe("sortMatches", () => {
         expect(result[0].id).toBe("b");
         expect(result[1].id).toBe("a");
         expect(result[2].id).toBe("c");
-    });
-});
-
-describe("filterMatches", () => {
-    const upcomingMatch = createMockMatch({ id: "1", status: "UPCOMING", title: "Morning Game", location: "GOR A" });
-    const completedMatch = createMockMatch({ id: "2", status: "COMPLETED", title: "Evening Game", location: "GOR B" });
-    const matches = [upcomingMatch, completedMatch];
-
-    it("filters by upcoming status", () => {
-        const result = filterMatches(matches, "upcoming", "");
-        expect(result).toHaveLength(1);
-        expect(result[0].id).toBe("1");
-    });
-
-    it("filters by completed status", () => {
-        const result = filterMatches(matches, "completed", "");
-        expect(result).toHaveLength(1);
-        expect(result[0].id).toBe("2");
-    });
-
-    it("filters by search query on title", () => {
-        const result = filterMatches(matches, "upcoming", "Morning");
-        expect(result).toHaveLength(1);
-        expect(result[0].id).toBe("1");
-    });
-
-    it("filters by search query on location", () => {
-        const result = filterMatches(matches, "completed", "GOR B");
-        expect(result).toHaveLength(1);
-        expect(result[0].id).toBe("2");
-    });
-
-    it("returns empty array if no matches", () => {
-        const result = filterMatches(matches, "upcoming", "nonexistent");
-        expect(result).toHaveLength(0);
-    });
-});
-
-describe("areAllPlayersPaid", () => {
-    it("returns false for match with no players", () => {
-        const match = createMockMatch({ players: [] });
-        expect(areAllPlayersPaid(match)).toBe(false);
-    });
-
-    it("returns true if all players have SUDAH_SETOR status", () => {
-        const match = createMockMatch({
-            players: [
-                { player: { id: "1", name: "Player 1", status: "ACTIVE" }, paymentStatus: "SUDAH_SETOR" },
-                { player: { id: "2", name: "Player 2", status: "ACTIVE" }, paymentStatus: "SUDAH_SETOR" },
-            ],
-        });
-        expect(areAllPlayersPaid(match)).toBe(true);
-    });
-
-    it("returns false if any player has BELUM_SETOR status", () => {
-        const match = createMockMatch({
-            players: [
-                { player: { id: "1", name: "Player 1", status: "ACTIVE" }, paymentStatus: "SUDAH_SETOR" },
-                { player: { id: "2", name: "Player 2", status: "ACTIVE" }, paymentStatus: "BELUM_SETOR" },
-            ],
-        });
-        expect(areAllPlayersPaid(match)).toBe(false);
-    });
-});
-
-describe("getPendingPaymentCount", () => {
-    it("returns 0 for match with no players", () => {
-        const match = createMockMatch({ players: [] });
-        expect(getPendingPaymentCount(match)).toBe(0);
-    });
-
-    it("counts players with BELUM_SETOR status", () => {
-        const match = createMockMatch({
-            players: [
-                { player: { id: "1", name: "Player 1", status: "ACTIVE" }, paymentStatus: "SUDAH_SETOR" },
-                { player: { id: "2", name: "Player 2", status: "ACTIVE" }, paymentStatus: "BELUM_SETOR" },
-                { player: { id: "3", name: "Player 3", status: "ACTIVE" }, paymentStatus: "BELUM_SETOR" },
-            ],
-        });
-        expect(getPendingPaymentCount(match)).toBe(2);
     });
 });
 

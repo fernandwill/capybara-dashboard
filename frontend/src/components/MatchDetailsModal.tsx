@@ -12,7 +12,6 @@ import {
   IconMapPin,
   IconReceipt,
   IconUsers,
-  IconX,
 } from "@tabler/icons-react";
 import Modal from "./ui/Modal";
 import { Match, MatchPlayer } from "@/types/types";
@@ -268,7 +267,7 @@ export default function MatchDetailsModal({
                 PLAYERS & PAYMENT ({totalPlayersCount})
               </h3>
               <p className="text-xs text-app-text-muted">
-                Click a status badge to toggle payment status, from "Sudah Setor" to "Belum Setor" and vice versa.
+                Click a status badge to toggle payment status, from &ldquo;Sudah Setor&rdquo; to &ldquo;Belum Setor&rdquo; and vice versa.
               </p>
             </div>
             {totalPlayersCount > 0 && (

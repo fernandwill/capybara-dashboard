@@ -12,6 +12,8 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 import { Match } from "@/types/types";
+import { formatShortDate, formatTimeWithDuration } from "@/utils/formatters";
+import { getMatchCountdown } from "@/utils/match-utils";
 
 interface UpcomingMatchesCardProps {
   matches: Match[];
@@ -26,67 +28,28 @@ function getMatchDateParts(dateString: string) {
   if (isNaN(date.getTime())) {
     return { month: "TBD", day: "--", weekday: "---" };
   }
-  const month = date.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
-  const day = String(date.getDate()).padStart(2, "0");
+  const [day, month] = formatShortDate(dateString).split(" ");
   const weekday = date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
   return { month, day, weekday };
 }
 
-function formatTimeDuration(timeString: string) {
-  if (!timeString || !timeString.includes("-")) return "Time not set";
-  try {
-    const [start, end] = timeString.split("-").map((t) => t.trim());
-    const [startH, startM] = start.split(":").map(Number);
-    const [endH, endM] = end.split(":").map(Number);
-
-    if (isNaN(startH) || isNaN(startM) || isNaN(endH) || isNaN(endM)) return timeString;
-
-    const startDate = new Date();
-    startDate.setHours(startH, startM, 0, 0);
-    const endDate = new Date();
-    endDate.setHours(endH, endM, 0, 0);
-
-    let diff = endDate.getTime() - startDate.getTime();
-    if (diff < 0) diff += 24 * 60 * 60 * 1000;
-
-    const hours = Math.round((diff / (1000 * 60 * 60)) * 10) / 10;
-    return `${start} - ${end} (${hours} hrs)`;
-  } catch {
-    return timeString;
-  }
-}
-
-function getMatchCountdown(match: Match): string {
-  try {
-    const matchDate = new Date(match.date);
-    const timeString = match.time?.split("-")[0]?.trim() || "00:00";
-    const [hours, minutes] = timeString.split(":").map(Number);
-
-    const matchDateTime = new Date(matchDate);
-    matchDateTime.setHours(hours || 0, minutes || 0, 0, 0);
-
-    const now = new Date();
-    const timeDiff = matchDateTime.getTime() - now.getTime();
-
-    if (timeDiff <= 0) {
-      return "Starting soon";
-    }
-
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) {
-      return `In ${days}d ${hoursLeft}h ${minutesLeft}m`;
-    } else if (hoursLeft > 0) {
-      return `In ${hoursLeft}h ${minutesLeft}m`;
-    } else if (minutesLeft > 0) {
-      return `In ${minutesLeft}m`;
-    } else {
-      return "Starting soon";
-    }
-  } catch {
+function getCountdownLabel(match: Match): string {
+  const parts = getMatchCountdown(match);
+  if (parts === null) {
     return "Upcoming";
+  }
+  if (parts.started) {
+    return "Starting soon";
+  }
+  const { days, hours, minutes } = parts;
+  if (days > 0) {
+    return `In ${days}d ${hours}h ${minutes}m`;
+  } else if (hours > 0) {
+    return `In ${hours}h ${minutes}m`;
+  } else if (minutes > 0) {
+    return `In ${minutes}m`;
+  } else {
+    return "Starting soon";
   }
 }
 
@@ -209,7 +172,7 @@ export default function UpcomingMatchesCard({
               const { month, day, weekday } = getMatchDateParts(match.date);
               const playersCount = match.players?.length || 0;
               const courtCount = match.courtNumber || "4";
-              const countdownStr = getMatchCountdown(match);
+              const countdownStr = getCountdownLabel(match);
 
               return (
                 <div
@@ -239,7 +202,7 @@ export default function UpcomingMatchesCard({
                       </h4>
                       <p className="mt-1 flex items-center gap-1 text-[11px] text-app-text-muted">
                         <IconClock size={11} className="shrink-0 text-emerald-400" />
-                        <span className="truncate">{formatTimeDuration(match.time)}</span>
+                        <span className="truncate">{formatTimeWithDuration(match.time)}</span>
                       </p>
                       <p className="mt-0.5 truncate text-[11px] text-app-text-muted">
                         {courtCount} {Number(courtCount) === 1 ? "Court" : "Courts"} • {playersCount} {playersCount === 1 ? "Player" : "Players"}

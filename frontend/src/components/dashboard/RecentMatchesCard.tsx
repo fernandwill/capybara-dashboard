@@ -10,9 +10,7 @@ import { formatDurationHours, formatShortDate } from "@/utils/formatters";
 interface RecentMatchesCardProps {
   matches: Match[];
   totalCount: number;
-  showAll?: boolean;
   isLoading: boolean;
-  onToggleShowAll?: () => void;
   onMatchClick: (match: Match) => void;
   onOpenMenu: (event: React.MouseEvent<HTMLButtonElement>, match: Match) => void;
 }

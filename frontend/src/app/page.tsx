@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,7 +11,6 @@ import './login/login.css';
 
 export default function Home() {
   const { user, loading } = useAuth();
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
@@ -39,11 +37,6 @@ export default function Home() {
       setLoginLoading(false);
     }
   };
-
-  useEffect(() => {
-    // If user is authenticated, we can stay on this page and show dashboard
-    // If not authenticated, we show the login form
-  }, [user, router]);
 
   if (loading) {
     return (

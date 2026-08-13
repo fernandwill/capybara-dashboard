@@ -25,7 +25,6 @@ interface UseMatchesReturn {
     matches: Match[];
     isLoading: boolean;
     error: string | null;
-    fetchMatches: () => Promise<void>;
     createMatch: (data: MatchFormData) => Promise<boolean>;
     updateMatch: (id: string, data: MatchFormData) => Promise<boolean>;
     deleteMatch: (id: string) => Promise<boolean>;
@@ -43,10 +42,6 @@ export function useMatches(): UseMatchesReturn {
         error,
         mutate,
     } = useSWR<Match[]>("/api/matches");
-
-    const fetchMatches = useCallback(async () => {
-        await mutate();
-    }, [mutate]);
 
     const createMatch = useCallback(async (data: MatchFormData): Promise<boolean> => {
         try {
@@ -162,7 +157,6 @@ export function useMatches(): UseMatchesReturn {
         matches,
         isLoading,
         error: error ? "Failed to fetch matches" : null,
-        fetchMatches,
         createMatch,
         updateMatch,
         deleteMatch,

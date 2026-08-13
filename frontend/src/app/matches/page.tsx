@@ -7,7 +7,6 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconHistory,
-  IconPlus,
   IconSearch,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/Button";

@@ -4,7 +4,7 @@
 // across pages. SWR fetches on mount (replacing the old mount effect), so the
 // raw data arrives automatically and realtime keeps it fresh.
 
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import useSWR from "swr";
 
 export interface MonthlyPoint {
@@ -26,12 +26,7 @@ export function useMonthlyStats(selectedYear: number) {
     const {
         data: raw = {},
         isLoading,
-        mutate,
     } = useSWR<RawMonthly>("/api/stats/monthly");
-
-    const fetchMonthly = useCallback(async () => {
-        await mutate();
-    }, [mutate]);
 
     // Available years derived from the fetched data; always include the
     // current year even if it has no completed matches yet.
@@ -65,7 +60,6 @@ export function useMonthlyStats(selectedYear: number) {
         monthlyData,
         availableYears,
         isLoading,
-        fetchMonthly,
         raw,
     };
 }

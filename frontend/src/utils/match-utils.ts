@@ -71,52 +71,6 @@ export function sortMatches(matches: Match[], sortOption: SortOption): Match[] {
 }
 
 /**
- * Filters matches by status and search query.
- */
-export function filterMatches(
-    matches: Match[],
-    status: "upcoming" | "completed",
-    searchQuery: string
-): Match[] {
-    const targetStatus = status === "upcoming" ? "UPCOMING" : "COMPLETED";
-    const query = searchQuery.toLowerCase();
-
-    return matches.filter((match) => {
-        const statusMatch = match.status === targetStatus;
-        const searchMatch =
-            query === "" ||
-            match.title.toLowerCase().includes(query) ||
-            match.location.toLowerCase().includes(query);
-
-        return statusMatch && searchMatch;
-    });
-}
-
-/**
- * Checks if all players in a match have paid (SUDAH_SETOR).
- */
-export function areAllPlayersPaid(match: Match): boolean {
-    if (!match.players || match.players.length === 0) {
-        return false;
-    }
-    return match.players.every(
-        (playerMatch) => playerMatch.paymentStatus === "SUDAH_SETOR"
-    );
-}
-
-/**
- * Counts the number of players who have not paid (BELUM_SETOR).
- */
-export function getPendingPaymentCount(match: Match): number {
-    if (!match.players || match.players.length === 0) {
-        return 0;
-    }
-    return match.players.filter(
-        (playerMatch) => playerMatch.paymentStatus === "BELUM_SETOR"
-    ).length;
-}
-
-/**
  * Finds the closest upcoming match from an array of matches.
  */
 export function getClosestUpcomingMatch(matches: Match[]): Match | null {
@@ -125,4 +79,41 @@ export function getClosestUpcomingMatch(matches: Match[]): Match | null {
         .sort((a, b) => compareByDateTime(a, b, true));
 
     return upcomingMatches.length > 0 ? upcomingMatches[0] : null;
+}
+
+/**
+ * Computes the time remaining until a match's start time.
+ * Returns null when the date/time cannot be parsed, and `started: true` once
+ * the start time has passed.
+ */
+export function getMatchCountdown(
+    match: Match
+): { days: number; hours: number; minutes: number; started: boolean } | null {
+    try {
+        const matchDate = new Date(match.date);
+        const timeString = match.time.split("-")[0].trim();
+        const [hours, minutes] = timeString.split(":").map(Number);
+
+        const matchDateTime = new Date(matchDate);
+        matchDateTime.setHours(hours, minutes, 0, 0);
+
+        const timeDiff = matchDateTime.getTime() - Date.now();
+
+        if (timeDiff <= 0) {
+            return { days: 0, hours: 0, minutes: 0, started: true };
+        }
+
+        return {
+            days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
+            hours: Math.floor(
+                (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            ),
+            minutes: Math.floor(
+                (timeDiff % (1000 * 60 * 60)) / (1000 * 60)
+            ),
+            started: false,
+        };
+    } catch {
+        return null;
+    }
 }

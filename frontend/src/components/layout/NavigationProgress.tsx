@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 /**
@@ -10,16 +10,20 @@ import { usePathname, useSearchParams } from "next/navigation";
 export default function NavigationProgress() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isNavigating, setIsNavigating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
 
+  // Mirrors the in-flight navigation flag for the route-change effect so it
+  // reads the latest value without re-running the moment a click starts
+  // navigation (which would instantly jump the bar to 100%).
+  const isNavigatingRef = useRef(false);
+
   // Complete and hide progress when route finishes changing
   useEffect(() => {
-    if (isNavigating) {
+    if (isNavigatingRef.current) {
       setProgress(100);
       const timer = setTimeout(() => {
-        setIsNavigating(false);
+        isNavigatingRef.current = false;
         setVisible(false);
         setProgress(0);
       }, 200);
@@ -45,8 +49,8 @@ export default function NavigationProgress() {
         !e.altKey &&
         href !== pathname
       ) {
+        isNavigatingRef.current = true;
         setVisible(true);
-        setIsNavigating(true);
         setProgress(25);
 
         // Advance progress smoothly while waiting for page bundle
