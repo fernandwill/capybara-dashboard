@@ -1,7 +1,7 @@
 .agents
 .claude
 .copilot
-prod_issue.md
+*.md
 
 backend/dist/
 backend/dist-ssr/
