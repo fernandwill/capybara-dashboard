@@ -315,7 +315,7 @@ export function Dashboard() {
             </h1>
 
             <p className="text-base text-app-text-secondary">
-              Here&apos;s how your badminton is going this year.
+              Capybara! Ia ma ia lo, su ma su lo.
             </p>
           </header>
 
@@ -383,11 +383,6 @@ export function Dashboard() {
             onMatchClick={handleMatchClick}
             onOpenMenu={openRowMenu}
           />
-
-          {/* Footer */}
-          <footer className="flex flex-col items-center gap-1 pb-2 text-center text-sm text-app-text-muted">
-            <p>Capy Club Badmin</p>
-          </footer>
         </div>
 
       {/* Row action menu */}

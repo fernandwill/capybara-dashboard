@@ -9,6 +9,7 @@ import {
   IconCalendarEvent,
   IconChevronLeft,
   IconChevronRight,
+  IconCopyright,
   IconHistory,
   IconPlus,
   IconSearch,
@@ -479,6 +480,14 @@ export default function AllMatchesHistoryPage() {
           )}
         </div>
       </main>
+
+      {/* App Footer */}
+      <footer className="w-full border-t border-app-border/40 py-6 text-center text-xs text-app-text-muted">
+        <p className="flex items-center justify-center gap-1.5 font-medium">
+          <IconCopyright size={14} className="shrink-0 text-app-text-muted" />
+          <span>Capy Club Badmin</span>
+        </p>
+      </footer>
 
       {/* Row Menu */}
       <MatchRowMenu

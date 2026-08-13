@@ -78,7 +78,7 @@ export default function Home() {
           className="login-logo"
         />
       </div>
-      <h1 className="app-title">CapyHub&apos;s Dashboard</h1>
+      <h1 className="app-title">CapyHub</h1>
       {error && <div className="error-message">{error}</div>}
       <form className="login-form" onSubmit={handleLogin}>
         <input

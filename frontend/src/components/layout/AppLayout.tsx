@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { IconDeviceDesktop, IconMoon, IconSun } from "@tabler/icons-react";
+import { IconCopyright, IconDeviceDesktop, IconMoon, IconSun } from "@tabler/icons-react";
 import { useTheme } from "next-themes";
 import FloatingNav from "./FloatingNav";
 import CustomDropdown from "@/components/ui/CustomDropdown";
@@ -34,7 +34,7 @@ export default function AppLayout({
     current === "system" ? "System" : current === "light" ? "Light" : "Dark";
 
   return (
-    <div className="min-h-screen bg-app-bg text-app-text-primary">
+    <div className="min-h-screen flex flex-col justify-between bg-app-bg text-app-text-primary">
       {/* Top Header with Floating Left Menu */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-app-border bg-app-bg/85 px-4 pb-0 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:px-6 lg:px-8" style={{ height: "calc(4rem + env(safe-area-inset-top))" }}>
         {/* Left: Floating Navigation Menu */}
@@ -79,9 +79,17 @@ export default function AppLayout({
       </header>
 
       {/* Main Body */}
-      <main className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+      <main className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {children}
       </main>
+
+      {/* App Footer */}
+      <footer className="w-full border-t border-app-border/40 py-6 text-center text-xs text-app-text-muted">
+        <p className="flex items-center justify-center gap-1.5 font-medium">
+          <IconCopyright size={14} className="shrink-0 text-app-text-muted" />
+          <span>Capy Club Badmin</span>
+        </p>
+      </footer>
     </div>
   );
 }
