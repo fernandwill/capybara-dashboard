@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DataProvider } from "@/providers/DataProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "CapyHub's Dashboard",
@@ -39,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${inter.className}`}>
+      <body className={`${jetbrainsMono.variable} ${jetbrainsMono.className}`}>
         <ThemeProvider>
           <AuthProvider>
             <DataProvider>

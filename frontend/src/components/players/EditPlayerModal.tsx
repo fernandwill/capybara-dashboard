@@ -124,7 +124,7 @@ export default function EditPlayerModal({
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting || !name.trim()}
-            className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2 text-xs font-medium text-white shadow-md transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-xl bg-app-primary px-5 py-2 text-xs font-medium text-white shadow-md transition hover:bg-app-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isSubmitting ? (
               <>
@@ -153,7 +153,7 @@ export default function EditPlayerModal({
             }}
             placeholder="e.g. Yocelyn"
             required
-            className="w-full rounded-xl border border-app-border bg-app-input px-3.5 py-2.5 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full rounded-xl border border-app-border bg-app-input px-3.5 py-2.5 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
           />
         </div>
 
@@ -171,7 +171,7 @@ export default function EditPlayerModal({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Add any notes about this player..."
-            className="w-full resize-none rounded-xl border border-app-border bg-app-input p-3 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full resize-none rounded-xl border border-app-border bg-app-input p-3 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
           />
         </div>
 

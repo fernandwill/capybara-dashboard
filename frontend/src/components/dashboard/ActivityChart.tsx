@@ -88,7 +88,7 @@ export default function ActivityChart({
                       <div className="mt-0.5 text-[10px] text-app-text-secondary">
                         <span
                           className={`font-semibold ${
-                            mode === "hours" ? "text-emerald-400" : "text-blue-400"
+                            mode === "hours" ? "text-yellow-400" : "text-amber-400"
                           }`}
                         >
                           {mode === "hours"
@@ -117,8 +117,8 @@ export default function ActivityChart({
                       <div
                         className={`w-full rounded-t-md transition-all duration-300 ${
                           mode === "hours"
-                            ? "bg-gradient-to-t from-emerald-600/80 to-emerald-400 group-hover:from-emerald-500 group-hover:to-emerald-300 shadow-sm shadow-emerald-950/40"
-                            : "bg-gradient-to-t from-blue-600/80 to-blue-400 group-hover:from-blue-500 group-hover:to-blue-300 shadow-sm shadow-blue-950/40"
+                            ? "bg-gradient-to-t from-amber-500 to-yellow-400 group-hover:from-amber-400 group-hover:to-yellow-300 shadow-sm shadow-yellow-950/40"
+                            : "bg-gradient-to-t from-amber-700 to-amber-500 group-hover:from-amber-600 group-hover:to-amber-400 shadow-sm shadow-amber-950/40"
                         }`}
                         style={{ height: `${Math.max(percentage, 4)}%` }}
                       />
@@ -151,7 +151,7 @@ export default function ActivityChart({
               <span
                 className={`text-xs select-none transition ${
                   isCurrentMonth
-                    ? "font-bold text-emerald-400 underline underline-offset-4 decoration-emerald-500/50"
+                    ? "font-bold text-yellow-400 underline underline-offset-4 decoration-yellow-500/50"
                     : value > 0
                     ? "font-semibold text-app-text-primary"
                     : "font-normal text-app-text-muted hover:text-app-text-secondary"

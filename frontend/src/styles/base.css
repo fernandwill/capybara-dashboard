@@ -22,7 +22,8 @@ body {
    Dark slate palette shared by all dashboard components (Tailwind v4 @theme)
    ============================================================================= */
 @theme inline {
-    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    --font-sans: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     /* App design tokens resolve to the --app-* vars below, which flip between
        the light (:root) and dark (.dark) palettes at runtime. */
@@ -50,36 +51,36 @@ body {
 /* Light theme variables and base elements */
 @layer base {
     :root {
-        /* App design tokens — light palette */
-        --app-bg: #f6f7f9;
+        /* App design tokens — light palette (Golden Yuzu & Cedar) */
+        --app-bg: #f8f6f0;
         --app-card: #ffffff;
-        --app-border: #e2e8f0;
-        --app-border-hover: #94a3b8;
-        --app-text-primary: #0f172a;
-        --app-text-secondary: #475569;
-        --app-text-muted: #94a3b8;
-        --app-primary: #3b82f6;
-        --app-primary-hover: #2563eb;
-        --app-success: #22c55e;
-        --app-success-bg: rgba(34, 197, 94, 0.12);
-        --app-success-text: #16a34a;
-        --app-icon-green: #22c55e;
-        --app-icon-blue: #3b82f6;
-        --app-icon-purple: #a855f7;
-        --app-icon-orange: #f97316;
-        --app-hover: #eef1f5;
-        --app-input: #f1f4f8;
-        --app-selected: #e2e8f0;
-        --app-scrollbar-thumb: rgba(15, 23, 42, 0.25);
-        --app-scrollbar-thumb-hover: rgba(15, 23, 42, 0.35);
+        --app-border: #e9e4d8;
+        --app-border-hover: #bdae99;
+        --app-text-primary: #1c1915;
+        --app-text-secondary: #595246;
+        --app-text-muted: #a69c8c;
+        --app-primary: #ca8a04;
+        --app-primary-hover: #a16207;
+        --app-success: #16a34a;
+        --app-success-bg: rgba(22, 163, 74, 0.12);
+        --app-success-text: #15803d;
+        --app-icon-green: #16a34a;
+        --app-icon-blue: #0284c7;
+        --app-icon-purple: #9333ea;
+        --app-icon-orange: #eab308;
+        --app-hover: #f1ede3;
+        --app-input: #f5f2e9;
+        --app-selected: #e9e4d8;
+        --app-scrollbar-thumb: rgba(28, 25, 21, 0.22);
+        --app-scrollbar-thumb-hover: rgba(28, 25, 21, 0.35);
 
         --bg-color: #ffffff;
-        --text-color: #000000;
-        --card-bg: #f8f9fa;
-        --border-color: #e5e7eb;
+        --text-color: #1c1915;
+        --card-bg: #f8f6f0;
+        --border-color: #e9e4d8;
         --radius: 0.625rem;
-        --primary-color: #3b82f6;
-        --secondary-color: #22c55e;
+        --primary-color: #ca8a04;
+        --secondary-color: #16a34a;
 
         /* Shadcn light theme */
         --background: oklch(1 0 0);
@@ -117,33 +118,33 @@ body {
 
     /* Dark theme variables */
     .dark {
-        /* App design tokens — dark palette */
-        --app-bg: #0f1115;
-        --app-card: #16191f;
-        --app-border: #282c35;
-        --app-border-hover: #4b5563;
-        --app-text-primary: #f3f4f6;
-        --app-text-secondary: #9ca3af;
-        --app-text-muted: #6b7280;
-        --app-primary: #3b82f6;
-        --app-primary-hover: #2563eb;
-        --app-success: #22c55e;
-        --app-success-bg: rgba(34, 197, 94, 0.1);
-        --app-success-text: #4ade80;
-        --app-icon-green: #22c55e;
-        --app-icon-blue: #3b82f6;
-        --app-icon-purple: #a855f7;
-        --app-icon-orange: #f97316;
-        --app-hover: #1d222d;
-        --app-input: #12151c;
-        --app-selected: #1d222d;
-        --app-scrollbar-thumb: rgba(255, 255, 255, 0.15);
-        --app-scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
+        /* App design tokens — dark palette (Capybara Option 2: Golden Yuzu & Cedar) */
+        --app-bg: #11100e;
+        --app-card: #1a1714;
+        --app-border: #2c2720;
+        --app-border-hover: #4d4438;
+        --app-text-primary: #f7f4ee;
+        --app-text-secondary: #ada599;
+        --app-text-muted: #7a7062;
+        --app-primary: #eab308;
+        --app-primary-hover: #ca8a04;
+        --app-success: #10b981;
+        --app-success-bg: rgba(16, 185, 129, 0.1);
+        --app-success-text: #34d399;
+        --app-icon-green: #10b981;
+        --app-icon-blue: #38bdf8;
+        --app-icon-purple: #c084fc;
+        --app-icon-orange: #facc15;
+        --app-hover: #26221c;
+        --app-input: #151310;
+        --app-selected: #2c2720;
+        --app-scrollbar-thumb: rgba(247, 244, 238, 0.14);
+        --app-scrollbar-thumb-hover: rgba(247, 244, 238, 0.28);
 
-        --bg-color: #0f1115;
-        --text-color: #f3f4f6;
-        --card-bg: #16191f;
-        --border-color: #282c35;
+        --bg-color: #11100e;
+        --text-color: #f7f4ee;
+        --card-bg: #1a1714;
+        --border-color: #2c2720;
 
         /* Shadcn dark theme */
         --background: oklch(0.145 0 0);
@@ -180,9 +181,7 @@ body {
     }
 
     body {
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-            "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-            "Helvetica Neue", sans-serif;
+        font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         background-color: var(--app-bg);
         color: var(--app-text-primary);
         line-height: 1.6;

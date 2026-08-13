@@ -139,7 +139,7 @@ export default function UpcomingMatchesCard({
           <button
             type="button"
             onClick={onNewMatch}
-            className="flex items-center gap-1 rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-500"
+            className="flex items-center gap-1 rounded-xl bg-app-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-app-primary-hover"
           >
             <IconPlus size={14} />
             <span>New Match</span>
@@ -169,7 +169,7 @@ export default function UpcomingMatchesCard({
           <button
             type="button"
             onClick={onNewMatch}
-            className="mt-4 flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500"
+            className="mt-4 flex items-center gap-1.5 rounded-xl bg-app-primary px-4 py-2 text-xs font-semibold text-white transition hover:bg-app-primary-hover"
           >
             <IconPlus size={14} />
             <span>Schedule a Match</span>

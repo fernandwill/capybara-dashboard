@@ -59,7 +59,7 @@ export default function UpcomingMatchBanner({
           <button
             type="button"
             onClick={onNewMatch}
-            className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-500 shrink-0"
+            className="flex items-center gap-1.5 rounded-xl bg-app-primary px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-app-primary-hover shrink-0"
           >
             <IconPlus size={15} />
             <span>Schedule a Match</span>
@@ -72,15 +72,14 @@ export default function UpcomingMatchBanner({
   const courtCount = match.courtNumber || "4";
   const playersCount = match.players?.length || 0;
 
-  // ponytail: hero banner intentionally stays a dark navy gradient in both
-  // themes (accent element), so its white/gray text is kept as-is.
+  // ponytail: hero banner styled with Golden Yuzu & Cedar tones
   return (
     <div
       onClick={() => onMatchClick(match)}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-blue-500/30 bg-gradient-to-r from-[#0c1222] via-[#101728] to-[#0d121c] p-5 shadow-lg transition-all duration-200 hover:border-blue-500/60 hover:shadow-blue-950/30 hover:shadow-xl"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-yellow-500/30 bg-gradient-to-r from-[#181511] via-[#211c15] to-[#15130f] p-5 shadow-lg transition-all duration-200 hover:border-yellow-500/60 hover:shadow-yellow-950/30 hover:shadow-xl"
     >
       {/* Subtle background glow effect */}
-      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-blue-500/10 blur-3xl transition group-hover:bg-blue-500/20" />
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-yellow-500/10 blur-3xl transition group-hover:bg-yellow-500/20" />
       <div className="pointer-events-none absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-emerald-500/5 blur-3xl" />
 
       <div className="relative z-10 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
@@ -95,20 +94,20 @@ export default function UpcomingMatchBanner({
               Upcoming Match
             </span>
 
-            <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-blue-400">
+            <span className="rounded-full border border-yellow-500/20 bg-yellow-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-yellow-400">
               {courtCount} Courts • {playersCount} Players
             </span>
           </div>
 
           <div>
-            <h2 className="truncate text-lg sm:text-xl font-bold tracking-tight text-white transition group-hover:text-blue-300">
+            <h2 className="truncate text-lg sm:text-xl font-bold tracking-tight text-white transition group-hover:text-yellow-300">
               {match.title}
             </h2>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-300">
             <div className="flex items-center gap-1.5 text-gray-300">
-              <IconCalendarEvent size={14} className="text-blue-400 shrink-0" />
+              <IconCalendarEvent size={14} className="text-yellow-400 shrink-0" />
               <span>{formatDate(match.date)}</span>
             </div>
 
@@ -141,7 +140,7 @@ export default function UpcomingMatchBanner({
             </div>
           )}
 
-          <div className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition group-hover:bg-blue-500 group-hover:shadow-md">
+          <div className="flex items-center gap-1.5 rounded-xl bg-app-primary px-4 py-2 text-xs font-semibold text-white shadow-sm transition group-hover:bg-app-primary-hover group-hover:shadow-md">
             <span>View Match Details</span>
             <IconChevronRight size={14} className="transition group-hover:translate-x-0.5" />
           </div>

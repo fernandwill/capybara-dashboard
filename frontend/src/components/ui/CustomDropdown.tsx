@@ -121,7 +121,7 @@ export default function CustomDropdown<T extends string | number = string>({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={ariaLabel || placeholder}
-        className={`flex w-full items-center justify-between border border-app-border bg-app-input font-medium text-app-text-primary transition-all duration-150 hover:border-app-border-hover hover:bg-app-hover focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`flex w-full items-center justify-between border border-app-border bg-app-input font-medium text-app-text-primary transition-all duration-150 hover:border-app-border-hover hover:bg-app-hover focus:border-app-primary focus:outline-none focus:ring-1 focus:ring-app-primary disabled:cursor-not-allowed disabled:opacity-50 ${
           sizeClasses[size]
         } ${triggerClassName}`}
       >
@@ -142,7 +142,7 @@ export default function CustomDropdown<T extends string | number = string>({
         <IconChevronDown
           size={size === "sm" ? 13 : 15}
           className={`shrink-0 text-app-text-muted transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-blue-400" : ""
+            isOpen ? "rotate-180 text-app-primary" : ""
           }`}
         />
       </button>
@@ -177,7 +177,7 @@ export default function CustomDropdown<T extends string | number = string>({
                   size === "sm" ? "text-xs" : "text-sm"
                 } ${
                   isSelected
-                    ? "bg-blue-600/15 text-blue-400 font-semibold"
+                    ? "bg-app-primary/15 text-app-primary font-semibold"
                     : isFocused
                     ? "bg-app-selected text-app-text-primary"
                     : "text-app-text-secondary hover:bg-app-hover hover:text-app-text-primary"
@@ -202,7 +202,7 @@ export default function CustomDropdown<T extends string | number = string>({
                 {isSelected && (
                   <IconCheck
                     size={size === "sm" ? 13 : 15}
-                    className="shrink-0 text-blue-400 ml-2"
+                    className="shrink-0 text-app-primary ml-2"
                   />
                 )}
               </button>

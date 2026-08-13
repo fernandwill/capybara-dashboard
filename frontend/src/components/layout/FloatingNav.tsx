@@ -143,9 +143,9 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
         onClick={handleToggle}
         aria-haspopup="true"
         aria-expanded={isOpen}
-        className={`group relative flex items-center gap-2.5 rounded-full border border-app-border bg-app-input/90 py-1.5 pl-1.5 pr-3.5 shadow-lg backdrop-blur-md transition-all duration-200 hover:border-emerald-500/40 hover:bg-app-hover active:scale-95 ${
+        className={`group relative flex items-center gap-2.5 rounded-full border border-app-border bg-app-input/90 py-1.5 pl-1.5 pr-3.5 shadow-lg backdrop-blur-md transition-all duration-200 hover:border-yellow-500/40 hover:bg-app-hover active:scale-95 ${
           isOpen
-            ? "border-emerald-500/50 bg-app-hover ring-2 ring-emerald-500/20"
+            ? "border-yellow-500/50 bg-app-hover ring-2 ring-yellow-500/20"
             : ""
         }`}
         title="Open Navigation Menu"
@@ -161,12 +161,12 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
         </div>
         <span className="flex items-center gap-1.5 text-sm font-bold tracking-tight text-app-text-primary">
           CapyHub
-          <span className="text-xs text-emerald-400">✦</span>
+          <span className="text-xs text-yellow-400">✦</span>
         </span>
         <IconChevronDown
           size={14}
           className={`text-app-text-muted transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-emerald-400" : "group-hover:text-app-text-primary"
+            isOpen ? "rotate-180 text-yellow-400" : "group-hover:text-app-text-primary"
           }`}
         />
       </button>
@@ -194,14 +194,14 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
               {/* Header Badge */}
               <div className="mb-2.5 flex items-center justify-between px-2 pt-1">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md border border-yellow-500/30 bg-yellow-500/10 text-yellow-400">
                     <IconSparkles size={13} />
                   </div>
                   <span className="text-xs font-semibold uppercase tracking-wider text-app-text-muted">
                     Navigation
                   </span>
                 </div>
-                <span className="rounded-md border border-app-border bg-app-input px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                <span className="rounded-md border border-app-border bg-app-input px-2 py-0.5 text-[10px] font-medium text-yellow-400">
                   Menu
                 </span>
               </div>
@@ -217,14 +217,14 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
                       onClick={() => setIsOpen(false)}
                       className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${
                         item.isActive
-                          ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 font-semibold"
+                          ? "border border-yellow-500/20 bg-yellow-500/10 text-yellow-400 font-semibold"
                           : "border border-transparent text-app-text-secondary hover:bg-app-hover hover:text-app-text-primary"
                       }`}
                     >
                       <div
                         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${
                           item.isActive
-                            ? "bg-emerald-500/20 text-emerald-400"
+                            ? "bg-yellow-500/20 text-yellow-400"
                             : "bg-app-input text-app-text-muted group-hover:bg-app-hover group-hover:text-app-text-primary"
                         }`}
                       >

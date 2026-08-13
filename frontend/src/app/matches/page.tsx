@@ -333,7 +333,7 @@ export default function AllMatchesHistoryPage() {
                 variant={statusFilter === "UPCOMING" ? "primary" : "secondary"}
                 size="xs"
                 className={`font-semibold ${
-                  statusFilter === "UPCOMING" ? "bg-blue-500 hover:bg-blue-600" : "text-app-text-secondary hover:text-app-text-primary"
+                  statusFilter === "UPCOMING" ? "bg-app-primary hover:bg-app-primary-hover" : "text-app-text-secondary hover:text-app-text-primary"
                 }`}
                 onClick={() => handleFilterChange("UPCOMING")}
               >

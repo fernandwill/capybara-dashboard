@@ -200,7 +200,7 @@ export default function NewMatchModal({
               type="submit"
               form="new-match-form"
               disabled={isSubmitting}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex items-center gap-2 rounded-lg bg-app-primary px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-app-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? (
                 <>
@@ -237,7 +237,7 @@ export default function NewMatchModal({
                 required
                 placeholder="Match title..."
                 minLength={3}
-                className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+                className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
               />
             </div>
 
@@ -255,14 +255,14 @@ export default function NewMatchModal({
                   onChange={handleChange}
                   required
                   placeholder="Court location..."
-                  className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
                 />
               </div>
               <div>
                 <label htmlFor="courtNumber" className="mb-1.5 block text-xs font-medium text-app-text-secondary">
                   Court #
                 </label>
-                <div className="flex items-center rounded-lg border border-app-border bg-app-input transition-colors focus-within:border-blue-500">
+                <div className="flex items-center rounded-lg border border-app-border bg-app-input transition-colors focus-within:border-app-primary">
                   <button
                     type="button"
                     onClick={() => {
@@ -324,7 +324,7 @@ export default function NewMatchModal({
                     value={formData.date}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default function NewMatchModal({
                     value={formData.startTime}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -368,7 +368,7 @@ export default function NewMatchModal({
                     value={formData.endTime}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full rounded-lg border border-app-border bg-app-input py-2 pl-9 pr-3.5 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -386,7 +386,7 @@ export default function NewMatchModal({
                   placeholder="50,000"
                   min="0"
                   step="1000"
-                  className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+                  className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function NewMatchModal({
                 onChange={handleChange}
                 rows={3}
                 placeholder="Add any notes about this match..."
-                className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors resize-none"
+                className="w-full rounded-lg border border-app-border bg-app-input px-3.5 py-2 text-sm text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors resize-none"
               />
             </div>
           </div>

@@ -208,7 +208,7 @@ export default function SelectPlayersModal({
               type="button"
               onClick={handleApply}
               disabled={!hasSelectionChanges || isSubmitting}
-              className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-medium text-white shadow transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-1.5 rounded-lg bg-app-primary px-4 py-1.5 text-xs font-medium text-white shadow transition hover:bg-app-primary-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isSubmitting ? (
                 <>
@@ -241,7 +241,7 @@ export default function SelectPlayersModal({
             placeholder="Search players..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-app-border bg-app-input py-2 pl-9 pr-8 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full rounded-xl border border-app-border bg-app-input py-2 pl-9 pr-8 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
           />
           {searchQuery && (
             <button
@@ -261,7 +261,7 @@ export default function SelectPlayersModal({
             onClick={() => setActiveTab("all")}
             className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors ${
               activeTab === "all"
-                ? "bg-blue-600 text-white shadow"
+                ? "bg-app-primary text-white shadow"
                 : "text-app-text-muted hover:text-app-text-primary"
             }`}
           >
@@ -272,7 +272,7 @@ export default function SelectPlayersModal({
             onClick={() => setActiveTab("frequent")}
             className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors ${
               activeTab === "frequent"
-                ? "bg-blue-600 text-white shadow"
+                ? "bg-app-primary text-white shadow"
                 : "text-app-text-muted hover:text-app-text-primary"
             }`}
           >
@@ -283,7 +283,7 @@ export default function SelectPlayersModal({
             onClick={() => setActiveTab("favorites")}
             className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors ${
               activeTab === "favorites"
-                ? "bg-blue-600 text-white shadow"
+                ? "bg-app-primary text-white shadow"
                 : "text-app-text-muted hover:text-app-text-primary"
             }`}
           >
@@ -311,7 +311,7 @@ export default function SelectPlayersModal({
                   handleCreateNewPlayer();
                 }
               }}
-              className="w-full rounded-lg border border-app-border bg-app-input px-3 py-1.5 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-blue-500 focus:outline-none transition-colors"
+              className="w-full rounded-lg border border-app-border bg-app-input px-3 py-1.5 text-xs text-app-text-primary placeholder:text-app-text-muted focus:border-app-primary focus:outline-none transition-colors"
             />
             <button
               type="button"
@@ -358,7 +358,7 @@ export default function SelectPlayersModal({
                   onClick={() => handleTogglePlayer(player.id)}
                   className={`flex cursor-pointer items-center justify-between rounded-xl border px-3 py-2 transition-colors select-none ${
                     isSelected
-                      ? "border-blue-500/60 bg-app-selected text-app-text-primary"
+                      ? "border-app-primary/60 bg-app-selected text-app-text-primary"
                       : "border-transparent bg-app-input/60 text-app-text-secondary hover:border-app-border hover:bg-app-hover"
                   }`}
                 >
@@ -369,7 +369,7 @@ export default function SelectPlayersModal({
                       checked={isSelected}
                       onChange={() => handleTogglePlayer(player.id)}
                       onClick={(e) => e.stopPropagation()}
-                      className="h-4 w-4 rounded border-app-border bg-app-input text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
+                      className="h-4 w-4 rounded border-app-border bg-app-input text-app-primary focus:ring-0 cursor-pointer accent-[var(--app-primary)]"
                     />
                     <Image
                       src="/capybara-avatar.png"

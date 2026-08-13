@@ -80,7 +80,7 @@ export default function MatchPlayersSection({
               type="button"
               disabled={isLoadingPlayers}
               onClick={() => setIsPlayerPickerOpen(true)}
-              className="mt-3.5 flex items-center gap-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-400 transition hover:border-blue-500/50 hover:bg-blue-500/20 disabled:opacity-50"
+              className="mt-3.5 flex items-center gap-1.5 rounded-lg border border-app-primary/30 bg-app-primary/10 px-4 py-1.5 text-xs font-semibold text-app-primary transition hover:border-app-primary/50 hover:bg-app-primary/20 disabled:opacity-50"
             >
               <IconPlus size={14} />
               <span>Add Players</span>
@@ -138,7 +138,7 @@ export default function MatchPlayersSection({
           <button
             type="button"
             onClick={() => setIsPlayerPickerOpen(true)}
-            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/5 py-2 text-xs font-semibold text-blue-400 transition hover:border-blue-500/50 hover:bg-blue-500/15"
+            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-app-primary/30 bg-app-primary/5 py-2 text-xs font-semibold text-app-primary transition hover:border-app-primary/50 hover:bg-app-primary/15"
           >
             <IconPlus size={14} />
             <span>+ Add More Players</span>
