@@ -149,11 +149,16 @@ export default function ActivityChart({
           const value = mode === "hours" ? item.hours : item.matches;
           const isCurrentMonth =
             selectedYear === currentYear && idx === currentMonthIndex;
+          // On mobile, label every other month (keep the column so the
+          // labels stay aligned with the bars); show all on sm+ screens.
+          const hideOnMobile = idx % 2 === 1 && !isCurrentMonth;
 
           return (
             <div key={item.month} className="flex-1 text-center">
               <span
                 className={`text-xs select-none transition ${
+                  hideOnMobile ? "hidden sm:inline" : "inline"
+                } ${
                   isCurrentMonth
                     ? "font-bold text-yellow-400 underline underline-offset-4 decoration-yellow-500/50"
                     : value > 0
