@@ -309,14 +309,21 @@ export default function MatchDetailsPage() {
         {/* Navigation Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-app-text-muted">
           <Link
-            href="/matches"
+            href="/"
             className="flex items-center gap-1 transition hover:text-app-text-primary"
           >
             <IconArrowLeft size={13} />
+            <span>Dashboard</span>
+          </Link>
+          <IconChevronRight size={13} className="text-app-text-muted" />
+          <Link
+            href="/matches"
+            className="flex items-center gap-1 transition hover:text-app-text-primary"
+          >
             <span>Matches</span>
           </Link>
           <IconChevronRight size={13} className="text-app-text-muted" />
-          <span className="truncate font-medium text-app-text-secondary">
+          <span className="min-w-0 truncate font-medium text-app-text-secondary">
             {match.title}
           </span>
         </div>
