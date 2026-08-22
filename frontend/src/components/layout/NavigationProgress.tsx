@@ -34,7 +34,8 @@ export default function NavigationProgress() {
   // Intercept internal link clicks to start progress bar immediately (0ms feedback)
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      const target = (e.target as HTMLElement).closest("a");
+      if (!(e.target instanceof HTMLElement)) return;
+      const target = e.target.closest("a");
       if (!target) return;
 
       const href = target.getAttribute("href");

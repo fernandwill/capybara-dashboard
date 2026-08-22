@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/api-auth';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
@@ -121,7 +122,7 @@ export async function POST(request: Request) {
         name: trimmedName,
         email: email || null,
         phone: phone || null,
-        notes: typeof notes === "string" && notes.trim() ? notes.trim() : null,
+        notes: notes != null && notes.trim() ? notes.trim() : null,
         status,
       },
     });
@@ -130,7 +131,8 @@ export async function POST(request: Request) {
   } catch (error) {
     // Unique constraint on name (P2002) can be hit by a concurrent create that
     // slipped past the findFirst guard above.
-    if (error && typeof error === "object" && (error as { code?: string }).code === "P2002") {
+    // Prisma surfaces unique-index violations as P2002 known request errors.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return NextResponse.json({ error: "Player already exists." }, { status: 409 });
     }
     return handleApiError(error, ApiErrors.serverError('create player'));

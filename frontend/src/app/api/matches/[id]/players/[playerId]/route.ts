@@ -22,7 +22,7 @@ export async function PATCH(
   try {
     const { id: matchId, playerId } = await params;
     const body = await request.json();
-    const { paymentStatus } = body as { paymentStatus?: PaymentStatus };
+    const { paymentStatus } = body;
 
     const validStatuses: PaymentStatus[] = ["BELUM_SETOR", "SUDAH_SETOR"];
 

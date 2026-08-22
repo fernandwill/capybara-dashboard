@@ -76,7 +76,7 @@ export function useCourtManager({
       setCourts((prev) => {
         const next = [...prev];
         const court = { ...next[courtIndex] };
-        const teamSlots = [...court[team]] as [CourtSlot, CourtSlot];
+        const teamSlots: [CourtSlot, CourtSlot] = [{ ...court[team][0] }, { ...court[team][1] }];
         teamSlots[slotIndex] = { playerId };
         court[team] = teamSlots;
 
@@ -97,7 +97,7 @@ export function useCourtManager({
       setCourts((prev) => {
         const next = [...prev];
         const court = { ...next[courtIndex] };
-        const teamSlots = [...court[team]] as [CourtSlot, CourtSlot];
+        const teamSlots: [CourtSlot, CourtSlot] = [{ ...court[team][0] }, { ...court[team][1] }];
         teamSlots[slotIndex] = { playerId: null };
         court[team] = teamSlots;
 
@@ -134,16 +134,16 @@ export function useCourtManager({
   }, []);
 
   const handleFinishCourt = useCallback(
-    async (courtIndex: number, revalidateMatch: () => Promise<unknown>) => {
+    async (courtIndex: number, revalidateMatch: () => Promise<void>) => {
       const court = courts[courtIndex];
       if (!court || !matchIdRef.current) return;
 
       const teamAPlayerIds = court.teamA
         .map((s) => s.playerId)
-        .filter(Boolean) as string[];
+        .filter((id): id is string => id !== null);
       const teamBPlayerIds = court.teamB
         .map((s) => s.playerId)
-        .filter(Boolean) as string[];
+        .filter((id): id is string => id !== null);
       const allPlayedIds = [...teamAPlayerIds, ...teamBPlayerIds];
 
       if (allPlayedIds.length === 0) return;

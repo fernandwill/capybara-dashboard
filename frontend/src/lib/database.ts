@@ -1,8 +1,10 @@
 import {PrismaClient} from '@prisma/client';
 
-const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClient | undefined;
-};
+type PrismaGlobal = typeof globalThis & { prisma?: PrismaClient };
+
+// SAFETY: dev hot reload re-evaluates this module per reload; only globalThis
+// survives, so the singleton lives there and no other value ever assigns it.
+const globalForPrisma = globalThis as PrismaGlobal;
 
 const prisma = globalForPrisma.prisma ?? new PrismaClient();
 

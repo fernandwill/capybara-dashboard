@@ -12,55 +12,76 @@ interface ValidationResult<T> {
     errors?: string[];
 }
 
+// Raw JSON values as received from request.json() at the API boundary.
+type JsonValue =
+    | string
+    | number
+    | boolean
+    | null
+    | JsonValue[]
+    | { [key: string]: JsonValue };
+
+type JsonObject = { [key: string]: JsonValue };
+
 // Field validator types
-type FieldValidator = (value: unknown, fieldName: string) => string | null;
+type FieldValidator = (value: JsonValue | undefined, fieldName: string) => string | null;
+
+function isString(value: JsonValue | undefined): value is string {
+    return typeof value === "string";
+}
+
+function isNumber(value: JsonValue | undefined): value is number {
+    return typeof value === "number";
+}
 
 // Common validators
 const validators = {
-    required: (value: unknown, fieldName: string): string | null => {
+    required: (value: JsonValue | undefined, fieldName: string): string | null => {
         if (value === undefined || value === null || value === "") {
             return `${fieldName} is required`;
         }
         return null;
     },
 
-    string: (value: unknown, fieldName: string): string | null => {
-        if (value !== undefined && value !== null && typeof value !== "string") {
+    string: (value: JsonValue | undefined, fieldName: string): string | null => {
+        if (value !== undefined && value !== null && !isString(value)) {
             return `${fieldName} must be a string`;
         }
         return null;
     },
 
-    number: (value: unknown, fieldName: string): string | null => {
-        if (value !== undefined && value !== null && typeof value !== "number") {
+    number: (value: JsonValue | undefined, fieldName: string): string | null => {
+        if (value !== undefined && value !== null && !isNumber(value)) {
             return `${fieldName} must be a number`;
         }
         return null;
     },
 
-    email: (value: unknown, fieldName: string): string | null => {
+    email: (value: JsonValue | undefined, fieldName: string): string | null => {
         if (value !== undefined && value !== null && value !== "") {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (typeof value !== "string" || !emailRegex.test(value)) {
+            if (!isString(value) || !emailRegex.test(value)) {
                 return `${fieldName} must be a valid email address`;
             }
         }
         return null;
     },
 
-    date: (value: unknown, fieldName: string): string | null => {
+    date: (value: JsonValue | undefined, fieldName: string): string | null => {
         if (value !== undefined && value !== null) {
-            const date = new Date(value as string);
-            if (isNaN(date.getTime())) {
+            // ponytail: numeric timestamps were previously accepted; clients
+            // only ever send ISO date strings.
+            const date = isString(value) ? new Date(value) : null;
+            if (!date || isNaN(date.getTime())) {
                 return `${fieldName} must be a valid date`;
             }
         }
         return null;
     },
 
-    timeRange: (value: unknown, fieldName: string): string | null => {
+    timeRange: (value: JsonValue | undefined, fieldName: string): string | null => {
         if (value !== undefined && value !== null && value !== "") {
-            if (typeof value !== "string") {
+            if (!isString(value)) {
                 return `${fieldName} must be a string`;
             }
             const timeRangeRegex = /^\d{2}:\d{2}-\d{2}:\d{2}$/;
@@ -71,34 +92,38 @@ const validators = {
         return null;
     },
 
-    positiveNumber: (value: unknown, fieldName: string): string | null => {
+    positiveNumber: (value: JsonValue | undefined, fieldName: string): string | null => {
         if (value !== undefined && value !== null) {
-            if (typeof value !== "number" || value < 0) {
+            if (!isNumber(value) || value < 0) {
                 return `${fieldName} must be a positive number`;
             }
         }
         return null;
     },
 
-    enum: (allowedValues: string[]) => (value: unknown, fieldName: string): string | null => {
-        if (value !== undefined && value !== null && value !== "") {
-            if (!allowedValues.includes(value as string)) {
-                return `${fieldName} must be one of: ${allowedValues.join(", ")}`;
+    enum:
+        (allowedValues: string[]) =>
+        (value: JsonValue | undefined, fieldName: string): string | null => {
+            if (value !== undefined && value !== null && value !== "") {
+                if (!isString(value) || !allowedValues.includes(value)) {
+                    return `${fieldName} must be one of: ${allowedValues.join(", ")}`;
+                }
             }
-        }
-        return null;
-    },
+            return null;
+        },
 
-    minLength: (min: number) => (value: unknown, fieldName: string): string | null => {
-        if (value !== undefined && value !== null && typeof value === "string") {
-            if (value.trim().length < min) {
-                return `${fieldName} must be at least ${min} characters`;
+    minLength:
+        (min: number) =>
+        (value: JsonValue | undefined, fieldName: string): string | null => {
+            if (value !== undefined && value !== null && isString(value)) {
+                if (value.trim().length < min) {
+                    return `${fieldName} must be at least ${min} characters`;
+                }
             }
-        }
-        return null;
-    },
+            return null;
+        },
 
-    array: (value: unknown, fieldName: string): string | null => {
+    array: (value: JsonValue | undefined, fieldName: string): string | null => {
         if (value !== undefined && value !== null && !Array.isArray(value)) {
             return `${fieldName} must be an array`;
         }
@@ -116,7 +141,7 @@ type Schema = Record<string, FieldSchema>;
 /**
  * Validates data against a schema
  */
-function validate<T>(data: Record<string, unknown>, schema: Schema): ValidationResult<T> {
+function validate<T>(data: JsonObject, schema: Schema): ValidationResult<T> {
     const errors: string[] = [];
 
     for (const [fieldName, fieldSchema] of Object.entries(schema)) {
@@ -135,6 +160,8 @@ function validate<T>(data: Record<string, unknown>, schema: Schema): ValidationR
         return { success: false, errors };
     }
 
+    // SAFETY: every field declared in the schema passed its validators above,
+    // so data matches the contract T that callers derive from that schema.
     return { success: true, data: data as T };
 }
 
@@ -156,7 +183,7 @@ const schemas = {
         phone: { validators: [validators.string] },
         notes: { validators: [validators.string] },
         status: { validators: [validators.enum(["ACTIVE", "INACTIVE"])] },
-    } as Schema,
+    } satisfies Schema,
 
     // Partial updates: every validator tolerates undefined, so a PUT with only
     // a subset of fields still validates what it receives.
@@ -166,7 +193,7 @@ const schemas = {
         phone: { validators: [validators.string] },
         notes: { validators: [validators.string] },
         status: { validators: [validators.enum(["ACTIVE", "INACTIVE"])] },
-    } as Schema,
+    } satisfies Schema,
 
     createMatch: {
         title: { validators: [validators.required, validators.string, validators.minLength(3)] },
@@ -178,7 +205,7 @@ const schemas = {
         status: { validators: [validators.enum(["UPCOMING", "COMPLETED"])] },
         description: { validators: [validators.string] },
         playerIds: { validators: [validators.array] },
-    } as Schema,
+    } satisfies Schema,
 };
 
 export { validate, validationErrorResponse, schemas };

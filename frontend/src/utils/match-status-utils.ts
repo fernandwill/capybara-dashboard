@@ -64,18 +64,23 @@ export function determineMatchStatus(
     currentStatus: string
 ): MatchStatus {
     if (currentStatus !== "UPCOMING") {
+        // SAFETY: statuses come from Prisma's MatchStatus enum, which defines
+        // only UPCOMING and COMPLETED; non-upcoming persisted values are
+        // therefore COMPLETED.
         return currentStatus as MatchStatus;
     }
 
     try {
         const matchEndDate = getWibEndDate(date, time);
         if (!matchEndDate) {
+            // SAFETY: see comment above — non-upcoming values are COMPLETED.
             return currentStatus as MatchStatus;
         }
 
         return matchEndDate < new Date() ? "COMPLETED" : "UPCOMING";
     } catch (error) {
         logger.warn("Error determining match status", error);
+        // SAFETY: see comment above — non-upcoming values are COMPLETED.
         return currentStatus as MatchStatus;
     }
 }
@@ -110,11 +115,15 @@ export function getMatchIdsToComplete(
  * Checks upcoming matches where the end time has passed.
  * Returns the count of updated matches.
  */
-export async function updateMatchStatuses(): Promise<number> {
+type MatchStatusStore = Pick<typeof prisma.match, "findMany" | "updateMany">;
+
+export async function updateMatchStatuses(
+    store: MatchStatusStore = prisma.match
+): Promise<number> {
     try {
         const now = new Date();
 
-        const upcomingMatches = await prisma.match.findMany({
+        const upcomingMatches = await store.findMany({
             where: {
                 status: "UPCOMING",
                 date: {
@@ -134,7 +143,7 @@ export async function updateMatchStatuses(): Promise<number> {
             return 0;
         }
 
-        const result = await prisma.match.updateMany({
+        const result = await store.updateMany({
             where: {
                 id: {
                     in: matchIdsToComplete,

@@ -28,13 +28,14 @@ import SlotPickerModal, {
 import { useCourtManager } from "@/hooks/use-court-manager";
 import { usePlayers } from "@/hooks/use-players";
 import { authFetch } from "@/lib/auth-fetch";
-import { Match, Player, ModalState } from "@/types/types";
+import { Match, Player, MatchPlayer, ModalState } from "@/types/types";
 import { formatDate, formatTimeWithDuration } from "@/utils/formatters";
 import type { PlayerInMatch, FinishedGameHistory } from "@/types/match-types";
 
 // Shape returned by GET /api/matches/:id (match + per-match play counts +
 // persisted round history).
-interface MatchDetail extends Match {
+interface MatchDetail extends Omit<Match, "players"> {
+  players?: Array<MatchPlayer & { player: Player & { playCount?: number } }>;
   rounds: Array<{
     id: string;
     courtNumber: number;
@@ -45,8 +46,8 @@ interface MatchDetail extends Match {
 }
 
 export default function MatchDetailsPage() {
-  const params = useParams();
-  const matchId = params?.id as string;
+  const params = useParams<{ id: string }>();
+  const matchId = params?.id;
 
   // Match data — SWR-backed. The detail key lives in the shared cache, so
   // revisiting a match (or navigating from another page) renders instantly;
@@ -110,11 +111,10 @@ export default function MatchDetailsPage() {
   // In-match players enriched with per-match play counts (server truth).
   const players = useMemo<PlayerInMatch[]>(() => {
     return (matchData?.players ?? []).map((matchPlayer) => {
-      const p = matchPlayer.player as Player & { playCount?: number };
       return {
-        ...p,
+        ...matchPlayer.player,
         paymentStatus: matchPlayer.paymentStatus,
-        playCount: p.playCount ?? 0,
+        playCount: matchPlayer.player.playCount ?? 0,
       };
     });
   }, [matchData]);
@@ -301,7 +301,9 @@ export default function MatchDetailsPage() {
       : activeMobileCourtIndex;
 
   const finishCourt = (courtIndex: number) =>
-    courtManager.handleFinishCourt(courtIndex, revalidateMatch);
+    courtManager.handleFinishCourt(courtIndex, async () => {
+      await revalidateMatch();
+    });
 
   return (
     <AppLayout>

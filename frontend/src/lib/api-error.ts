@@ -21,14 +21,14 @@ interface ApiErrorOptions {
  * - Returns a consistent JSON error response
  */
 export function handleApiError(
-    error: unknown,
+    cause: unknown,
     options: ApiErrorOptions
 ): NextResponse {
     const { clientMessage, status = 500, context } = options;
 
     // Log the error with context
     const logMessage = context ? `${context}: ${clientMessage}` : clientMessage;
-    logger.error(logMessage, error);
+    logger.error(logMessage, cause);
 
     // Return consistent error response
     return NextResponse.json(

@@ -17,12 +17,12 @@ const fetcher = async (url: string) => {
 // Table -> SWR cache keys affected by a change on that table. The realtime
 // payload tells us which tables actually changed, so a burst only revalidates
 // the keys that need it instead of refetching everything.
-const TABLE_KEYS: Record<string, string[]> = {
+const TABLE_KEYS = {
   matches: ["/api/matches", "/api/stats", "/api/stats/monthly"],
   players: ["/api/players"],
   match_players: ["/api/matches", "/api/players"],
   payments: ["/api/matches"],
-};
+} satisfies Record<string, string[]>;
 
 /**
  * Single app-wide realtime subscription. Any row change in a watched table
@@ -36,7 +36,9 @@ function RealtimeSync() {
   useRealtimeRefresh((tables) => {
     const keys = new Set<string>();
     for (const table of tables) {
-      for (const key of TABLE_KEYS[table] ?? []) {
+      // SAFETY: realtime table names outside the map above revalidate
+      // nothing; the ?? [] fallback handles that at runtime.
+      for (const key of TABLE_KEYS[table as keyof typeof TABLE_KEYS] ?? []) {
         keys.add(key);
       }
     }
@@ -49,7 +51,7 @@ function RealtimeSync() {
     // page (status, play counts, round history), so revalidate those keys too.
     if (tables.some((t) => t === "matches" || t === "match_players" || t === "payments")) {
       void mutate(
-        (key) =>
+        (key): key is string =>
           typeof key === "string" &&
           key.startsWith("/api/matches/") &&
           key !== "/api/matches"

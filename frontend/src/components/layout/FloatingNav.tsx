@@ -57,12 +57,15 @@ export default function FloatingNav({ onLogout }: FloatingNavProps) {
   // Close on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
+      const clickedOutsideMenu =
+        event.target instanceof Node &&
         menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
+        !menuRef.current.contains(event.target);
+      const clickedOutsideTrigger =
+        event.target instanceof Node &&
         triggerRef.current &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
+        !triggerRef.current.contains(event.target);
+      if (clickedOutsideMenu && clickedOutsideTrigger) {
         setIsOpen(false);
       }
     }

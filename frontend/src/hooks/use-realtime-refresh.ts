@@ -54,7 +54,7 @@ export function useRealtimeRefresh(onChange: (tables: string[]) => void) {
         "postgres_changes",
         { event: "*", schema: "public", table },
         (payload) => {
-          scheduleRefresh(payload.table as string);
+          scheduleRefresh(payload.table);
         }
       );
     }

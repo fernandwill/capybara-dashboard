@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import prisma from '@/lib/database';
 import { requireAdminUser } from '@/lib/api-auth';
 import { validate, validationErrorResponse, schemas } from '@/lib/validation';
@@ -57,7 +58,8 @@ export async function PUT(
     const { name, email, phone, notes, status } = body;
 
     // Reject renaming to a name already used by another player
-    if (typeof name === "string" && name.trim()) {
+    // Schema validation above guarantees name is a string or absent.
+    if (name != null && name.trim()) {
       const existingPlayer = await prisma.player.findFirst({
         where: {
           name: name.trim(),
@@ -70,12 +72,13 @@ export async function PUT(
       }
     }
 
-    const data: Record<string, unknown> = {};
+    const data: Prisma.PlayerUpdateInput = {};
     if (name !== undefined) data.name = name.trim();
     if (email !== undefined) data.email = email;
     if (phone !== undefined) data.phone = phone;
-    if (notes !== undefined) {
-      data.notes = typeof notes === "string" && notes.trim() ? notes.trim() : null;
+    if (notes != null) {
+      // Schema validation above guarantees notes is a string or absent.
+      data.notes = notes.trim() ? notes.trim() : null;
     }
     if (status !== undefined) data.status = status;
 

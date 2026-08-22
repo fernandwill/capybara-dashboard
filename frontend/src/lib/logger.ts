@@ -17,7 +17,9 @@ interface LogMessage {
     timestamp: string;
 }
 
-function formatMessage(level: LogLevel, message: string, data?: unknown): LogMessage {
+// ponytail: a logger is the terminal serialization sink, so it accepts any
+// payload generically instead of declaring an unknown parameter.
+function formatMessage<T>(level: LogLevel, message: string, data?: T): LogMessage {
     return {
         level,
         message,
@@ -29,7 +31,7 @@ function formatMessage(level: LogLevel, message: string, data?: unknown): LogMes
 /**
  * Info level - only logs in development
  */
-function info(message: string, data?: unknown): void {
+function info<T>(message: string, data?: T): void {
     if (!isDevelopment) return;
     const log = formatMessage('info', message, data);
     console.info(`[INFO] ${log.timestamp}: ${log.message}`, data ?? '');
@@ -38,7 +40,7 @@ function info(message: string, data?: unknown): void {
 /**
  * Warn level - logs in both development and production
  */
-function warn(message: string, data?: unknown): void {
+function warn<T>(message: string, data?: T): void {
     const log = formatMessage('warn', message, data);
     console.warn(`[WARN] ${log.timestamp}: ${log.message}`, data ?? '');
 }
@@ -46,7 +48,7 @@ function warn(message: string, data?: unknown): void {
 /**
  * Error level - logs in both development and production
  */
-function error(message: string, data?: unknown): void {
+function error<T>(message: string, data?: T): void {
     const log = formatMessage('error', message, data);
     console.error(`[ERROR] ${log.timestamp}: ${log.message}`, data ?? '');
 

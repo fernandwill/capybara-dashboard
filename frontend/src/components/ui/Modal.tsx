@@ -5,7 +5,7 @@ import { IconX } from "@tabler/icons-react";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 
-const SIZE_MAP: Record<ModalSize, string> = {
+const SIZE_MAP = {
   sm: "max-w-sm",
   md: "max-w-md",
   lg: "max-w-lg",
@@ -13,7 +13,11 @@ const SIZE_MAP: Record<ModalSize, string> = {
   "2xl": "max-w-2xl",
   "3xl": "max-w-3xl",
   "4xl": "max-w-4xl",
-};
+} satisfies Record<ModalSize, string>;
+
+function isText(value: React.ReactNode): value is string {
+  return typeof value === "string";
+}
 
 export interface ModalProps {
   isOpen: boolean;
@@ -59,6 +63,8 @@ export default function Modal({
   useEffect(() => {
     if (!isOpen) return;
 
+    // SAFETY: the element focused when the modal opened is the trigger
+    // control (an HTML button/link), so focus() below is available on it.
     previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
 
     const raf = requestAnimationFrame(() => {
@@ -144,7 +150,7 @@ export default function Modal({
       role="dialog"
       aria-modal="true"
       tabIndex={-1}
-      aria-label={typeof title === "string" ? title : ariaLabel || "Modal"}
+      aria-label={isText(title) ? title : ariaLabel || "Modal"}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 sm:p-6 backdrop-blur-sm transition-opacity outline-none animate-in fade-in duration-150"
       onClick={(e) => {
         if (closeOnBackdropClick && e.target === e.currentTarget) {

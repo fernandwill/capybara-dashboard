@@ -56,10 +56,10 @@ export function assignUnassignedPlayers(
   queue: QueuePlayer[]
 ): CourtState[] {
   const available = [...queue];
-  const next = courts.map((c) => ({
+  const next = courts.map((c): CourtState => ({
     ...c,
-    teamA: [{ ...c.teamA[0] }, { ...c.teamA[1] }] as [CourtSlot, CourtSlot],
-    teamB: [{ ...c.teamB[0] }, { ...c.teamB[1] }] as [CourtSlot, CourtSlot],
+    teamA: [{ ...c.teamA[0] }, { ...c.teamA[1] }],
+    teamB: [{ ...c.teamB[0] }, { ...c.teamB[1] }],
   }));
 
   // Pass 1: complete courts that already have players, most-full first so a
